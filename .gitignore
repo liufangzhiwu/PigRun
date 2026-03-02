@@ -1,4 +1,7 @@
 ﻿PigRun/Library
 PigRun/Temp
 PigRun/Logs
-PigRun
+PigRun/.idea
+PigRun/obj
+PigRun/Assembly-CSharp-Editor.csproj
+PigRun/Assembly-CSharp.csproj
