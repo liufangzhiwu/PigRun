@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PigPrefab_PrefabInfo
   m_EditorClassIdentifier: 
   prefab: {fileID: 6647560384166464273, guid: 0fd6e41127dcd0446bfa80e71f2648be, type: 3}
-  rows: 2
-  cols: 1
+  rows: 6
+  cols: 3
   pivotRow: -1
   pivotCol: -1

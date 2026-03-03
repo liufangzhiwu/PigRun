@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
 
     public void StartGamePanel()
     {
+        MapData level1 = LevelManager.Instance.GetLevel("level1");
         GamePanel.SetActive(true);
     }
     
