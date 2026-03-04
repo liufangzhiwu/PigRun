@@ -15,36 +15,6 @@ MonoBehaviour:
   rows: 20
   cols: 20
   cellSize: 0.21
-  origin: {x: -2.48, y: 0, z: 0}
+  origin: {x: 0, y: 0, z: 0}
   version: 1.0
-  items:
-  - info: {fileID: 11400000, guid: 3d58d69fd176add4bb6e8aaf7bf7eefd, type: 2}
-    gridPos: {x: 6, y: 15}
-    rotIndex: 1
-  - info: {fileID: 11400000, guid: 3d58d69fd176add4bb6e8aaf7bf7eefd, type: 2}
-    gridPos: {x: 6, y: 9}
-    rotIndex: 1
-  - info: {fileID: 11400000, guid: 3d58d69fd176add4bb6e8aaf7bf7eefd, type: 2}
-    gridPos: {x: 10, y: 12}
-    rotIndex: 0
-  - info: {fileID: 11400000, guid: 3d58d69fd176add4bb6e8aaf7bf7eefd, type: 2}
-    gridPos: {x: 10, y: 8}
-    rotIndex: 0
-  - info: {fileID: 11400000, guid: 3d58d69fd176add4bb6e8aaf7bf7eefd, type: 2}
-    gridPos: {x: 3, y: 9}
-    rotIndex: 1
-  - info: {fileID: 11400000, guid: 3d58d69fd176add4bb6e8aaf7bf7eefd, type: 2}
-    gridPos: {x: 15, y: 11}
-    rotIndex: 1
-  - info: {fileID: 11400000, guid: 3d58d69fd176add4bb6e8aaf7bf7eefd, type: 2}
-    gridPos: {x: 10, y: 16}
-    rotIndex: 0
-  - info: {fileID: 11400000, guid: 3d58d69fd176add4bb6e8aaf7bf7eefd, type: 2}
-    gridPos: {x: 15, y: 5}
-    rotIndex: 1
-  - info: {fileID: 11400000, guid: 3d58d69fd176add4bb6e8aaf7bf7eefd, type: 2}
-    gridPos: {x: 10, y: 3}
-    rotIndex: 1
-  - info: {fileID: 11400000, guid: 3d58d69fd176add4bb6e8aaf7bf7eefd, type: 2}
-    gridPos: {x: 5, y: 5}
-    rotIndex: 2
+  items: []
