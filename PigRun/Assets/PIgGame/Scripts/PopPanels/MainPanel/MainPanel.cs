@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace PigGame
 {
     
-    public class MainPanel : MonoBehaviour
+    public class MainPanel : UIBase
     {
         
         [SerializeField] private Button LevelButton;

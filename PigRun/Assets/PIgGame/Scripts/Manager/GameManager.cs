@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    [SerializeField] private GameObject GamePanel;
+    //[SerializeField] private GameObject GamePanel;
 
     private void Awake()
     {
@@ -15,17 +15,22 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        UIManager.Instance.ShowPanel(PanelType.MainPanel);
+        UIManager.Instance.ShowPanel(PanelType.MenuPanel);
     }
 
     public void StartGamePanel()
     {
+        UIManager.Instance.HidePanel(PanelType.MainPanel);
+        UIManager.Instance.ShowPanel(PanelType.GamePanel);
+        
         MapData level1 = LevelManager.Instance.GetLevel("level1");
-        GamePanel.SetActive(true);
+        AudioManager.Instance.PlayBackgroundMusic("game-bgm"); // 播放默认音乐
+        //GamePanel.SetActive(true);
     }
     
     public void BackHomePanel()
     {
-        GamePanel.SetActive(false);
+        //GamePanel.SetActive(false);
     }
 }

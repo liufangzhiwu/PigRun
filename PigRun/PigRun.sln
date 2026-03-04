@@ -1,7 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DOTweenPro.EditorScripts", "DOTweenPro.EditorScripts.csproj", "{423f1434-f57a-e5cd-142d-707dd90e80ff}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{7c8a9119-d586-bdf1-f006-0326f5165673}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DOTween.Modules", "DOTween.Modules.csproj", "{96acafdc-c698-7b84-7ed1-e16a71ce0773}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DOTweenPro.Scripts", "DOTweenPro.Scripts.csproj", "{4c70470c-742b-3023-d509-33d441afaa6c}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{fe6ef6cd-be54-7e18-5fb4-9b350f339f35}"
 EndProject
@@ -10,8 +16,14 @@ Global
 		Debug|Any CPU = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{423f1434-f57a-e5cd-142d-707dd90e80ff}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{423f1434-f57a-e5cd-142d-707dd90e80ff}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7c8a9119-d586-bdf1-f006-0326f5165673}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7c8a9119-d586-bdf1-f006-0326f5165673}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96acafdc-c698-7b84-7ed1-e16a71ce0773}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96acafdc-c698-7b84-7ed1-e16a71ce0773}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4c70470c-742b-3023-d509-33d441afaa6c}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4c70470c-742b-3023-d509-33d441afaa6c}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{fe6ef6cd-be54-7e18-5fb4-9b350f339f35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{fe6ef6cd-be54-7e18-5fb4-9b350f339f35}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection

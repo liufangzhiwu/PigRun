@@ -41,9 +41,24 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Base
+  - name: BasePanel
     uniqueID: 329134687
     locked: 0
-  - name: Menu
+  - name: MenuPanel
     uniqueID: 2275738799
+    locked: 0
+  - name: PopPanel
+    uniqueID: 3847782529
+    locked: 0
+  - name: UpPopPanel
+    uniqueID: 1207280069
+    locked: 0
+  - name: UpPopTwoPanel
+    uniqueID: 1567001645
+    locked: 0
+  - name: RewardPanel
+    uniqueID: 4069208459
+    locked: 0
+  - name: TipsPanel
+    uniqueID: 3433492867
     locked: 0
