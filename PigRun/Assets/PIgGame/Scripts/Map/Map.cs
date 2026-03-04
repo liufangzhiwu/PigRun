@@ -149,15 +149,17 @@ public class Map : MonoBehaviour
     /// <summary>
     /// 顺时针旋转后，锚点在占用矩阵中的行列索引映射
     /// </summary>
-    Vector2Int RotatedPivot(Vector2Int pivot, int rotIndex, Vector2Int dims0)
+    Vector2Int RotatedPivot(int rotIndex, Vector2Int dims0)
     {
         // Step 1：归一化旋转索引到 [0,3]
         rotIndex = ((rotIndex % 4) + 4) % 4;
         // Step 2：根据旋转索引计算 pivot 的映射位置
-        if (rotIndex == 0) return pivot;
-        if (rotIndex == 1) return new Vector2Int(pivot.y, pivot.x);
-        if (rotIndex == 2) return new Vector2Int(dims0.x - 1 - pivot.x, dims0.y - 1 - pivot.y);
-        return new Vector2Int(dims0.y - 1 - pivot.y, dims0.x - 1 - pivot.x);
+        if (rotIndex == 0) return new Vector2Int(dims0.x, 0);
+        if (rotIndex == 1) return new Vector2Int(dims0.y, dims0.x);
+        if (rotIndex == 2) return new Vector2Int(0 , dims0.y);
+        if (rotIndex == 3) return new Vector2Int(0, 0);
+        //return new Vector2Int(dims0.y - 1 - pivot.y, dims0.x - 1 - pivot.x);
+        return new Vector2Int(dims0.y - 1, dims0.x - 1);
     }
 
     /// <summary>
@@ -170,9 +172,10 @@ public class Map : MonoBehaviour
         // Step 2：计算未旋转时的 pivot
         var piv0 = PivotRC(info);
         // Step 3：计算旋转后 pivot 在占用矩阵中的索引
-        var pivR = RotatedPivot(piv0, rotIndex, dims0);
+        var pivR = RotatedPivot(rotIndex, dims0);
         // Step 4：pivotGrid 减去旋转 pivot 得到占用矩形的左下角（anchor）
         return new Vector2Int(pivotGrid.x - pivR.x, pivotGrid.y - pivR.y);
+        //return new Vector2Int(pivotGrid.x, pivotGrid.y);
     }
 
     // ==================== 边界和占用检测 ====================
@@ -258,6 +261,7 @@ public class Map : MonoBehaviour
     }
 
 
+    
 
     // ==================== 数据资产加载 ====================
     /// <summary>
@@ -287,7 +291,7 @@ public class Map : MonoBehaviour
             if (!InBounds(anchor, dims)) continue;
             var obj = Instantiate(it.info.prefab, transform);
             var baseRot = obj.transform.rotation;
-            obj.transform.rotation = Quaternion.AngleAxis(it.rotIndex * 90f, Vector3.up) * baseRot;
+            obj.transform.rotation = Quaternion.AngleAxis((it.rotIndex) * 90f, Vector3.up) * baseRot;
             obj.transform.position = FootprintWorldCenter(anchor, dims);
             var mi = obj.GetComponent<MapItem>();
             if (mi == null) mi = obj.AddComponent<MapItem>();

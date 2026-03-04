@@ -127,8 +127,9 @@ public class LevelManager : MonoBehaviour
             item.gridPos = new Vector2Int(gridX, gridY);
 
             // 旋转索引 (0,1,2,3 对应 0°,90°,180°,270°)
-            item.rotIndex = pig.angle / 90;
-
+            //item.rotIndex = pig.angle / 90;
+            item.rotIndex = (pig.angle / 90-1) % 4;   // 新映射
+            
             mapData.items.Add(item);
         }
 
