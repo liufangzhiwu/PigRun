@@ -242,7 +242,7 @@ public class UIManager : MonoBehaviour
                 panelName);
                 
             panelData.prefab = AssetBundleLoader.SharedInstance.LoadGameObject(
-                panelData.bundleName.ToLower(), 
+                panelName.ToLower(), 
                 panelName);
         }
 

@@ -1,5 +1,5 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15,19 +15,16 @@ MonoBehaviour:
   viewsData:
   - panelName: MainPanel
     panelLayer: BasePanel
-    bundleName: mainpanel
     spriteAtlasName: 
-    prefab: {fileID: 2508230401924753788, guid: ced4f644b3e41d6448ce7f348b97936d,
+    prefab: {fileID: 2508230401924753788, guid: afeac25d812f45c4b9eb791bab695dbf,
       type: 3}
   - panelName: MenuPanel
     panelLayer: BasePanel
-    bundleName: menupanel
     spriteAtlasName: 
-    prefab: {fileID: 3024168589130899512, guid: 8d757dade3725104282bf2df52e4a93f,
+    prefab: {fileID: 3024168589130899512, guid: 1ae92811742ab594eb9e3b4c5b2ceb9e,
       type: 3}
   - panelName: GamePanel
     panelLayer: BasePanel
-    bundleName: menupanel
     spriteAtlasName: 
-    prefab: {fileID: 2426500168314530211, guid: f8930c19a0b279745b56e149ac5fbc0d,
+    prefab: {fileID: 2426500168314530211, guid: 936a5bc41810e7946a513f68134c12ff,
       type: 3}

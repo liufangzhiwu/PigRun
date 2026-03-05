@@ -14,7 +14,7 @@ public class AudioManager : MonoBehaviour
     public AudioSource audioSPrefab; 
     private ObjectPool audioSourcePool;
     
-    float normalVolume = 0.25f; // 正常音量
+    float normalVolume = 1f; // 正常音量
     
     private void Awake()
     {
@@ -70,7 +70,8 @@ public class AudioManager : MonoBehaviour
         
         // 设置并播放
         source.clip = clip;
-        source.volume = GameDataManager.Instance.UserData.IsSoundOn ? normalVolume : 0;
+        //source.volume = GameDataManager.Instance.UserData.IsSoundOn ? normalVolume : 0;
+        source.volume = normalVolume;
         source.pitch = 1;
         source.loop = false;
         source.Play();
@@ -130,11 +131,11 @@ public class AudioManager : MonoBehaviour
     {
         
         //修复1：确保使用正确的音频配置
-        FixAudioConfiguration();
+        //FixAudioConfiguration();
         
         
         // 修复4：监控和自动恢复
-        StartCoroutine(AudioHealthMonitor());
+        //StartCoroutine(AudioHealthMonitor());
     }
     
     private void FixAudioConfiguration()
@@ -212,14 +213,14 @@ public class AudioManager : MonoBehaviour
     {             
         yield return new WaitForSeconds(transitionTime);
         
-        if (!GameDataManager.Instance.UserData.IsMusicOn)
-        {
-            musicSource.Stop(); // 如果音乐关闭，停止播放
-        }
-        else
-        {
+        // if (!GameDataManager.Instance.UserData.IsMusicOn)
+        // {
+        //     musicSource.Stop(); // 如果音乐关闭，停止播放
+        // }
+        // else
+        // {
             PlayBackgroundMusic("menu-bgm"); // 播放默认音乐
-        }
+        //}
     }
     
     public void ToggleMusic()
@@ -312,6 +313,7 @@ public class AudioManager : MonoBehaviour
             yield return null;
         }
         source.volume = targetVolume;
+        Debug.Log("背景音乐播放"+source.volume);
     }
     
     public void TriggerVibration(long milliseconds = 5,int intensity=50,int iointensity=1)

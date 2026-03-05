@@ -14,7 +14,7 @@ public class GamePanels : ScriptableObject
         public string panelName;
         [StringInList(typeof(UIPanelLayer), "GetPanelLayers")]
         public string panelLayer;            
-        public string bundleName;
+        //public string bundleName;
         public string spriteAtlasName;
         public GameObject prefab;
     }

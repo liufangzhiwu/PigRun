@@ -1,17 +1,16 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &1098769895241669504
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 645392698739956524}
   - component: {fileID: 5736749202375274434}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: UIBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -56,15 +55,14 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3348149280488444271}
   - component: {fileID: 8280429790780138894}
   - component: {fileID: 7358129262942564822}
   - component: {fileID: 5780311666598182103}
-  - component: {fileID: 2874353291398327990}
+  - component: {fileID: 3558257831892474313}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: MainPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -140,7 +138,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &2874353291398327990
+--- !u!114 &3558257831892474313
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -149,7 +147,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2508230401924753788}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a45c2a290efd9b24e950e46b92dba8ec, type: 3}
+  m_Script: {fileID: 11500000, guid: 55702d1c475ed7d418ae17527a59baeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   LevelButton: {fileID: 3394200111808309017}
@@ -159,14 +157,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 871136742145997141}
   - component: {fileID: 6784329196807523554}
   - component: {fileID: 2060918703606719987}
   - component: {fileID: 3394200111808309017}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: LevelButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -221,7 +218,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fb9a421075b87fd4492b62612fdbbb17, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ea78614fdf135bd448b7a773e2f3b421, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -281,13 +278,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4454236157551206563}
   - component: {fileID: 2547702562493788601}
   - component: {fileID: 5630192877518882952}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -341,7 +337,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 69e43398b1eccfa4d8188c6e6433b17b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c12ea0ee4203eb843a6487ac948af938, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -357,7 +353,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2959746078294462324}
   - component: {fileID: 1053868132254293651}
@@ -365,7 +361,6 @@ GameObject:
   - component: {fileID: 104137516368364991}
   - component: {fileID: 8101311546749712993}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (Legacy)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -420,7 +415,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 3162df505a6246a4f99bff5c4ba402dd, type: 3}
+    m_Font: {fileID: 12800000, guid: 7494a1187570a3e48826a0d72e27e5ba, type: 3}
     m_FontSize: 80
     m_FontStyle: 1
     m_BestFit: 1

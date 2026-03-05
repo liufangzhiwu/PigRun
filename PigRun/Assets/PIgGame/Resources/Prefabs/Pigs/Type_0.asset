@@ -1,5 +1,5 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b502b9062456a849bdb91f08dccffec, type: 3}
   m_Name: Type_0
   m_EditorClassIdentifier: 
-  prefab: {fileID: 6647560384166464273, guid: 0fd6e41127dcd0446bfa80e71f2648be, type: 3}
+  prefab: {fileID: 6647560384166464273, guid: c252758fc9fe5c74f901baf82f477f7a, type: 3}
   rows: 6
   cols: 3
   pivotRow: -1

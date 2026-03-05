@@ -82,7 +82,7 @@ public class AssetBundleBuilder : EditorWindow
             return;
         }
 
-        string[] assetTypes = new[] { "*.spriteatlas", "*.prefab", "*.csv", "*.mp4", "*.txt", "*.wav", "*.unity", "*.asset", "*.ttf","*.mat" };
+        string[] assetTypes = new[] { "*.spriteatlas", "*.prefab", "*.csv", "*.mp4", "*.txt", "*.wav", "*.unity", "*.asset", "*.ttf","*.mat","*.json" };
         var assetPaths = assetTypes.SelectMany(assetType => Directory.GetFiles(folderPath, assetType, SearchOption.AllDirectories)).ToArray();
         var bundleNames = GetBundleNames(assetPaths);
         SetAssetBundleNames(assetPaths, bundleNames);

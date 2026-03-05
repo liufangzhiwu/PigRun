@@ -1,18 +1,17 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &134454430684937964
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3569250396758870}
   - component: {fileID: 3665609127572721725}
   - component: {fileID: 7781836261955888419}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text (Legacy)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86,13 +85,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5347788392818484058}
   - component: {fileID: 5443352198643191814}
   - component: {fileID: 8680106493509300090}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -162,13 +160,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 1806920227219264877}
   - component: {fileID: 3192565339165691544}
   - component: {fileID: 5900072997618128461}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -238,16 +235,15 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8376866762686680680}
   - component: {fileID: -355956859974786508}
-  - component: {fileID: 8539469695385708457}
   - component: {fileID: 801689464436795928}
   - component: {fileID: 3929930095147131879}
   - component: {fileID: 4938259999930138055}
+  - component: {fileID: 3602300740330946434}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: MenuPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -283,18 +279,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3024168589130899512}
   m_CullTransparentMesh: 1
---- !u!114 &8539469695385708457
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3024168589130899512}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c492989e46d6a84c90938143e16954b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!223 &801689464436795928
 Canvas:
   m_ObjectHideFlags: 0
@@ -347,13 +331,25 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &3602300740330946434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3024168589130899512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2b82a6efa8536b4ba9e24e4e832c201, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4732368726963434277
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4917123014269334453}
   - component: {fileID: 8170329828407908642}
@@ -361,7 +357,6 @@ GameObject:
   - component: {fileID: 3096475399072548934}
   - component: {fileID: 1672135179364520840}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: feedbackBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -488,7 +483,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2386522571079063164}
   - component: {fileID: 7118530758184056456}
@@ -498,7 +493,6 @@ GameObject:
   - component: {fileID: 5478541814475169475}
   - component: {fileID: 6873066178796011962}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Coinstable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -555,8 +549,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e8cb434311f6c2e44b3a6443bff330ff, type: 3}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: ae37eb82f79d12d4e960d61aec78c972, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -667,14 +661,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4727513832124781058}
   - component: {fileID: 176832865076089887}
   - component: {fileID: 6267269574116299687}
   - component: {fileID: 4660417414320376449}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -729,7 +722,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 3162df505a6246a4f99bff5c4ba402dd, type: 3}
+    m_Font: {fileID: 12800000, guid: 7494a1187570a3e48826a0d72e27e5ba, type: 3}
     m_FontSize: 55
     m_FontStyle: 0
     m_BestFit: 1
@@ -763,13 +756,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 5058187209952751540}
   - component: {fileID: 4845236352661089388}
   - component: {fileID: 1403143967626836493}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: HeadBtns
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -842,14 +834,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 8714892691680924344}
   - component: {fileID: 8369039864370634720}
   - component: {fileID: 5673532709782126288}
   - component: {fileID: 6105819173516958875}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: systemButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -948,7 +939,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 96952ecf7d4697e429ff0391ca3fe65f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 576b393f4446724438e8003eed21ac6b, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -964,14 +955,13 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 2392269058798808669}
   - component: {fileID: 2812519569131325}
   - component: {fileID: 341587217236408207}
   - component: {fileID: 7537188135427826925}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: gmBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1086,13 +1076,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 3300433921927202891}
   - component: {fileID: 4858709399332280020}
   - component: {fileID: 35840849647798724}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: CoinIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1146,7 +1135,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 458192af1d5cb624ea41703c082adfee, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e9b7a1beba612d2489646c387b5cc9f3, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -1162,13 +1151,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 430268234540201000}
   - component: {fileID: 1123823626890820175}
   - component: {fileID: 2794569280799796081}
   m_Layer: 5
-  m_HasEditorInfo: 1
   m_Name: add
   m_TagString: Untagged
   m_Icon: {fileID: 0}

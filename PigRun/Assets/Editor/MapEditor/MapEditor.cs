@@ -12,7 +12,7 @@ public class MapEditor : Editor
 
     void OnEnable()
     {
-        //map = (Map)target;
+        map = (Map)target;
     }
 
     // Inspector：基础参数 + 预制体目录编辑与拖拽导入

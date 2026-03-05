@@ -39,29 +39,36 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     private void LoadAllLevels()
     {
-        string folderPath = Path.Combine(Application.dataPath, levelsFolder);
-        if (!Directory.Exists(folderPath))
-        {
-            Debug.LogError($"关卡文件夹不存在: {folderPath}");
-            return;
-        }
 
-        string[] jsonFiles = Directory.GetFiles(folderPath, "*.json");
-        foreach (string filePath in jsonFiles)
-        {
-            string fileName = Path.GetFileNameWithoutExtension(filePath);
-            try
-            {
-                string jsonContent = File.ReadAllText(filePath);
-                MapData mapData = ParseToMapData(jsonContent, cellSize);
+        string fileName = "level1";
+        
+        TextAsset levelTextAsset = AssetBundleLoader.SharedInstance.LoadTextFile(
+            "levels", 
+            fileName);
+        
+        // string folderPath = Path.Combine(Application.dataPath, levelsFolder);
+        // if (!Directory.Exists(folderPath))
+        // {
+        //     Debug.LogError($"关卡文件夹不存在: {folderPath}");
+        //     return;
+        // }
+        //
+        // string[] jsonFiles = Directory.GetFiles(folderPath, "*.json");
+        // foreach (string filePath in jsonFiles)
+        // {
+        //     string fileName = Path.GetFileNameWithoutExtension(filePath);
+        //     try
+        //     {
+        //         string jsonContent = File.ReadAllText(filePath);
+                MapData mapData = ParseToMapData(levelTextAsset.ToString(), cellSize);
                 loadedLevels[fileName] = mapData;
                 Debug.Log($"成功加载关卡: {fileName}");
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"加载关卡文件 {fileName} 失败: {e.Message}");
-            }
-        }
+        //     }
+        //     catch (System.Exception e)
+        //     {
+        //         Debug.LogError($"加载关卡文件 {fileName} 失败: {e.Message}");
+        //     }
+        // }
     }
 
     /// <summary>
