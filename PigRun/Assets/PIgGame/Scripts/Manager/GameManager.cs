@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
         UIManager.Instance.HidePanel(PanelType.MainPanel);
         UIManager.Instance.ShowPanel(PanelType.GamePanel);
         
-        MapData level1 = LevelManager.Instance.GetLevel("level1");
+        LevelManager.Instance.LoadLevel(GameDataManager.Instance.UserData.LevelIndex);
         AudioManager.Instance.PlayBackgroundMusic("game-bgm"); // 播放默认音乐
         //GamePanel.SetActive(true);
     }

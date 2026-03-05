@@ -41,9 +41,9 @@ public class GameDataManager :MonoBehaviour
         }
     }
     
-    public void Init()
+    public void Start()
     {
-       
+        LoadPlayerDatas();
     }
    
 

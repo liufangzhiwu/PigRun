@@ -12,14 +12,11 @@ public class LevelManager : MonoBehaviour
 
     [Header("配置")]
     [Tooltip("JSON 文件所在的文件夹路径（相对于 Application.dataPath）")]
-    public string levelsFolder = "PIgGame/MultipleData/GameInfo/levels";
+    public string LevelName = "level";
     [Tooltip("网格单元大小（世界单位）")]
     public float cellSize = 1f;
     [Tooltip("猪类型与 PrefabInfo 的映射（在 Inspector 中手动配置）")]
     public List<PigTypeMapping> pigTypeMappings;   // 可在 Inspector 中配置
-
-    // 存储所有已加载的关卡，键为文件名（不含扩展名），值为 MapData
-    private Dictionary<string, MapData> loadedLevels = new Dictionary<string, MapData>();
 
     private void Awake()
     {
@@ -30,45 +27,22 @@ public class LevelManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject); // 保持场景切换时不被销毁
-
-        LoadAllLevels();
     }
 
     /// <summary>
     /// 加载 levels 文件夹下所有 .json 文件
     /// </summary>
-    private void LoadAllLevels()
+    public void LoadLevel(int levelid)
     {
-
-        string fileName = "level1";
-        
+        string fileName = LevelName +levelid;
         TextAsset levelTextAsset = AssetBundleLoader.SharedInstance.LoadTextFile(
             "levels", 
             fileName);
+       
+        MapData mapData = ParseToMapData(levelTextAsset.ToString(), cellSize);
+        Debug.Log($"成功加载关卡: {fileName}");
+        Map.Instance.LoadFromAsset(mapData,true);
         
-        // string folderPath = Path.Combine(Application.dataPath, levelsFolder);
-        // if (!Directory.Exists(folderPath))
-        // {
-        //     Debug.LogError($"关卡文件夹不存在: {folderPath}");
-        //     return;
-        // }
-        //
-        // string[] jsonFiles = Directory.GetFiles(folderPath, "*.json");
-        // foreach (string filePath in jsonFiles)
-        // {
-        //     string fileName = Path.GetFileNameWithoutExtension(filePath);
-        //     try
-        //     {
-        //         string jsonContent = File.ReadAllText(filePath);
-                MapData mapData = ParseToMapData(levelTextAsset.ToString(), cellSize);
-                loadedLevels[fileName] = mapData;
-                Debug.Log($"成功加载关卡: {fileName}");
-        //     }
-        //     catch (System.Exception e)
-        //     {
-        //         Debug.LogError($"加载关卡文件 {fileName} 失败: {e.Message}");
-        //     }
-        // }
     }
 
     /// <summary>
@@ -144,49 +118,6 @@ public class LevelManager : MonoBehaviour
         return mapData;
     }
 
-    /// <summary>
-    /// 通过关卡名称获取 MapData（不区分大小写）
-    /// </summary>
-    public MapData GetLevel(string levelName)
-    {
-        if (loadedLevels.TryGetValue(levelName, out MapData data))
-            return data;
-        else
-            Debug.LogError($"未找到关卡: {levelName}");
-        return null;
-    }
-
-    /// <summary>
-    /// 通过索引获取关卡（按文件名排序）
-    /// </summary>
-    public MapData GetLevelByIndex(int index)
-    {
-        if (index < 0 || index >= loadedLevels.Count)
-        {
-            Debug.LogError($"索引超出范围: {index}");
-            return null;
-        }
-        List<string> keys = new List<string>(loadedLevels.Keys);
-        keys.Sort(); // 自然排序
-        return loadedLevels[keys[index]];
-    }
-
-    /// <summary>
-    /// 获取所有已加载的关卡名称
-    /// </summary>
-    public List<string> GetAllLevelNames()
-    {
-        return new List<string>(loadedLevels.Keys);
-    }
-
-    /// <summary>
-    /// 重新加载所有关卡（清空缓存）
-    /// </summary>
-    public void ReloadAllLevels()
-    {
-        loadedLevels.Clear();
-        LoadAllLevels();
-    }
 }
 
 /// <summary>

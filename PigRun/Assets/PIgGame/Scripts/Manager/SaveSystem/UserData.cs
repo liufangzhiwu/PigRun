@@ -60,11 +60,6 @@ public class UserData
     #endregion
     
     
-    // 生命周期事件配置
-    private readonly int[] LIFE_CYCLE_MINUTES = { 1, 5, 10, 15, 20, 30, 40, 60, 120, 300, 600 };
-    private readonly string LIFE_CYCLE_EVENT_PREFIX = "time_level_";
-    
-   
 
     #region 数据初始化方法
     
@@ -142,6 +137,7 @@ public class UserData
         // 基础数据
         // 用户基础数据
         PlayerId = null;
+        LevelIndex = AppGameSettings.FirstLevel;
         Gold = AppGameSettings.StartingGold;
         IsMusicOn = true;
         IsSoundOn = true;
@@ -159,6 +155,7 @@ public class UserData
         // 基础数据
         PlayerId = user.PlayerId;
         Gold = user.Gold;
+        LevelIndex=user.LevelIndex;
         IsMusicOn = user.IsMusicOn;
         IsSoundOn = user.IsSoundOn;
         IsAgreePrivacy = user.IsAgreePrivacy;
