@@ -8,6 +8,7 @@ public class PanelType  // Renamed class
     public const string MainPanel = "MainPanel";  
     public const string MenuPanel = "MenuPanel";  
     public const string GamePanel = "GamePanel";  
+    public const string FinishPanel = "FinishPanel";  
     
 
     /// <summary>

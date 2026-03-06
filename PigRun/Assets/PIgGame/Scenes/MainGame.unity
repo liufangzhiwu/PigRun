@@ -327,8 +327,8 @@ Transform:
   m_GameObject: {fileID: 673649474}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.58, y: 0.6, z: 1}
+  m_LocalPosition: {x: 0.25, y: 0, z: -0.34}
+  m_LocalScale: {x: 1.26, y: 1, z: 1.55}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1991746639}
@@ -375,7 +375,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c901a6b5e3b2e1746a5d007ba4ca1eaa, type: 2}
+  - {fileID: 2100000, guid: dbd5311975057f14d9484b306c399041, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -453,11 +453,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 0
+  m_ReferenceResolution: {x: 1024, y: 2048}
+  m_ScreenMatchMode: 1
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
@@ -495,16 +495,16 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 783496358}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.0045289854, y: 0.0045289854, z: 0.0045289854}
+  m_LocalPosition: {x: 0, y: 0, z: -0.000011920929}
+  m_LocalScale: {x: 0.0048828125, y: 0.0048828125, z: 0.0048828125}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1242, y: 2208}
+  m_AnchoredPosition: {x: 0, y: 1}
+  m_SizeDelta: {x: 1024, y: 2048}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &961739749
 GameObject:
@@ -780,7 +780,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1991746639}
-  - component: {fileID: 1991746638}
   - component: {fileID: 1991746637}
   m_Layer: 0
   m_Name: GameMap
@@ -801,23 +800,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33948e235b4e1f8499bd532005cc1060, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelsFolder: PIgGame/MultipleData/GameInfo/levels
+  LevelName: level
   cellSize: 1
   pigTypeMappings: []
---- !u!114 &1991746638
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1991746636}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df76ab2305627bd4fa92c91bac8da8e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  levelName: level1
-  loadOnStart: 1
 --- !u!4 &1991746639
 Transform:
   m_ObjectHideFlags: 0

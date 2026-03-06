@@ -162,6 +162,12 @@ public class UserData
      
     }
 
+
+    public void UpdateLevelIndex()
+    {
+        LevelIndex += 1;
+    }
+
     #endregion
 
 }

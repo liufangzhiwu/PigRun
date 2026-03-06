@@ -28,3 +28,8 @@ MonoBehaviour:
     spriteAtlasName: 
     prefab: {fileID: 2426500168314530211, guid: 936a5bc41810e7946a513f68134c12ff,
       type: 3}
+  - panelName: FinishPanel
+    panelLayer: BasePanel
+    spriteAtlasName: 
+    prefab: {fileID: 2508230401924753788, guid: 9db9e8aad5c93044dad3ee3c85d17ff9,
+      type: 3}

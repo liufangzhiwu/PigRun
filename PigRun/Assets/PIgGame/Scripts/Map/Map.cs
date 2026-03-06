@@ -22,6 +22,11 @@ public class Map : MonoBehaviour
     // 场景可用的预制体目录（支持在编辑器中维护）
     public List<PrefabInfo> prefabCatalog = new List<PrefabInfo>();
     
+    /// <summary>
+    /// 所有地图项被销毁时触发的事件
+    /// </summary>
+    public event System.Action OnAllItemsDestroyed;
+    
     // ==================== 视觉配置 ====================
     // 网格与选中高亮的视觉配置
     public Color gridColor = Color.gray;
@@ -166,7 +171,7 @@ public class Map : MonoBehaviour
         // Step 1：归一化旋转索引到 [0,3]
         rotIndex = ((rotIndex % 4) + 4) % 4;
         // Step 2：根据旋转索引计算 pivot 的映射位置
-        if (rotIndex == 0) return new Vector2Int(dims0.x, 0);
+        if (rotIndex == 0) return new Vector2Int(dims0.x, 1);
         if (rotIndex == 1) return new Vector2Int(dims0.y, dims0.x);
         if (rotIndex == 2) return new Vector2Int(0, dims0.y);
         if (rotIndex == 3) return new Vector2Int(0, 0);
@@ -750,12 +755,21 @@ public class Map : MonoBehaviour
         var dims = FootprintDims(item.info, item.rotIndex);
         var anchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
         MarkArea(anchor, dims, -1);
+
         // Step 2：移除记录并销毁对象
         items.Remove(id);
+
 #if UNITY_EDITOR
         UnityEditor.Selection.activeObject = null;
 #endif
         Destroy(item.gameObject);
+
+        // Step 3：检查是否所有物品都已销毁
+        if (items.Count == 0)
+        {
+            OnAllItemsDestroyed?.Invoke();
+        }
+
         return true;
     }
 

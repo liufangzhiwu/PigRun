@@ -4,28 +4,27 @@ using UnityEngine;
 
 public class PigItem : MonoBehaviour
 {
+    public Animator animator;
+    
     Rigidbody pigRigidbody;
     float speed = 5f;
 
-    // 缓存 MapItem 组件，用于后续移除
     MapItem mapItem;
-    // 标记是否已经开始移动（点击后）
     bool isMoving = false;
 
     void Start()
     {
         pigRigidbody = GetComponent<Rigidbody>();
-        mapItem = GetComponent<MapItem>(); // 获取地图项信息
+        mapItem = GetComponent<MapItem>();
     }
 
     void Update()
     {
-        // 只有已经开始移动时才检测边界
+        // 只有已经开始移动时才检测屏幕边界
         if (isMoving && Map.Instance != null)
         {
-            if (IsOutOfBounds())
+            if (IsOutOfScreen())
             {
-                // 通过 Map 管理器移除自身（释放占用并销毁）
                 Map.Instance.RemoveItem(mapItem);
             }
         }
@@ -33,30 +32,41 @@ public class PigItem : MonoBehaviour
 
     void OnMouseUpAsButton()
     {
+        animator.SetBool("IsRun",true);
         pigRigidbody.isKinematic = false;
         Debug.Log("PigItem Had Mouse Button");
         pigRigidbody.AddForce(transform.forward * speed, ForceMode.Impulse);
-        isMoving = true; // 标记开始移动
+        isMoving = true;
+    }
+    
+    void OnCollisionEnter(Collision collision)
+    {
+        // 可选：只对特定标签（如 "Obstacle"）的对象做出反应
+        if (collision.gameObject.CompareTag("Pig"))
+        {
+            if (isMoving)
+            {
+                animator.SetBool("IsRun",false);
+                animator.SetBool("IsHit",true);
+                pigRigidbody.isKinematic = true;
+                isMoving = false;
+                Debug.Log("Pig collided with obstacle, stopped moving.");
+            }
+        }
     }
 
     /// <summary>
-    /// 检查小猪是否跑出地图网格边界
+    /// 检查小猪是否跑出屏幕（摄像机视野外）
     /// </summary>
-    bool IsOutOfBounds()
+    bool IsOutOfScreen()
     {
-        Vector3 pos = transform.position;
-        // 将世界坐标转换到地图本地坐标系，并减去原点得到相对于地图左下角的偏移
-        Vector3 localPos = Map.Instance.transform.InverseTransformPoint(pos) - Map.Instance.origin;
-        float gridX = localPos.x; // 对应列方向
-        float gridZ = localPos.z; // 对应行方向
+        // 将世界坐标转换为视口坐标 (0~1)
+        Vector3 viewportPos = Camera.main.WorldToViewportPoint(transform.position);
 
-        // 计算地图的总宽度和高度
-        float totalWidth = Map.Instance.cols * Map.Instance.cellSize;
-        float totalHeight = Map.Instance.rows * Map.Instance.cellSize;
-
-        // 如果超出范围（加上微小容差），则认为出界
-        if (gridX < -0.01f || gridX > totalWidth + 0.01f ||
-            gridZ < -0.01f || gridZ > totalHeight + 0.01f)
+        // 如果物体在摄像机后方（z<0）或者超出视口范围（加上微小容差），则认为出界
+        if (viewportPos.z < 0 ||
+            viewportPos.x < -0.01f || viewportPos.x > 1.01f ||
+            viewportPos.y < -0.01f || viewportPos.y > 1.01f)
         {
             return true;
         }

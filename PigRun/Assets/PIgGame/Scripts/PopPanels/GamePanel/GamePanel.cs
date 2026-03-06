@@ -4,15 +4,26 @@ using UnityEngine;
 
 public class GamePanel : UIBase
 {
-    // Start is called before the first frame update
+    
     void Start()
     {
-        
+        if (Map.Instance != null)
+        {
+            Map.Instance.OnAllItemsDestroyed += ShowLevelComplete;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    void ShowLevelComplete()
     {
-        
+        //GameDataManager.Instance.UserData.UpdateLevelIndex();
+       UIManager.Instance.ShowPanel(PanelType.FinishPanel);
+    }
+
+    void OnDestroy()
+    {
+        if (Map.Instance != null)
+        {
+            Map.Instance.OnAllItemsDestroyed -= ShowLevelComplete;
+        }
     }
 }
