@@ -16,6 +16,7 @@ public class MapItem : MonoBehaviour
     public Vector2Int gridPos;
     // 顺时针旋转索引（0/1/2/3 分别对应 0/90/180/270°）
     public int rotIndex;
+    public int id;
     // 预制体的初始旋转（作为世界 Y 轴叠加的基底）
     public Quaternion baseRotation;
     #endregion

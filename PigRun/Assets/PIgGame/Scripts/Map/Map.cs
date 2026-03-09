@@ -252,6 +252,25 @@ public class Map : MonoBehaviour
             for (int c = 0; c < dims.y; c++)
                 occupancy[start.x + r, start.y + c] = id;
     }
+    
+    /// <summary>
+    /// 将区域写入占用表
+    /// 标记指定区域为给定的 id
+    /// </summary>
+    void MarkAreaFormRotate(Vector2Int start, Vector2Int dims, int id,int rotIndex)
+    {
+        Vector2Int vector2Int=Vector2Int.one; 
+        
+        if (rotIndex == 0) vector2Int = new Vector2Int(-1, 1);
+        if (rotIndex == 1) vector2Int = new Vector2Int(-1, -1);
+        if (rotIndex == 2) vector2Int = new Vector2Int(1, -1);
+        if (rotIndex == 3) vector2Int = new Vector2Int(0, 0);
+        
+        // Step 1：遍历占用矩形范围并写入 id
+        for (int r = 0; r < dims.x; r++)
+        for (int c = 0; c < dims.y; c++)
+            occupancy[start.x + r*vector2Int.x, start.y + c*vector2Int.y] = id;
+    }
 
     // ==================== 坐标转换 ====================
     /// <summary>
@@ -611,7 +630,7 @@ public class Map : MonoBehaviour
             mi.baseRotation = baseRot;
             var id = nextId++;
             items[id] = new PlacedItem { id = id, info = it.info, gridPos = it.gridPos, rotIndex = it.rotIndex, instance = obj, baseRotation = baseRot };
-            MarkArea(anchor, dims, id);
+            MarkAreaFormRotate(it.gridPos, dims, id,mi.rotIndex);
         }
     }
 
@@ -838,6 +857,39 @@ public class Map : MonoBehaviour
         var anchor = StartFromPivot(pivotGrid, item.info, item.rotIndex);
         // Step 2：返回占用中心世界坐标
         return FootprintWorldCenter(anchor, dims);
+    }
+    
+    // 获取指定网格的占用者ID（-1表示空闲）
+    public int GetOccupantIdAtCell(Vector2Int cell)
+    {
+        if (cell.x < 0 || cell.x >= rows || cell.y < 0 || cell.y >= cols)
+            return -1;
+        return occupancy[cell.x, cell.y];
+    }
+
+// 获取网格中心的世界坐标
+    public Vector3 GetCellWorldPosition(Vector2Int grid)
+    {
+        // 直接调用已有的私有方法 GridToWorld（将其改为public，或复制逻辑）
+        float lx = (grid.y + 0.5f) * cellSize + origin.x;
+        float lz = (grid.x + 0.5f) * cellSize + origin.z;
+        var local = new Vector3(lx, origin.y, lz);
+        return transform.TransformPoint(local);
+    }
+    
+    public int GetIdByItem(MapItem item)
+    {
+        foreach (var kv in items)
+        {
+            if (kv.Value.instance == item.gameObject)
+                return kv.Key;
+        }
+        // 若未找到，尝试通过占用表查找
+        var dims = FootprintDims(item.info, item.rotIndex);
+        var anchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
+        int id = occupancy[anchor.x, anchor.y];
+        if (id != -1) return id;
+        return -1; // 未找到
     }
 }
 

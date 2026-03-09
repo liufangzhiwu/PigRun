@@ -9,7 +9,7 @@ public class GamePanel : UIBase
     {
         if (Map.Instance != null)
         {
-            Map.Instance.OnAllItemsDestroyed += ShowLevelComplete;
+            //Map.Instance.OnAllItemsDestroyed += ShowLevelComplete;
         }
     }
 
@@ -23,7 +23,7 @@ public class GamePanel : UIBase
     {
         if (Map.Instance != null)
         {
-            Map.Instance.OnAllItemsDestroyed -= ShowLevelComplete;
+            //Map.Instance.OnAllItemsDestroyed -= ShowLevelComplete;
         }
     }
 }
