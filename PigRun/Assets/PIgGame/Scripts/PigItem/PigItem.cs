@@ -66,6 +66,7 @@ public class PigItem : MonoBehaviour
             // 无障碍：匀速向前移动
             movingForward = true;
             movingToTarget = false;
+            Map.Instance.UpdateMapItemArea(mapItem);
         }
 
         isMoving = true;

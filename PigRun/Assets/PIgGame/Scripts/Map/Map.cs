@@ -59,7 +59,7 @@ public class Map : MonoBehaviour
     }
 
     // ==================== 占用表和实例管理 ====================
-    int[,] occupancy;                                           // 网格占用表，记录每个格子被哪个 id 占用
+    public int[,] occupancy;                                           // 网格占用表，记录每个格子被哪个 id 占用
     Dictionary<int, PlacedItem> items = new Dictionary<int, PlacedItem>();  // 已放置实例字典
     int nextId = 1;                                             // 下一个可用 ID
     PlacedItem selected;                                        // 当前选中的实例
@@ -505,6 +505,16 @@ public class Map : MonoBehaviour
         return AreaFree(targetAnchor, dims, ignoreId);
     }
 
+    public void UpdateMapItemArea(MapItem item)
+    {
+        // Step 1：解析 id 并释放占用
+        int id = ResolveItemId(item);
+        var dims = FootprintDims(item.info, item.rotIndex);
+        //var anchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
+        MarkArea(item.gridPos, dims, -1);
+        items.Remove(id);
+    }
+
     /// <summary>
     /// 移除地图项
     /// 释放占用并销毁实例
@@ -512,13 +522,9 @@ public class Map : MonoBehaviour
     public bool RemoveItem(MapItem item)
     {
         // Step 1：解析 id 并释放占用
-        int id = ResolveItemId(item);
-        var dims = FootprintDims(item.info, item.rotIndex);
-        var anchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
-        MarkArea(anchor, dims, -1);
+        UpdateMapItemArea(item);
 
         // Step 2：移除记录并销毁对象
-        items.Remove(id);
 
         Destroy(item.gameObject);
 

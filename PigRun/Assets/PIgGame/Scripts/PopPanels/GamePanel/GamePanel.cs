@@ -9,21 +9,21 @@ public class GamePanel : UIBase
     {
         if (Map.Instance != null)
         {
-            //Map.Instance.OnAllItemsDestroyed += ShowLevelComplete;
+            Map.Instance.OnAllItemsDestroyed += ShowLevelComplete;
         }
     }
 
     void ShowLevelComplete()
     {
-        //GameDataManager.Instance.UserData.UpdateLevelIndex();
-       UIManager.Instance.ShowPanel(PanelType.FinishPanel);
+        GameDataManager.Instance.UserData.UpdateLevelIndex();
+        UIManager.Instance.ShowPanel(PanelType.FinishPanel);
     }
 
     void OnDestroy()
     {
         if (Map.Instance != null)
         {
-            //Map.Instance.OnAllItemsDestroyed -= ShowLevelComplete;
+            Map.Instance.OnAllItemsDestroyed -= ShowLevelComplete;
         }
     }
 }
