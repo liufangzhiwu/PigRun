@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using static Map;
 
@@ -33,7 +34,10 @@ public class Map : MonoBehaviour
     public float gridLineWidth = 1f;
     
     [Tooltip("运行时在地图网格上显示每格占用 id，便于检查占用表是否正确")]
-    public bool showOccupancyTable = false;
+    public bool showOccupancyTable = true;
+
+    [Tooltip("占用表写入时打印 occupancy（日志较多，仅调试用）")]
+    public bool logOccupancyOnChange = false;
     
     // ==================== 数据资产 ====================
     public MapData dataAsset;
@@ -253,17 +257,36 @@ public class Map : MonoBehaviour
     /// </summary>
     void MarkAreaFormRotate(Vector2Int start, Vector2Int dims, int id,int rotIndex)
     {
-        Vector2Int vector2Int=Vector2Int.one; 
+        Vector2Int vector2Int=Vector2Int.one;
+
+        if (rotIndex == 0)
+        {
+            vector2Int = new Vector2Int(-1, 1);
+        }
+        if (rotIndex == 1) //向下
+        {
+            vector2Int = new Vector2Int(-1, -1);
+            
+            // Step 1：遍历占用矩形范围并写入 id
+            for (int r = 0; r < dims.x; r++)
+            for (int c = 0; c < dims.y; c++)
+                occupancy[start.x + r*vector2Int.x, start.y + c*vector2Int.y] = id;
+        }
+        if (rotIndex == 2) //向左
+        {
+            vector2Int = new Vector2Int(1, -1);
+            // Step 1：遍历占用矩形范围并写入 id
+            for (int r = 0; r < dims.x; r++)
+            for (int c = 1; c < dims.y+1; c++)
+                occupancy[start.x + r*vector2Int.x, start.y + c*vector2Int.y] = id;
+        }
+
+        if (rotIndex == 3)
+        {
+            vector2Int = new Vector2Int(0, 0);
+        }
         
-        if (rotIndex == 0) vector2Int = new Vector2Int(-1, 1);
-        if (rotIndex == 1) vector2Int = new Vector2Int(-1, -1);
-        if (rotIndex == 2) vector2Int = new Vector2Int(1, -1);
-        if (rotIndex == 3) vector2Int = new Vector2Int(0, 0);
-        
-        // Step 1：遍历占用矩形范围并写入 id
-        for (int r = 1; r < dims.x; r++)
-        for (int c = 1; c < dims.y; c++)
-            occupancy[start.x + r*vector2Int.x, start.y + c*vector2Int.y] = id;
+       
     }
 
     // ==================== 坐标转换 ====================
@@ -496,7 +519,7 @@ public class Map : MonoBehaviour
         item.gridPos = targetPivot;
         //item.transform.position = FootprintWorldCenter(targetAnchor, dims);
         target=FootprintWorldCenter(targetAnchor, dims);
-        MarkAreaFormRotate(targetAnchor, dims, item.id,item.rotIndex);
+        MarkAreaFormRotate(item.gridPos, dims, item.id,item.rotIndex);
         if (items.TryGetValue(item.id, out var rec)) rec.gridPos = item.gridPos;
         return true;
     }

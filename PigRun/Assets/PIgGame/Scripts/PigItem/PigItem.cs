@@ -98,7 +98,7 @@ public class PigItem : MonoBehaviour
             }
             
             int occupantId = Map.Instance.GetOccupantIdAtCell(checkGrid);
-            if (occupantId != -1 && occupantId != GetMyId())
+            if (occupantId != -1 && occupantId != mapItem.id)
             {
                 Vector2Int gVector2Int = new Vector2Int(checkGrid.x, checkGrid.y);
                 
@@ -122,20 +122,12 @@ public class PigItem : MonoBehaviour
     {
         switch (mapItem.rotIndex)
         {
-            case 3: return new Vector2Int(-1, 0); // 向上
-            case 0: return new Vector2Int(0, 1);  // 向右
+            case 3: return new Vector2Int(-1, 0); // 向右
+            case 0: return new Vector2Int(0, -1);  // 向上
             case 1: return new Vector2Int(0, 1);  // 向下
-            case 2: return new Vector2Int(0, -1); // 向左
+            case 2: return new Vector2Int(-1, 0); // 向左
             default: return Vector2Int.zero;
         }
-    }
-
-    /// <summary>
-    /// 获取当前小猪在Map中的ID
-    /// </summary>
-    int GetMyId()
-    {
-        return Map.Instance.GetIdByItem(mapItem);
     }
 
     void StopMoving()
