@@ -95,13 +95,16 @@ public class PigItem : MonoBehaviour
                 // 无障碍物，但已到边界，可继续向前移动（最终出屏）
                 return false;
             }
-        
+            
             int occupantId = Map.Instance.GetOccupantIdAtCell(checkGrid);
             if (occupantId != -1 && occupantId != GetMyId())
             {
-                // 遇到障碍，终点为当前检查格的前一个空闲格
-                Vector2Int lastFreeGrid = checkGrid - forwardOffset;
-                target = Map.Instance.GetCellWorldPosition(lastFreeGrid);
+                Vector2Int gVector2Int = new Vector2Int(checkGrid.x, checkGrid.y);
+                
+                Map.Instance.TryMoveItemTargetCell(mapItem,gVector2Int,out target);
+                // // 遇到障碍：target 为障碍物前一格的世界坐标，保证停在障碍后面且不重叠
+                // Vector2Int lastFreeGrid = checkGrid - forwardOffset;
+                //target = Map.Instance.GridToWorld(lastFreeGrid);
                 return true;
             }
         

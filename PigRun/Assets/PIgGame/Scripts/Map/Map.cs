@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static Map;
 
 /// <summary>
 /// 地图管理器核心类
@@ -16,12 +17,9 @@ public class Map : MonoBehaviour
     public int rows = 10;
     public int cols = 10;
     public float cellSize = 0.21f;
-    public Vector3 origin;
-    
-    // ==================== 预制体目录 ====================
-    // 场景可用的预制体目录（支持在编辑器中维护）
-    public List<PrefabInfo> prefabCatalog = new List<PrefabInfo>();
-    
+    public Vector3 origin;      
+
+
     /// <summary>
     /// 所有地图项被销毁时触发的事件
     /// </summary>
@@ -50,7 +48,7 @@ public class Map : MonoBehaviour
     /// 已放置实例的内部记录
     /// 运行时记录每个已放置实例的状态，用于占用管理和交互
     /// </summary>
-    class PlacedItem
+    public class PlacedItem
     {
         public int id;                      // 唯一标识符
         public PrefabInfo info;             // 预制体配置信息
@@ -92,29 +90,29 @@ public class Map : MonoBehaviour
         // Step 3：初始化拾取用平面与主相机引用
         plane = new Plane(transform.up, transform.TransformPoint(origin));
         cam = Camera.main;
-        // Step 4：若绑定了数据资产，在唤醒时加载地图
-        if (dataAsset != null)
-        {
-            if (Application.isPlaying)
-            {
-                runtimeData = ScriptableObject.CreateInstance<MapData>();
-                runtimeData.rows = dataAsset.rows;
-                runtimeData.cols = dataAsset.cols;
-                //runtimeData.cellSize = dataAsset.cellSize;
-                runtimeData.origin = dataAsset.origin;
-                runtimeData.items = new List<MapData.MapItemData>();
-                foreach (var it in dataAsset.items)
-                {
-                    var d = new MapData.MapItemData { info = it.info, gridPos = it.gridPos, rotIndex = it.rotIndex };
-                    runtimeData.items.Add(d);
-                }
-                LoadFromAsset(runtimeData, true);
-            }
-            else
-            {
-                LoadFromAsset(dataAsset, true);
-            }
-        }
+        // // Step 4：若绑定了数据资产，在唤醒时加载地图
+        // if (dataAsset != null)
+        // {
+        //     if (Application.isPlaying)
+        //     {
+        //         runtimeData = ScriptableObject.CreateInstance<MapData>();
+        //         runtimeData.rows = dataAsset.rows;
+        //         runtimeData.cols = dataAsset.cols;
+        //         //runtimeData.cellSize = dataAsset.cellSize;
+        //         runtimeData.origin = dataAsset.origin;
+        //         runtimeData.items = new List<MapData.MapItemData>();
+        //         foreach (var it in dataAsset.items)
+        //         {
+        //             var d = new MapData.MapItemData { info = it.info, gridPos = it.gridPos, rotIndex = it.rotIndex };
+        //             runtimeData.items.Add(d);
+        //         }
+        //         LoadFromAsset(runtimeData, true);
+        //     }
+        //     else
+        //     {
+        //         LoadFromAsset(dataAsset, true);
+        //     }
+        // }
     }
 
     void OnDestroy()
@@ -140,7 +138,7 @@ public class Map : MonoBehaviour
     /// 根据旋转索引计算占用矩形尺寸
     /// 行列在 90°/270° 时互换
     /// </summary>
-    Vector2Int FootprintDims(PrefabInfo info, int rotIndex)
+    public Vector2Int FootprintDims(PrefabInfo info, int rotIndex)
     {
         // Step 1：容错，当 info 为空时按 1x1 处理
         if (info == null) return new Vector2Int(1, 1);
@@ -277,7 +275,7 @@ public class Map : MonoBehaviour
     /// 将网格坐标转换为世界坐标
     /// 返回单个网格中心的世界位置
     /// </summary>
-    Vector3 GridToWorld(Vector2Int grid)
+    public Vector3 GridToWorld(Vector2Int grid)
     {
         // Step 1：计算本地坐标系下的中心位置
         float lx = (grid.y + 0.5f) * cellSize + origin.x;
@@ -290,7 +288,7 @@ public class Map : MonoBehaviour
     /// <summary>
     /// 计算占用矩形的几何中心世界坐标
     /// </summary>
-    Vector3 FootprintWorldCenter(Vector2Int anchor, Vector2Int dims)
+    public Vector3 FootprintWorldCenter(Vector2Int anchor, Vector2Int dims)
     {
         // Step 1：计算占用矩形中心的本地坐标
         float lx = (anchor.y + dims.y * 0.5f) * cellSize + origin.x;
@@ -299,29 +297,7 @@ public class Map : MonoBehaviour
         // Step 2：转换到世界坐标
         return transform.TransformPoint(local);
     }
-
-    // ==================== 鼠标拾取 ====================
-    /// <summary>
-    /// 从鼠标射线拾取网格坐标
-    /// 随 transform 移动/旋转
-    /// </summary>
-    bool TryGetMouseGrid(out Vector2Int grid)
-    {
-        grid = default;
-        // Step 1：准备射线与动态平面（随 MapEditor 变换）
-        if (cam == null) return false;
-        var ray = cam.ScreenPointToRay(Input.mousePosition);
-        var dynPlane = new Plane(transform.up, transform.TransformPoint(origin));
-        if (!dynPlane.Raycast(ray, out float enter)) return false;
-        var point = ray.GetPoint(enter);
-        // Step 2：转到本地坐标，按 cellSize 量化为行列
-        var local = transform.InverseTransformPoint(point) - origin;
-        int c = Mathf.FloorToInt(local.x / cellSize);
-        int r = Mathf.FloorToInt(local.z / cellSize);
-        grid = new Vector2Int(r, c);
-        // Step 3：返回是否在网格范围内
-        return r >= 0 && c >= 0 && r < rows && c < cols;
-    }
+    
 
     /// <summary>
     /// 获取占用者 ID
@@ -331,194 +307,6 @@ public class Map : MonoBehaviour
     {
         // Step 1：读取占用表中该格的 id（-1 表示空）
         return occupancy[cell.x, cell.y];
-    }
-
-    // ==================== 实例放置和管理 ====================
-    /// <summary>
-    /// 放置实例
-    /// 以锚点为基准，校验边界与占用并实例化
-    /// </summary>
-    PlacedItem Place(PrefabInfo info, Vector2Int start, int rotIndex)
-    {
-        // Step 1：计算当前旋转下的占用尺寸与锚点/起点
-        var dims = FootprintDims(info, rotIndex);
-        var pivotGrid = start;
-        var anchor = StartFromPivot(pivotGrid, info, rotIndex);
-        // Step 2：越界与空间校验，失败时提示消息/音效
-        if (!InBounds(anchor, dims)) { if (rotateFailClip != null) AudioSource.PlayClipAtPoint(rotateFailClip, transform.position); runtimeMessage = placeFailMessage + "：越界"; runtimeMessageUntil = Time.time + failMessageDuration; return null; }
-        if (!AreaFree(anchor, dims, -1)) { if (rotateFailClip != null) AudioSource.PlayClipAtPoint(rotateFailClip, transform.position); runtimeMessage = placeFailMessage + "：空间不足"; runtimeMessageUntil = Time.time + failMessageDuration; return null; }
-        // Step 3：分配 id 并实例化 GameObject 到地图节点下
-        int id = nextId++;
-        var go = Instantiate(info.prefab);
-        go.transform.SetParent(transform);
-        // Step 4：定位到占用中心并叠加旋转（保持预制体原始朝向）
-        go.transform.position = FootprintWorldCenter(anchor, dims);
-        var baseRot = go.transform.rotation;
-        go.transform.rotation = Quaternion.AngleAxis(rotIndex * 90f, Vector3.up) * baseRot;
-        // Step 5：记录 PlacedItem 并写入占用表
-        var item = new PlacedItem { id = id, info = info, gridPos = pivotGrid, rotIndex = rotIndex, instance = go };
-        item.baseRotation = baseRot;
-        items[id] = item;
-        MarkArea(anchor, dims, id);
-        return item;
-    }
-
-    /// <summary>
-    /// 按单格移动选中实例
-    /// 含占用表更新
-    /// </summary>
-    bool TryMoveOneCell(PlacedItem item, Vector2Int delta)
-    {
-        // Step 1：释放当前占用区域
-        var dims = FootprintDims(item.info, item.rotIndex);
-        var curAnchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
-        MarkArea(curAnchor, dims, -1);
-        // Step 2：计算目标 pivot/anchor 并校验越界/占用
-        var targetPivot = new Vector2Int(item.gridPos.x + delta.x, item.gridPos.y + delta.y);
-        var targetAnchor = StartFromPivot(targetPivot, item.info, item.rotIndex);
-        if (!InBounds(targetAnchor, dims) || !AreaFree(targetAnchor, dims, -1))
-        {
-            // Step 3：失败则恢复占用并返回 false
-            MarkArea(curAnchor, dims, item.id);
-            return false;
-        }
-        // Step 4：更新位置到占用中心并写入占用表
-        item.gridPos = targetPivot;
-        item.instance.transform.position = FootprintWorldCenter(targetAnchor, dims);
-        MarkArea(targetAnchor, dims, item.id);
-        return true;
-    }
-
-    /// <summary>
-    /// 顺时针旋转 90°
-    /// 沿世界空间 Y 轴，并更新占用与居中位置
-    /// </summary>
-    bool TryRotate90(PlacedItem item)
-    {
-        // Step 1：释放当前占用区域
-        var dims = FootprintDims(item.info, item.rotIndex);
-        var curAnchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
-        MarkArea(curAnchor, dims, -1);
-        // Step 2：计算下一旋转索引与目标占用范围
-        int nextRot = (item.rotIndex + 1) % 4;
-        var nextDims = FootprintDims(item.info, nextRot);
-        var nextAnchor = StartFromPivot(item.gridPos, item.info, nextRot);
-        // Step 3：越界/空间不足则提示并恢复占用
-        if (!InBounds(nextAnchor, nextDims) || !AreaFree(nextAnchor, nextDims, -1))
-        {
-            if (rotateFailClip != null) AudioSource.PlayClipAtPoint(rotateFailClip, transform.position);
-            runtimeMessage = rotateFailMessage;
-            runtimeMessageUntil = Time.time + failMessageDuration;
-            MarkArea(curAnchor, dims, item.id);
-            return false;
-        }
-        // Step 4：应用旋转、重新居中并写入占用表
-        item.rotIndex = nextRot;
-        item.instance.transform.rotation = Quaternion.AngleAxis(item.rotIndex * 90f, Vector3.up) * item.baseRotation;
-        item.instance.transform.position = FootprintWorldCenter(nextAnchor, nextDims);
-        MarkArea(nextAnchor, nextDims, item.id);
-        return true;
-    }
-
-    // ==================== 运行时交互 ====================
-    /// <summary>
-    /// 运行时编辑开关
-    /// 启用后支持放置、选择、拖拽、旋转和删除
-    /// </summary>
-    public bool runtimeEditingEnabled = false;
-    
-    /// <summary>
-    /// 简易交互更新
-    /// 放置、选择、拖拽、旋转与 Alt+Delete 删除
-    /// </summary>
-    void Update()
-    {
-        // Step 1：运行时编辑开关（避免误触）
-        if (!runtimeEditingEnabled) return;
-        // Step 2：Alpha1 放置（示范交互），含越界与占用提示
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            if (prefabCatalog.Count > 0 && TryGetMouseGrid(out var cell))
-            {
-                var info = prefabCatalog[0];
-                var dims = FootprintDims(info, 0);
-                var anchor = StartFromPivot(cell, info, 0);
-                if (!InBounds(anchor, dims))
-                {
-                    runtimeMessage = placeFailMessage + "：越界";
-                    runtimeMessageUntil = Time.time + failMessageDuration;
-                }
-                else if (!AreaFree(anchor, dims, -1))
-                {
-                    runtimeMessage = placeFailMessage + "：目标区域已被占用";
-                    runtimeMessageUntil = Time.time + failMessageDuration;
-                }
-                else
-                {
-                    var item = Place(info, cell, 0);
-                    if (item != null) selected = item;
-                }
-            }
-        }
-
-        // Step 3：左键点击选择，同一元素再次点击触发旋转
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (TryGetMouseGrid(out var cell))
-            {
-                int id = GetOccupant(cell);
-                if (id != -1)
-                {
-                    var item = items[id];
-                    if (selected == item)
-                    {
-                        TryRotate90(selected);
-                    }
-                    else
-                    {
-                        selected = item;
-                    }
-                }
-            }
-        }
-
-        // Step 4：左键拖拽按主方向单格移动
-        if (Input.GetMouseButton(0) && selected != null)
-        {
-            if (TryGetMouseGrid(out var cell))
-            {
-                var diff = new Vector2Int(cell.x - selected.gridPos.x, cell.y - selected.gridPos.y);
-                Vector2Int step = Vector2Int.zero;
-                if (Mathf.Abs(diff.x) > Mathf.Abs(diff.y))
-                    step = new Vector2Int(diff.x > 0 ? 1 : -1, 0);
-                else if (Mathf.Abs(diff.y) > 0)
-                    step = new Vector2Int(0, diff.y > 0 ? 1 : -1);
-                if (step != Vector2Int.zero)
-                    TryMoveOneCell(selected, step);
-            }
-        }
-
-        // Step 5：方向键移动与 Alt+Delete 删除选中
-        if (selected != null)
-        {
-            if (Input.GetKeyDown(KeyCode.UpArrow)) TryMoveOneCell(selected, new Vector2Int(-1, 0));
-            if (Input.GetKeyDown(KeyCode.DownArrow)) TryMoveOneCell(selected, new Vector2Int(1, 0));
-            if (Input.GetKeyDown(KeyCode.LeftArrow)) TryMoveOneCell(selected, new Vector2Int(0, -1));
-            if (Input.GetKeyDown(KeyCode.RightArrow)) TryMoveOneCell(selected, new Vector2Int(0, 1));
-            if ((Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)) && Input.GetKeyDown(KeyCode.Delete))
-            {
-                // Step 5.1：释放占用并销毁实例
-                var dims = FootprintDims(selected.info, selected.rotIndex);
-                var anchor = StartFromPivot(selected.gridPos, selected.info, selected.rotIndex);
-                MarkArea(anchor, dims, -1);
-                items.Remove(selected.id);
-#if UNITY_EDITOR
-                UnityEditor.Selection.activeObject = null;
-#endif
-                Destroy(selected.instance);
-                selected = null;
-            }
-        }
     }
 
     // ==================== Gizmos 绘制 ====================
@@ -585,27 +373,20 @@ public class Map : MonoBehaviour
     public void LoadFromAsset(MapData data, bool clearExisting = true)
     {
         // Step 1：同步基础参数并重置占用表
+        dataAsset = data;
         rows = data.rows;
         cols = data.cols;
         //cellSize = data.cellSize;
         origin = data.origin;
         ResetOccupancy();
 #if UNITY_EDITOR
-        // Step 2：编辑器下清空现有子对象并记录 Undo
-        if (clearExisting)
-        {
-            UnityEditor.Selection.activeObject = null;
-            var toDelete = new List<GameObject>();
-            for (int i = 0; i < transform.childCount; i++) toDelete.Add(transform.GetChild(i).gameObject);
-            foreach (var go in toDelete) UnityEditor.Undo.DestroyObjectImmediate(go);
-        }
-#else
-        // Step 2：运行时下清空现有子对象
+        // 编辑器下清空现有子对象并记录 Undo（已注释）
+        // if (clearExisting) { UnityEditor.Selection.activeObject = null; ... UnityEditor.Undo.DestroyObjectImmediate(go); }
+#endif
         if (clearExisting)
         {
             for (int i = transform.childCount - 1; i >= 0; i--) Destroy(transform.GetChild(i).gameObject);
         }
-#endif
         // Step 3：遍历数据资产并实例化、定位与写入占用
         foreach (var it in data.items)
         {
@@ -613,11 +394,9 @@ public class Map : MonoBehaviour
             var dims = FootprintDims(it.info, it.rotIndex);
             var anchor = StartFromPivot(it.gridPos, it.info, it.rotIndex);
             if (!InBounds(anchor, dims)) continue;
-#if UNITY_EDITOR
-            var obj = UnityEditor.PrefabUtility.InstantiatePrefab(it.info.prefab, transform) as GameObject;
-            UnityEditor.Undo.RegisterCreatedObjectUndo(obj, "Load Map Item");
-#else
             var obj = Instantiate(it.info.prefab, transform);
+#if UNITY_EDITOR
+            // UnityEditor.PrefabUtility.InstantiatePrefab / RegisterCreatedObjectUndo 已注释
 #endif
             var baseRot = obj.transform.rotation;
             obj.transform.rotation = Quaternion.AngleAxis(it.rotIndex * 90f, Vector3.up) * baseRot;
@@ -628,10 +407,18 @@ public class Map : MonoBehaviour
             mi.gridPos = it.gridPos;
             mi.rotIndex = it.rotIndex;
             mi.baseRotation = baseRot;
+            mi.id = nextId;
             var id = nextId++;
             items[id] = new PlacedItem { id = id, info = it.info, gridPos = it.gridPos, rotIndex = it.rotIndex, instance = obj, baseRotation = baseRot };
             MarkAreaFormRotate(it.gridPos, dims, id,mi.rotIndex);
         }
+    }
+
+    public PlacedItem GetPlacedItem(int id)
+    {
+        PlacedItem item = items[id];
+        if (item == null) return null;
+        return item;
     }
 
     /// <summary>
@@ -645,53 +432,14 @@ public class Map : MonoBehaviour
         nextId = 1;
         selected = null;
 #if UNITY_EDITOR
-        var toDelete = new List<GameObject>();
-        UnityEditor.Selection.activeObject = null;
-        for (int i = 0; i < transform.childCount; i++) toDelete.Add(transform.GetChild(i).gameObject);
-        foreach (var go in toDelete) UnityEditor.Undo.DestroyObjectImmediate(go);
-#else
-        for (int i = transform.childCount - 1; i >= 0; i--) Destroy(transform.GetChild(i).gameObject);
+        // var toDelete = new List<GameObject>();
+        // UnityEditor.Selection.activeObject = null;
+        // for (int i = 0; i < transform.childCount; i++) toDelete.Add(transform.GetChild(i).gameObject);
+        // foreach (var go in toDelete) UnityEditor.Undo.DestroyObjectImmediate(go);
 #endif
+        for (int i = transform.childCount - 1; i >= 0; i--) Destroy(transform.GetChild(i).gameObject);
         UpdateDataAssetMirror();
     }
-
-#if UNITY_EDITOR
-    // ==================== 编辑器专用：保存到资产 ====================
-    /// <summary>
-    /// 保存地图到数据资产
-    /// 将当前场景中的地图项序列化到 ScriptableObject 资产
-    /// </summary>
-    public void SaveToAsset(MapData data)
-    {
-        // Step 1：通过 SerializedObject 写入标量字段
-        var so = new UnityEditor.SerializedObject(dataAsset);
-        so.FindProperty("rows").intValue = rows;
-        so.FindProperty("cols").intValue = cols;
-        so.FindProperty("cellSize").floatValue = cellSize;
-        so.FindProperty("origin").vector3Value = origin;
-        // Step 2：清空并重建 items 数组
-        var itemsProp = so.FindProperty("items");
-        itemsProp.ClearArray();
-        int idx = 0;
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            var child = transform.GetChild(i);
-            var mi = child.GetComponent<MapItem>();
-            if (mi == null || mi.info == null) continue;
-            itemsProp.InsertArrayElementAtIndex(idx);
-            var elem = itemsProp.GetArrayElementAtIndex(idx);
-            elem.FindPropertyRelative("info").objectReferenceValue = mi.info;
-            elem.FindPropertyRelative("gridPos").vector2IntValue = mi.gridPos;
-            elem.FindPropertyRelative("rotIndex").intValue = mi.rotIndex;
-            idx++;
-        }
-        // Step 3：应用改动、标记脏并保存刷新
-        so.ApplyModifiedProperties();
-        UnityEditor.EditorUtility.SetDirty(data);
-        UnityEditor.AssetDatabase.SaveAssets();
-        UnityEditor.AssetDatabase.Refresh();
-    }
-#endif
 
     // ==================== 项 ID 解析 ====================
     /// <summary>
@@ -719,10 +467,10 @@ public class Map : MonoBehaviour
 
     // ==================== 公共 API ====================
     /// <summary>
-    /// 尝试移动地图项一格
-    /// 供外部组件调用，用于移动地图项
+    /// 尝试移动到指定地图坐标并同步位置
+    /// 用于移动地图项
     /// </summary>
-    public bool TryMoveItemOneCell(MapItem item, Vector2Int delta)
+    public bool TryMoveItemTargetCell(MapItem item, Vector2Int targetPivot,out Vector3 target)
     {
         // Step 1：解析/确保该项的 id
         int id = ResolveItemId(item);
@@ -731,16 +479,10 @@ public class Map : MonoBehaviour
         var curAnchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
         MarkArea(curAnchor, dims, -1);
         // Step 3：计算目标占用并校验
-        var targetPivot = new Vector2Int(item.gridPos.x + delta.x, item.gridPos.y + delta.y);
         var targetAnchor = StartFromPivot(targetPivot, item.info, item.rotIndex);
-        if (!InBounds(targetAnchor, dims) || !AreaFree(targetAnchor, dims, -1))
-        {
-            MarkArea(curAnchor, dims, id);
-            return false;
-        }
-        // Step 4：应用位置并写入占用与记录表
         item.gridPos = targetPivot;
-        item.transform.position = FootprintWorldCenter(targetAnchor, dims);
+        //item.transform.position = FootprintWorldCenter(targetAnchor, dims);
+        target=FootprintWorldCenter(targetAnchor, dims);
         MarkArea(targetAnchor, dims, id);
         if (items.TryGetValue(id, out var rec)) rec.gridPos = item.gridPos;
         return true;
@@ -778,9 +520,6 @@ public class Map : MonoBehaviour
         // Step 2：移除记录并销毁对象
         items.Remove(id);
 
-#if UNITY_EDITOR
-        UnityEditor.Selection.activeObject = null;
-#endif
         Destroy(item.gameObject);
 
         // Step 3：检查是否所有物品都已销毁
@@ -818,32 +557,6 @@ public class Map : MonoBehaviour
             }
             return;
         }
-#if UNITY_EDITOR
-        // Step 3：非运行态（编辑器）写入资产并保存刷新
-        var so = new UnityEditor.SerializedObject(dataAsset);
-        so.FindProperty("rows").intValue = rows;
-        so.FindProperty("cols").intValue = cols;
-        so.FindProperty("cellSize").floatValue = cellSize;
-        so.FindProperty("origin").vector3Value = origin;
-        var itemsProp = so.FindProperty("items");
-        itemsProp.ClearArray();
-        int idx = 0;
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            var mi = transform.GetChild(i).GetComponent<MapItem>();
-            if (mi == null || mi.info == null) continue;
-            itemsProp.InsertArrayElementAtIndex(idx);
-            var elem = itemsProp.GetArrayElementAtIndex(idx);
-            elem.FindPropertyRelative("info").objectReferenceValue = mi.info;
-            elem.FindPropertyRelative("gridPos").vector2IntValue = mi.gridPos;
-            elem.FindPropertyRelative("rotIndex").intValue = mi.rotIndex;
-            idx++;
-        }
-        so.ApplyModifiedProperties();
-        UnityEditor.EditorUtility.SetDirty(dataAsset);
-        UnityEditor.AssetDatabase.SaveAssets();
-        UnityEditor.AssetDatabase.Refresh();
-#endif
     }
 
     /// <summary>
@@ -858,7 +571,8 @@ public class Map : MonoBehaviour
         // Step 2：返回占用中心世界坐标
         return FootprintWorldCenter(anchor, dims);
     }
-    
+
+
     // 获取指定网格的占用者ID（-1表示空闲）
     public int GetOccupantIdAtCell(Vector2Int cell)
     {
@@ -867,15 +581,6 @@ public class Map : MonoBehaviour
         return occupancy[cell.x, cell.y];
     }
 
-// 获取网格中心的世界坐标
-    public Vector3 GetCellWorldPosition(Vector2Int grid)
-    {
-        // 直接调用已有的私有方法 GridToWorld（将其改为public，或复制逻辑）
-        float lx = (grid.y + 0.5f) * cellSize + origin.x;
-        float lz = (grid.x + 0.5f) * cellSize + origin.z;
-        var local = new Vector3(lx, origin.y, lz);
-        return transform.TransformPoint(local);
-    }
     
     public int GetIdByItem(MapItem item)
     {
