@@ -32,12 +32,8 @@ public class Map : MonoBehaviour
     public bool selectedUseComplementary = false;
     public float gridLineWidth = 1f;
     
-    // ==================== 交互反馈配置 ====================
-    // 交互反馈：旋转/放置失败音效与消息
-    public AudioClip rotateFailClip;
-    public string rotateFailMessage = "无法旋转";
-    public float failMessageDuration = 1.5f;
-    public string placeFailMessage = "无法放置";
+    [Tooltip("运行时在地图网格上显示每格占用 id，便于检查占用表是否正确")]
+    public bool showOccupancyTable = false;
     
     // ==================== 数据资产 ====================
     public MapData dataAsset;
@@ -265,8 +261,8 @@ public class Map : MonoBehaviour
         if (rotIndex == 3) vector2Int = new Vector2Int(0, 0);
         
         // Step 1：遍历占用矩形范围并写入 id
-        for (int r = 0; r < dims.x; r++)
-        for (int c = 0; c < dims.y; c++)
+        for (int r = 1; r < dims.x; r++)
+        for (int c = 1; c < dims.y; c++)
             occupancy[start.x + r*vector2Int.x, start.y + c*vector2Int.y] = id;
     }
 
@@ -348,6 +344,23 @@ public class Map : MonoBehaviour
             Gizmos.DrawLine(wmax, new Vector3(wmin.x, wmin.y, wmax.z));
             Gizmos.DrawLine(new Vector3(wmin.x, wmin.y, wmax.z), wmin);
         }
+
+#if UNITY_EDITOR
+        // Step 4：运行时在地图网格上直接显示占用 id（每格中心，-1 显示为 ·）
+        if (Application.isPlaying && showOccupancyTable && occupancy != null)
+        {
+            for (int r = 0; r < rows; r++)
+            {
+                for (int c = 0; c < cols; c++)
+                {
+                    var worldPos = GridToWorld(new Vector2Int(r, c));
+                    int id = occupancy[r, c];
+                    string text = id >= 0 ? id.ToString() : "·";
+                    UnityEditor.Handles.Label(worldPos + Vector3.up * 0.02f, text);
+                }
+            }
+        }
+#endif
     }
 
     // ==================== UI 消息显示 ====================
@@ -473,7 +486,7 @@ public class Map : MonoBehaviour
     public bool TryMoveItemTargetCell(MapItem item, Vector2Int targetPivot,out Vector3 target)
     {
         // Step 1：解析/确保该项的 id
-        int id = ResolveItemId(item);
+        //int id = ResolveItemId(item);
         // Step 2：释放当前占用区域
         var dims = FootprintDims(item.info, item.rotIndex);
         var curAnchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
@@ -483,8 +496,8 @@ public class Map : MonoBehaviour
         item.gridPos = targetPivot;
         //item.transform.position = FootprintWorldCenter(targetAnchor, dims);
         target=FootprintWorldCenter(targetAnchor, dims);
-        MarkArea(targetAnchor, dims, id);
-        if (items.TryGetValue(id, out var rec)) rec.gridPos = item.gridPos;
+        MarkAreaFormRotate(targetAnchor, dims, item.id,item.rotIndex);
+        if (items.TryGetValue(item.id, out var rec)) rec.gridPos = item.gridPos;
         return true;
     }
 
@@ -508,11 +521,11 @@ public class Map : MonoBehaviour
     public void UpdateMapItemArea(MapItem item)
     {
         // Step 1：解析 id 并释放占用
-        int id = ResolveItemId(item);
+        //int id = ResolveItemId(item);
         var dims = FootprintDims(item.info, item.rotIndex);
         //var anchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
-        MarkArea(item.gridPos, dims, -1);
-        items.Remove(id);
+        MarkAreaFormRotate(item.gridPos, dims, -1,item.rotIndex);
+        items.Remove(item.id);
     }
 
     /// <summary>
