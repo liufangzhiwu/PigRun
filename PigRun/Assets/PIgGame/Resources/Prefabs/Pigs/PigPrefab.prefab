@@ -116,6 +116,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 3421955766904073414}
   speed: 5
+  idleFidgetDelay: 30
 --- !u!1001 &5746488402385903834
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -124,6 +125,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4437194010975269772}
     m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: ee8f501006f6f3242966312b017194cb,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ee8f501006f6f3242966312b017194cb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -177,7 +183,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: ee8f501006f6f3242966312b017194cb,
         type: 3}
       propertyPath: m_ConstrainProportionsScale
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: ee8f501006f6f3242966312b017194cb,
         type: 3}

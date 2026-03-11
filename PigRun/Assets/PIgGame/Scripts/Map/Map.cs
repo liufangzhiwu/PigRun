@@ -429,6 +429,8 @@ public class Map : MonoBehaviour
             items[id] = new PlacedItem { id = id, info = it.info, gridPos = it.gridPos, rotIndex = it.rotIndex, instance = obj, baseRotation = baseRot };
             MarkAreaFormRotate(it.gridPos, dims, id,mi.rotIndex);
         }
+
+        FitMapToScreen();
     }
 
     public PlacedItem GetPlacedItem(int id)
@@ -619,6 +621,54 @@ public class Map : MonoBehaviour
         int id = occupancy[anchor.x, anchor.y];
         if (id != -1) return id;
         return -1; // 未找到
+    }
+    
+    /// <summary>
+    /// 在不改变相机参数的前提下，缩放并移动地图，使其完整显示在屏幕内。
+    /// 缩放基于地图的原始尺寸（cols * cellSize, rows * cellSize），计算合适比例后应用。
+    /// 同时移动地图使其中心与相机视线中心对齐。
+    /// </summary>
+    public void FitMapToScreen()
+    {
+        if (!cam.orthographic)
+        {
+            Debug.LogWarning("相机不是正交相机，此方法仅适用于正交相机。");
+            return;
+        }
+
+        // 地图原始本地尺寸（缩放为1时）
+        float mapWidth_local = cols * cellSize;
+        float mapHeight_local = rows * cellSize;
+
+        // 正交相机的视野范围（世界单位）
+        float screenWorldHeight = 2f * cam.orthographicSize;
+        float screenWorldWidth = screenWorldHeight * cam.aspect;
+
+        // 计算所需缩放比例，使地图完全显示在屏幕内（取宽高适配的最小比例）
+        float scaleHeight = screenWorldHeight / mapHeight_local;
+        float scaleWidth = screenWorldWidth / mapWidth_local;
+        float scale = Mathf.Min(scaleHeight, scaleWidth);
+
+        // 应用均匀缩放（假设地图当前缩放为1，若需保留原有缩放可在此处调整）
+        transform.localScale = Vector3.one * scale;
+
+        // 计算缩放后地图中心的世界坐标
+        Vector3 mapCenter = FootprintWorldCenter(new Vector2Int(0, 0), new Vector2Int(rows, cols));
+
+        // 构造通过地图中心的水平面（法线向上）
+        Plane groundPlane = new Plane(Vector3.up, mapCenter);
+        Ray camRay = new Ray(cam.transform.position, cam.transform.forward);
+        float enter;
+        if (groundPlane.Raycast(camRay, out enter))
+        {
+            Vector3 hitPoint = camRay.GetPoint(enter); // 相机视线与水平面的交点（屏幕中心对应点）
+            // 移动地图使中心与交点重合
+            transform.position += hitPoint - mapCenter;
+        }
+        else
+        {
+            Debug.LogWarning("相机视线未与地图平面相交，无法自动居中。");
+        }
     }
 }
 
