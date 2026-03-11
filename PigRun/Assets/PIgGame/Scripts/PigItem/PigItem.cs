@@ -39,12 +39,19 @@ public class PigItem : MonoBehaviour
         }
         else if (movingToTarget)
         {
-            // 平滑移动到目标位置
-            float step = speed * Time.deltaTime;
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, step);
-            if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
+            if (targetPosition != Vector3.zero)
             {
-                // 到达目标，停止
+                // 平滑移动到目标位置
+                float step = speed * Time.deltaTime;
+                transform.position = Vector3.MoveTowards(transform.position, targetPosition, step);
+                if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
+                {
+                    // 到达目标，停止
+                    StopMoving();
+                }
+            }
+            else
+            {
                 StopMoving();
             }
         }
@@ -60,6 +67,17 @@ public class PigItem : MonoBehaviour
             // 有障碍：直接移动到障碍前
             movingToTarget = true;
             movingForward = false;
+            
+            isMoving = true;
+            
+            if (targetPosition != Vector3.zero)
+            {
+                animator.SetBool("IsRun", true);
+            }
+            else
+            {
+                animator.SetBool("IsHit", true);
+            }
         }
         else
         {
@@ -67,18 +85,14 @@ public class PigItem : MonoBehaviour
             movingForward = true;
             movingToTarget = false;
             Map.Instance.UpdateMapItemArea(mapItem);
+            
+            isMoving = true;
+            animator.SetBool("IsRun", true);
         }
 
-        isMoving = true;
-        animator.SetBool("IsRun", true);
         Debug.Log("PigItem Clicked");
     }
 
-    /// <summary>
-    /// 计算移动终点
-    /// </summary>
-    /// <param name="target">终点世界坐标（若无障碍，则无效）</param>
-    /// <returns>true=有障碍（target为障碍前位置），false=无障碍</returns>
     bool CalculateTargetPosition(out Vector3 target)
     {
         target = Vector3.zero;
@@ -86,30 +100,40 @@ public class PigItem : MonoBehaviour
         Vector2Int currentGrid = mapItem.gridPos;
         Vector2Int checkGrid = currentGrid + forwardOffset;
 
-        // 逐格向前扫描，直到遇到障碍或边界
         while (true)
         {
-            // 检查是否越界
+            // 检查边界
             if (checkGrid.x < 0 || checkGrid.x >= Map.Instance.rows ||
                 checkGrid.y < 0 || checkGrid.y >= Map.Instance.cols)
             {
-                // 无障碍物，但已到边界，可继续向前移动（最终出屏）
+                // 无障碍，可继续移动（调用者需处理边界移动）
                 return false;
             }
-            
+
             int occupantId = Map.Instance.GetOccupantIdAtCell(checkGrid);
             if (occupantId != -1 && occupantId != mapItem.id)
             {
-                Vector2Int gVector2Int = new Vector2Int(checkGrid.x, checkGrid.y);
-                
-                Map.Instance.TryMoveItemTargetCell(mapItem,gVector2Int,out target);
-                // // 遇到障碍：target 为障碍物前一格的世界坐标，保证停在障碍后面且不重叠
-                // Vector2Int lastFreeGrid = checkGrid - forwardOffset;
-                //target = Map.Instance.GridToWorld(lastFreeGrid);
-                return true;
+                // 判断是否紧邻障碍（第一次检查就遇到）
+                if (checkGrid - forwardOffset == currentGrid) // 相邻格
+                {
+                    target = Vector3.zero; // 无移动空间
+                    
+                    PigItem hitItem = Map.Instance.GetPlacedItem(occupantId)?.instance.GetComponent<PigItem>();
+                    hitItem.animator.SetBool("IsBeHit", true);
+                    hitItem.animator.SetBool("IsBeHit", false);
+                    return true;
+                }
+                else
+                {
+                    // 非紧邻，计算障碍前一格的位置
+                    Vector2Int obstacleGrid = new Vector2Int(checkGrid.x, checkGrid.y);
+                    Map.Instance.TryMoveItemTargetCell(mapItem, obstacleGrid, out target);
+                    // 若使用旧逻辑，可直接：target = Map.Instance.GridToWorld(checkGrid - forwardOffset);
+                    return true;
+                }
             }
-        
-            // 继续向前
+
+            // 继续向前扫描
             checkGrid += forwardOffset;
         }
     }
@@ -135,7 +159,14 @@ public class PigItem : MonoBehaviour
         isMoving = false;
         movingForward = false;
         movingToTarget = false;
-        animator.SetBool("IsRun", false);
+        if (targetPosition != Vector3.zero)
+        {
+            animator.SetBool("IsRun", false);
+        }
+        else
+        {
+            animator.SetBool("IsHit", false);
+        }
     }
 
     bool IsOutOfScreen()
