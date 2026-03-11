@@ -64,19 +64,20 @@ public class PigItem : MonoBehaviour
 
         if (hasObstacle)
         {
-            // 有障碍：直接移动到障碍前
-            movingToTarget = true;
-            movingForward = false;
-            
-            isMoving = true;
-            
             if (targetPosition != Vector3.zero)
             {
+                // 有障碍但非紧邻：移动到障碍前
+                movingToTarget = true;
+                movingForward = false;
+                isMoving = true;
                 animator.SetBool("IsRun", true);
             }
             else
             {
+                // 紧邻障碍：不移动，播放受击动画
                 animator.SetBool("IsHit", true);
+                StartCoroutine(ResetHitAnimation()); // 延迟复位
+                // 注意：不设置 isMoving，避免进入 Update 移动逻辑
             }
         }
         else
@@ -85,14 +86,13 @@ public class PigItem : MonoBehaviour
             movingForward = true;
             movingToTarget = false;
             Map.Instance.UpdateMapItemArea(mapItem);
-            
             isMoving = true;
             animator.SetBool("IsRun", true);
         }
 
         Debug.Log("PigItem Clicked");
     }
-
+    
     bool CalculateTargetPosition(out Vector3 target)
     {
         target = Vector3.zero;
@@ -102,25 +102,28 @@ public class PigItem : MonoBehaviour
 
         while (true)
         {
-            // 检查边界
+            // 检查边界...
             if (checkGrid.x < 0 || checkGrid.x >= Map.Instance.rows ||
                 checkGrid.y < 0 || checkGrid.y >= Map.Instance.cols)
             {
-                // 无障碍，可继续移动（调用者需处理边界移动）
                 return false;
             }
 
             int occupantId = Map.Instance.GetOccupantIdAtCell(checkGrid);
             if (occupantId != -1 && occupantId != mapItem.id)
             {
-                // 判断是否紧邻障碍（第一次检查就遇到）
-                if (checkGrid - forwardOffset == currentGrid) // 相邻格
+                // 判断是否紧邻障碍
+                if (checkGrid - forwardOffset == currentGrid)
                 {
                     target = Vector3.zero; // 无移动空间
-                    
+
                     PigItem hitItem = Map.Instance.GetPlacedItem(occupantId)?.instance.GetComponent<PigItem>();
-                    hitItem.animator.SetBool("IsBeHit", true);
-                    hitItem.animator.SetBool("IsBeHit", false);
+                    if (hitItem != null)
+                    {
+                        hitItem.animator.SetBool("IsBeHit", true);
+                        // 在被撞物体上启动复位协程（需在 PigItem 中添加 ResetBeHit 方法）
+                        hitItem.StartCoroutine(hitItem.ResetBeHitAfterDelay(0.5f));
+                    }
                     return true;
                 }
                 else
@@ -128,12 +131,9 @@ public class PigItem : MonoBehaviour
                     // 非紧邻，计算障碍前一格的位置
                     Vector2Int obstacleGrid = new Vector2Int(checkGrid.x, checkGrid.y);
                     Map.Instance.TryMoveItemTargetCell(mapItem, obstacleGrid, out target);
-                    // 若使用旧逻辑，可直接：target = Map.Instance.GridToWorld(checkGrid - forwardOffset);
                     return true;
                 }
             }
-
-            // 继续向前扫描
             checkGrid += forwardOffset;
         }
     }
@@ -163,10 +163,18 @@ public class PigItem : MonoBehaviour
         {
             animator.SetBool("IsRun", false);
         }
-        else
-        {
-            animator.SetBool("IsHit", false);
-        }
+    }
+    
+    IEnumerator ResetHitAnimation()
+    {
+        yield return new WaitForSeconds(0.5f); // 替换为实际动画长度
+        animator.SetBool("IsHit", false);
+    }
+    
+    public IEnumerator ResetBeHitAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        animator.SetBool("IsBeHit", false);
     }
 
     bool IsOutOfScreen()
