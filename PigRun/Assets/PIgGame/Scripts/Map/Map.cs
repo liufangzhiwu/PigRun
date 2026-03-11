@@ -783,7 +783,7 @@ public class Map : MonoBehaviour
                     rect.pivot = new Vector2(0.5f, 0.5f);
 
                     // 使格子平面水平（法线向上）
-                    rect.localRotation = Quaternion.Euler(90, 0, 0);
+                    rect.localRotation = Quaternion.Euler(90, 0, -10);
                 }
 
                 // 根据 (r+c) 的奇偶性分配图片（棋盘格效果）
