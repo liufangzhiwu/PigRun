@@ -1,19 +1,18 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PigItem : MonoBehaviour
 {
     public Animator animator;
     
-    Rigidbody pigRigidbody;
-    MapItem mapItem;
-    bool isMoving=false;
+    private Rigidbody pigRigidbody;
+    private MapItem mapItem;
+    private bool isMoving = false;
     
-    [SerializeField] private float speed = 5f;          // 移动速度
-    private Vector3 targetPosition;                      // 目标位置（有障碍时使用）
-    private bool movingToTarget;                         // 是否向目标移动
-    private bool movingForward;                           // 是否向前匀速移动
+    [SerializeField] private float speed = 5f;
+    private Vector3 targetPosition;
+    private bool movingToTarget;
+    private bool movingForward;
 
     void Start()
     {
@@ -27,10 +26,7 @@ public class PigItem : MonoBehaviour
 
         if (movingForward)
         {
-            // 匀速向前移动
             transform.Translate(Vector3.forward * speed * Time.deltaTime);
-
-            // 检测出屏
             if (Map.Instance != null && IsOutOfScreen())
             {
                 Map.Instance.RemoveItem(mapItem);
@@ -41,14 +37,10 @@ public class PigItem : MonoBehaviour
         {
             if (targetPosition != Vector3.zero)
             {
-                // 平滑移动到目标位置
                 float step = speed * Time.deltaTime;
                 transform.position = Vector3.MoveTowards(transform.position, targetPosition, step);
                 if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
-                {
-                    // 到达目标，停止
                     StopMoving();
-                }
             }
             else
             {
@@ -59,14 +51,16 @@ public class PigItem : MonoBehaviour
 
     private void OnMouseUpAsButton()
     {
-        // 计算终点
+        // 移动中不响应点击，避免干扰
+        if (isMoving) return;
+
         bool hasObstacle = CalculateTargetPosition(out targetPosition);
 
         if (hasObstacle)
         {
             if (targetPosition != Vector3.zero)
             {
-                // 有障碍但非紧邻：移动到障碍前
+                // 非紧邻障碍：移动到目标点
                 movingToTarget = true;
                 movingForward = false;
                 isMoving = true;
@@ -74,15 +68,13 @@ public class PigItem : MonoBehaviour
             }
             else
             {
-                // 紧邻障碍：不移动，播放受击动画
-                animator.SetBool("IsHit", true);
-                StartCoroutine(ResetHitAnimation()); // 延迟复位
-                // 注意：不设置 isMoving，避免进入 Update 移动逻辑
+                // 紧邻障碍：播放自身受击动画
+                HitSelf();
             }
         }
         else
         {
-            // 无障碍：匀速向前移动
+            // 无障碍：匀速向前
             movingForward = true;
             movingToTarget = false;
             Map.Instance.UpdateMapItemArea(mapItem);
@@ -92,7 +84,7 @@ public class PigItem : MonoBehaviour
 
         Debug.Log("PigItem Clicked");
     }
-    
+
     bool CalculateTargetPosition(out Vector3 target)
     {
         target = Vector3.zero;
@@ -102,7 +94,6 @@ public class PigItem : MonoBehaviour
 
         while (true)
         {
-            // 检查边界...
             if (checkGrid.x < 0 || checkGrid.x >= Map.Instance.rows ||
                 checkGrid.y < 0 || checkGrid.y >= Map.Instance.cols)
             {
@@ -112,23 +103,25 @@ public class PigItem : MonoBehaviour
             int occupantId = Map.Instance.GetOccupantIdAtCell(checkGrid);
             if (occupantId != -1 && occupantId != mapItem.id)
             {
-                // 判断是否紧邻障碍
+                // 紧邻障碍
                 if (checkGrid - forwardOffset == currentGrid)
                 {
-                    target = Vector3.zero; // 无移动空间
+                    target = Vector3.zero;
 
                     PigItem hitItem = Map.Instance.GetPlacedItem(occupantId)?.instance.GetComponent<PigItem>();
                     if (hitItem != null)
                     {
-                        hitItem.animator.SetBool("IsBeHit", true);
-                        // 在被撞物体上启动复位协程（需在 PigItem 中添加 ResetBeHit 方法）
-                        hitItem.StartCoroutine(hitItem.ResetBeHitAfterDelay(0.5f));
+                        hitItem.BeHit(); // 调用被撞对象的受击方法
+                    }
+                    else
+                    {
+                        Debug.LogWarning("未找到被撞物体的 PigItem 组件");
                     }
                     return true;
                 }
                 else
                 {
-                    // 非紧邻，计算障碍前一格的位置
+                    // 非紧邻：计算目标位置
                     Vector2Int obstacleGrid = new Vector2Int(checkGrid.x, checkGrid.y);
                     Map.Instance.TryMoveItemTargetCell(mapItem, obstacleGrid, out target);
                     return true;
@@ -139,17 +132,44 @@ public class PigItem : MonoBehaviour
     }
 
     /// <summary>
-    /// 根据旋转索引获取前方网格偏移量（需与Map坐标系一致）
-    /// 假设：rotIndex 3=上，0=右，1=下，2=左（根据你的实际映射调整）
+    /// 自身受击（撞到紧邻障碍时播放）
     /// </summary>
+    private void HitSelf()
+    {
+        animator.SetBool("IsHit", true);
+        StartCoroutine(ResetHitAfterDelay(0.5f)); // 根据动画长度调整
+    }
+
+    /// <summary>
+    /// 被其他物体撞击时调用
+    /// </summary>
+    public void BeHit()
+    {
+        animator.SetBool("IsBeHit", true);
+        StartCoroutine(ResetBeHitAfterDelay(0.5f));
+    }
+
+    private IEnumerator ResetHitAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        animator.SetBool("IsHit", false);
+    }
+
+    private IEnumerator ResetBeHitAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        animator.SetBool("IsBeHit", false);
+    }
+
     Vector2Int GetForwardOffset()
     {
+        // 根据实际方向映射调整
         switch (mapItem.rotIndex)
         {
-            case 3: return new Vector2Int(-1, 0); // 向右
-            case 0: return new Vector2Int(0, -1);  // 向上
-            case 1: return new Vector2Int(0, 1);  // 向下
-            case 2: return new Vector2Int(-1, 0); // 向左
+            case 3: return new Vector2Int(-1, 0); // 右
+            case 0: return new Vector2Int(0, -1); // 上
+            case 1: return new Vector2Int(0, 1);  // 下
+            case 2: return new Vector2Int(-1, 0); // 左
             default: return Vector2Int.zero;
         }
     }
@@ -159,33 +179,14 @@ public class PigItem : MonoBehaviour
         isMoving = false;
         movingForward = false;
         movingToTarget = false;
-        if (targetPosition != Vector3.zero)
-        {
-            animator.SetBool("IsRun", false);
-        }
-    }
-    
-    IEnumerator ResetHitAnimation()
-    {
-        yield return new WaitForSeconds(0.5f); // 替换为实际动画长度
-        animator.SetBool("IsHit", false);
-    }
-    
-    public IEnumerator ResetBeHitAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        animator.SetBool("IsBeHit", false);
+        animator.SetBool("IsRun", false); // 只复位跑步动画
     }
 
     bool IsOutOfScreen()
     {
         Vector3 viewportPos = Camera.main.WorldToViewportPoint(transform.position);
-        if (viewportPos.z < -0.05f ||
-            viewportPos.x < -0.05f || viewportPos.x > 1.05f ||
-            viewportPos.y < -0.05f || viewportPos.y > 1.05f)
-        {
-            return true;
-        }
-        return false;
+        return viewportPos.z < -0.05f ||
+               viewportPos.x < -0.05f || viewportPos.x > 1.05f ||
+               viewportPos.y < -0.05f || viewportPos.y > 1.05f;
     }
 }
