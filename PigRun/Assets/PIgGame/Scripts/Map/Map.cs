@@ -430,7 +430,7 @@ public class Map : MonoBehaviour
             MarkAreaFormRotate(it.gridPos, dims, id,mi.rotIndex);
         }
 
-        FitMapToScreen();
+        FitMapToScreen(new Vector2(0.52f, 0.435f)); // 左移0.1，上移0.1（视口坐标）
     }
 
     public PlacedItem GetPlacedItem(int id)
@@ -623,12 +623,12 @@ public class Map : MonoBehaviour
         return -1; // 未找到
     }
     
+    
     /// <summary>
-    /// 在不改变相机参数的前提下，缩放并移动地图，使其完整显示在屏幕内。
-    /// 缩放基于地图的原始尺寸（cols * cellSize, rows * cellSize），计算合适比例后应用。
-    /// 同时移动地图使其中心与相机视线中心对齐。
+    /// 根据实际放置的物品占用区域，缩放并移动地图使其完整显示在屏幕内，并可指定目标屏幕位置（视口坐标）。
     /// </summary>
-    public void FitMapToScreen()
+    /// <param name="targetScreenUV">目标屏幕位置，视口坐标 (0,0) 左下角到 (1,1) 右上角。默认 null 表示屏幕中心 (0.5,0.5)。</param>
+    public void FitMapToScreen(Vector2? targetScreenUV = null)
     {
         if (!cam.orthographic)
         {
@@ -636,34 +636,78 @@ public class Map : MonoBehaviour
             return;
         }
 
-        // 地图原始本地尺寸（缩放为1时）
-        float mapWidth_local = cols * cellSize;
-        float mapHeight_local = rows * cellSize;
+        // 如果没有物品，则无需调整
+        if (items.Count == 0)
+        {
+            Debug.Log("没有物品，不进行缩放适配。");
+            return;
+        }
 
-        // 正交相机的视野范围（世界单位）
+        // 初始化极值
+        int minRow = int.MaxValue;
+        int maxRow = int.MinValue;
+        int minCol = int.MaxValue;
+        int maxCol = int.MinValue;
+
+        // 遍历所有已放置物品，收集占用的所有格子
+        foreach (var kv in items)
+        {
+            var placed = kv.Value;
+            var info = placed.info;
+            var gridPos = placed.gridPos;
+            var rotIndex = placed.rotIndex;
+
+            var dims = FootprintDims(info, rotIndex);
+            var anchor = StartFromPivot(gridPos, info, rotIndex);
+
+            for (int r = 0; r < dims.x; r++)
+            {
+                for (int c = 0; c < dims.y; c++)
+                {
+                    int row = anchor.x + r;
+                    int col = anchor.y + c;
+                    if (row < minRow) minRow = row;
+                    if (row > maxRow) maxRow = row;
+                    if (col < minCol) minCol = col;
+                    if (col > maxCol) maxCol = col;
+                }
+            }
+        }
+
+        // 计算实际占用区域的尺寸（世界单位）
+        float occupiedWidth = (maxCol - minCol + 1) * cellSize;
+        float occupiedHeight = (maxRow - minRow + 1) * cellSize;
+
+        // 正交相机的视野范围
         float screenWorldHeight = 2f * cam.orthographicSize;
         float screenWorldWidth = screenWorldHeight * cam.aspect;
 
-        // 计算所需缩放比例，使地图完全显示在屏幕内（取宽高适配的最小比例）
-        float scaleHeight = screenWorldHeight / mapHeight_local;
-        float scaleWidth = screenWorldWidth / mapWidth_local;
+        // 计算所需缩放比例
+        float scaleHeight = screenWorldHeight / occupiedHeight;
+        float scaleWidth = screenWorldWidth / occupiedWidth;
         float scale = Mathf.Min(scaleHeight, scaleWidth);
 
-        // 应用均匀缩放（假设地图当前缩放为1，若需保留原有缩放可在此处调整）
+        // 应用均匀缩放
         transform.localScale = Vector3.one * scale;
 
-        // 计算缩放后地图中心的世界坐标
-        Vector3 mapCenter = FootprintWorldCenter(new Vector2Int(0, 0), new Vector2Int(rows, cols));
+        // 计算缩放后实际占用区域中心的世界坐标
+        Vector2Int occupiedAnchor = new Vector2Int(minRow, minCol);
+        Vector2Int occupiedDims = new Vector2Int(maxRow - minRow + 1, maxCol - minCol + 1);
+        Vector3 occupiedCenter = FootprintWorldCenter(occupiedAnchor, occupiedDims);
 
-        // 构造通过地图中心的水平面（法线向上）
-        Plane groundPlane = new Plane(Vector3.up, mapCenter);
-        Ray camRay = new Ray(cam.transform.position, cam.transform.forward);
+        // 确定目标屏幕位置（默认中心）
+        Vector2 screenUV = targetScreenUV ?? new Vector2(0.5f, 0.5f);
+
+        // 从相机发射一条穿过目标屏幕位置的射线
+        Ray camRay = cam.ViewportPointToRay(screenUV);
+        Plane groundPlane = new Plane(Vector3.up, occupiedCenter); // 平面经过区域中心，法线向上
+
         float enter;
         if (groundPlane.Raycast(camRay, out enter))
         {
-            Vector3 hitPoint = camRay.GetPoint(enter); // 相机视线与水平面的交点（屏幕中心对应点）
-            // 移动地图使中心与交点重合
-            transform.position += hitPoint - mapCenter;
+            Vector3 targetWorldPoint = camRay.GetPoint(enter);
+            // 移动地图使区域中心与目标世界点重合
+            transform.position += targetWorldPoint - occupiedCenter;
         }
         else
         {
