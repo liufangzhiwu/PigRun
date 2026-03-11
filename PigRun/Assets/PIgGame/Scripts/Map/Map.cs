@@ -687,6 +687,9 @@ public class Map : MonoBehaviour
         float scaleWidth = screenWorldWidth / occupiedWidth;
         float scale = Mathf.Min(scaleHeight, scaleWidth);
 
+        // 限制最大缩放不超过 1.3f
+        scale = Mathf.Min(scale, 1.3f);
+
         // 应用均匀缩放
         transform.localScale = Vector3.one * scale;
 
