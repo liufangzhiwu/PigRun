@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
 using static Map;
 
 /// <summary>
@@ -32,6 +33,8 @@ public class Map : MonoBehaviour
     public Color selectedColor = Color.red;
     public bool selectedUseComplementary = false;
     public float gridLineWidth = 1f;
+    public Sprite grid01 = null;
+    public Sprite grid02 = null;
     
     [Tooltip("运行时在地图网格上显示每格占用 id，便于检查占用表是否正确")]
     public bool showOccupancyTable = true;
@@ -40,7 +43,7 @@ public class Map : MonoBehaviour
     
     // ==================== 数据资产 ====================
     public MapData dataAsset;
-    MapData runtimeData;
+    //MapData runtimeData;
 
     // ==================== 运行时内部数据结构 ====================
     /// <summary>
@@ -108,6 +111,8 @@ public class Map : MonoBehaviour
         //         LoadFromAsset(dataAsset, true);
         //     }
         // }
+        grid01=Resources.Load<Sprite>("UI/grid01");
+        grid02=Resources.Load<Sprite>("UI/grid02");
     }
 
     void OnDestroy()
@@ -126,6 +131,10 @@ public class Map : MonoBehaviour
         for (int r = 0; r < rows; r++)
             for (int c = 0; c < cols; c++)
                 occupancy[r, c] = -1;
+        
+        // 清除网格 UI
+        if (gridUICanvas != null) Destroy(gridUICanvas);
+        gridUIItems.Clear();
     }
 
     // ==================== 占用计算工具方法 ====================
@@ -431,6 +440,7 @@ public class Map : MonoBehaviour
         }
 
         FitMapToScreen(new Vector2(0.52f, 0.435f)); // 左移0.1，上移0.1（视口坐标）
+        GenerateGridUI();
     }
 
     public PlacedItem GetPlacedItem(int id)
@@ -446,7 +456,7 @@ public class Map : MonoBehaviour
     /// </summary>
     public void ClearAllItems()
     {
-        ResetOccupancy();
+        //ResetOccupancy();
         items.Clear();
         nextId = 1;
         selected = null;
@@ -457,7 +467,7 @@ public class Map : MonoBehaviour
         // foreach (var go in toDelete) UnityEditor.Undo.DestroyObjectImmediate(go);
 #endif
         for (int i = transform.childCount - 1; i >= 0; i--) Destroy(transform.GetChild(i).gameObject);
-        UpdateDataAssetMirror();
+        //UpdateDataAssetMirror();
     }
 
     // ==================== 项 ID 解析 ====================
@@ -563,26 +573,26 @@ public class Map : MonoBehaviour
     /// </summary>
     public void UpdateDataAssetMirror()
     {
-        // Step 1：若无数据资产则返回
-        if (dataAsset == null) return;
-        // Step 2：运行态仅更新内存副本（不改动资产）
-        if (Application.isPlaying)
-        {
-            if (runtimeData == null) return;
-            runtimeData.rows = rows;
-            runtimeData.cols = cols;
-            runtimeData.cellSize = cellSize;
-            runtimeData.origin = origin;
-            runtimeData.items.Clear();
-            for (int i = 0; i < transform.childCount; i++)
-            {
-                var mi = transform.GetChild(i).GetComponent<MapItem>();
-                if (mi == null || mi.info == null) continue;
-                var d = new MapData.MapItemData { info = mi.info, gridPos = mi.gridPos, rotIndex = mi.rotIndex };
-                runtimeData.items.Add(d);
-            }
-            return;
-        }
+        // // Step 1：若无数据资产则返回
+        // if (dataAsset == null) return;
+        // // Step 2：运行态仅更新内存副本（不改动资产）
+        // if (Application.isPlaying)
+        // {
+        //     if (runtimeData == null) return;
+        //     runtimeData.rows = rows;
+        //     runtimeData.cols = cols;
+        //     runtimeData.cellSize = cellSize;
+        //     runtimeData.origin = origin;
+        //     runtimeData.items.Clear();
+        //     for (int i = 0; i < transform.childCount; i++)
+        //     {
+        //         var mi = transform.GetChild(i).GetComponent<MapItem>();
+        //         if (mi == null || mi.info == null) continue;
+        //         var d = new MapData.MapItemData { info = mi.info, gridPos = mi.gridPos, rotIndex = mi.rotIndex };
+        //         runtimeData.items.Add(d);
+        //     }
+        //     return;
+        // }
     }
 
     /// <summary>
@@ -717,5 +727,79 @@ public class Map : MonoBehaviour
             Debug.LogWarning("相机视线未与地图平面相交，无法自动居中。");
         }
     }
+    
+    
+    
+    // 添加字段（与现有字段放在一起）
+    private GameObject gridUICanvas;
+    private List<GameObject> gridUIItems = new List<GameObject>();
+
+    void GenerateGridUI()
+    {
+        // 清除旧 UI
+        if (gridUICanvas != null) Destroy(gridUICanvas);
+        gridUIItems.Clear();
+
+        // 创建世界空间 Canvas
+        GameObject canvasObj = new GameObject("GridUICanvas");
+        canvasObj.transform.SetParent(transform, false);
+        Canvas canvas = canvasObj.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.WorldSpace;
+        canvas.worldCamera = cam;
+
+        // 确保 Canvas 的世界旋转为恒等（不随父级旋转）
+        canvasObj.transform.rotation = Quaternion.identity;
+
+        RectTransform canvasRect = canvasObj.GetComponent<RectTransform>();
+        canvasRect.sizeDelta = new Vector2(100, 100); // 不影响子物体
+
+        // 加载格子预制体
+        GameObject gridPrefab = Resources.Load<GameObject>("UI/grid1");
+        if (gridPrefab == null)
+        {
+            Debug.LogError("无法从 Resources/UI/grid1 加载格子 UI 预制体");
+            return;
+        }
+       
+
+        for (int r = 0; r < rows; r++)
+        {
+            for (int c = 0; c < cols; c++)
+            {
+                Vector3 worldPos = GridToWorld(new Vector2Int(r, c));
+                GameObject gridItem = Instantiate(gridPrefab, canvasObj.transform);
+                gridItem.name = $"Grid_{r}_{c}";
+
+                RectTransform rect = gridItem.GetComponent<RectTransform>();
+                Image gImage = gridItem.GetComponent<Image>();
+
+                if (rect != null)
+                {
+                    rect.localScale = Vector3.one;
+                    rect.position = worldPos;
+                    rect.sizeDelta = new Vector2(cellSize, cellSize);
+                    rect.anchorMin = new Vector2(0.5f, 0.5f);
+                    rect.anchorMax = new Vector2(0.5f, 0.5f);
+                    rect.pivot = new Vector2(0.5f, 0.5f);
+
+                    // 使格子平面水平（法线向上）
+                    rect.localRotation = Quaternion.Euler(90, 0, 0);
+                }
+
+                // 根据 (r+c) 的奇偶性分配图片（棋盘格效果）
+                if (gImage != null)
+                {
+                    bool isEven = (r + c) % 2 == 0;
+                    gImage.sprite = isEven ? grid01 : grid02;
+                }
+
+                gridUIItems.Add(gridItem);
+            }
+        }
+
+        gridUICanvas = canvasObj;
+    }
+    
+    
 }
 
