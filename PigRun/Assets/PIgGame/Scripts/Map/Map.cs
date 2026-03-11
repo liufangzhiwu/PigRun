@@ -35,9 +35,8 @@ public class Map : MonoBehaviour
     
     [Tooltip("运行时在地图网格上显示每格占用 id，便于检查占用表是否正确")]
     public bool showOccupancyTable = true;
-
-    [Tooltip("占用表写入时打印 occupancy（日志较多，仅调试用）")]
-    public bool logOccupancyOnChange = false;
+   
+    public bool LevelFinish = false;
     
     // ==================== 数据资产 ====================
     public MapData dataAsset;
@@ -67,10 +66,6 @@ public class Map : MonoBehaviour
     // ==================== 拾取相关 ====================
     Plane plane;                                                // 拾取平面
     Camera cam;                                                 // 主相机引用
-    
-    // ==================== UI 消息 ====================
-    string runtimeMessage;                                      // 运行时消息文本
-    float runtimeMessageUntil;                                  // 消息显示截止时间
 
     // ==================== 初始化方法 ====================
     /// <summary>
@@ -386,20 +381,6 @@ public class Map : MonoBehaviour
 #endif
     }
 
-    // ==================== UI 消息显示 ====================
-    /// <summary>
-    /// 简易屏幕消息显示
-    /// 失败反馈提示
-    /// </summary>
-    void OnGUI()
-    {
-        // Step 1：在有效时间内显示失败提示框
-        if (Time.time < runtimeMessageUntil && !string.IsNullOrEmpty(runtimeMessage))
-        {
-            var rect = new Rect(10, 10, 480, 26);
-            GUI.Box(rect, runtimeMessage);
-        }
-    }
 
     // ==================== 数据资产加载 ====================
     /// <summary>
@@ -565,9 +546,10 @@ public class Map : MonoBehaviour
         Destroy(item.gameObject);
 
         // Step 3：检查是否所有物品都已销毁
-        if (items.Count == 0)
+        if (items.Count == 0&&!LevelFinish)
         {
             OnAllItemsDestroyed?.Invoke();
+            LevelFinish = true;
         }
 
         return true;
