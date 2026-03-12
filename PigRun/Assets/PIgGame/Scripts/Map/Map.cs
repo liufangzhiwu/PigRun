@@ -734,20 +734,27 @@ public class Map : MonoBehaviour
     private GameObject gridUICanvas;
     private List<GameObject> gridUIItems = new List<GameObject>();
 
-    void GenerateGridUI()
+  void GenerateGridUI()
 {
-    // 清除旧 UI
+    // 清除旧UI
     if (gridUICanvas != null) Destroy(gridUICanvas);
     gridUIItems.Clear();
 
-    // 创建世界空间 Canvas
+    // 如果没有任何物品，就不生成格子UI
+    if (items == null || items.Count == 0)
+    {
+        Debug.Log("没有物品，不生成格子UI。");
+        return;
+    }
+
+    // 创建世界空间Canvas
     GameObject canvasObj = new GameObject("GridUICanvas");
     canvasObj.transform.SetParent(transform, false);
     Canvas canvas = canvasObj.AddComponent<Canvas>();
     canvas.renderMode = RenderMode.WorldSpace;
     canvas.worldCamera = cam;
 
-    // 确保 Canvas 的世界旋转为恒等（不随父级旋转）
+    // 确保Canvas的世界旋转为恒等（不随父级旋转）
     canvasObj.transform.rotation = Quaternion.identity;
 
     RectTransform canvasRect = canvasObj.GetComponent<RectTransform>();
@@ -758,28 +765,64 @@ public class Map : MonoBehaviour
     if (gridPrefab == null)
     {
         Debug.LogError("无法从 Resources/UI/grid1 加载格子 UI 预制体");
+        Destroy(canvasObj);
         return;
     }
 
-    // 按3x3块生成UI
-    for (int r = 0; r < rows; r += 3)
+    // 计算所有物品占用的整体行列范围
+    int minRow = int.MaxValue;
+    int maxRow = int.MinValue;
+    int minCol = int.MaxValue;
+    int maxCol = int.MinValue;
+
+    foreach (var kv in items)
     {
-        for (int c = 0; c < cols; c += 3)
+        var placed = kv.Value;
+        var info = placed.info;
+        var gridPos = placed.gridPos;
+        var rotIndex = placed.rotIndex;
+
+        var dims = FootprintDims(info, rotIndex);
+        var anchor = StartFromPivot(gridPos, info, rotIndex);
+
+        for (int r = 0; r < dims.x; r++)
         {
-            // 计算当前块实际覆盖的行列范围（处理边界）
-            int blockRows = Mathf.Min(3, rows - r);
-            int blockCols = Mathf.Min(3, cols - c);
+            for (int c = 0; c < dims.y; c++)
+            {
+                int row = anchor.x + r;
+                int col = anchor.y + c;
+                if (row < minRow) minRow = row;
+                if (row > maxRow) maxRow = row;
+                if (col < minCol) minCol = col;
+                if (col > maxCol) maxCol = col;
+            }
+        }
+    }
+
+    // 以最小行和最小列为起点，步长3，生成格子UI，覆盖到最大行和最大列
+    for (int r = minRow; r <= maxRow; r += 3)
+    {
+        for (int c = minCol; c <= maxCol; c += 3)
+        {
+            // 计算当前块实际覆盖的行列范围（不超过 maxRow/maxCol）
+            int blockStartRow = r;
+            int blockStartCol = c;
+            int blockEndRow = Mathf.Min(r + 2, maxRow);
+            int blockEndCol = Mathf.Min(c + 2, maxCol);
+            int blockRows = blockEndRow - blockStartRow + 1;
+            int blockCols = blockEndCol - blockStartCol + 1;
+
             if (blockRows <= 0 || blockCols <= 0) continue;
 
-            // 计算块的中心位置
-            Vector3 topLeft = GridToWorld(new Vector2Int(r, c));
-            Vector3 bottomRight = GridToWorld(new Vector2Int(r + blockRows - 1, c + blockCols - 1));
+            // 计算块的中心位置（基于网格世界坐标）
+            Vector3 topLeft = GridToWorld(new Vector2Int(blockStartRow, blockStartCol));
+            Vector3 bottomRight = GridToWorld(new Vector2Int(blockEndRow, blockEndCol));
             Vector3 center = (topLeft + bottomRight) * 0.5f;
 
             // 实例化UI
             GameObject gridItem = Instantiate(gridPrefab, canvasObj.transform);
-            int blockR = r / 3;
-            int blockC = c / 3;
+            int blockR = (r - minRow) / 3; // 相对索引，用于命名和图片分配
+            int blockC = (c - minCol) / 3;
             gridItem.name = $"Block_{blockR}_{blockC}";
 
             RectTransform rect = gridItem.GetComponent<RectTransform>();
@@ -788,7 +831,7 @@ public class Map : MonoBehaviour
             if (rect != null)
             {
                 rect.localScale = Vector3.one;
-                rect.position = center;
+                rect.position = center; // 直接设置世界位置（忽略Canvas偏移）
                 // 尺寸 = 块实际格子数 * cellSize
                 rect.sizeDelta = new Vector2(blockCols * cellSize, blockRows * cellSize);
                 rect.anchorMin = new Vector2(0.5f, 0.5f);
