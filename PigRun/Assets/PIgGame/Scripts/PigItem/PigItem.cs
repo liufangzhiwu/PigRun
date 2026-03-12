@@ -16,6 +16,7 @@ public class PigItem : MonoBehaviour
     // 新增：闲置触发 Fidget 相关
     [SerializeField] public float idleFidgetDelay = 30;   // 闲置多少秒后触发 Fidget
     private float idleTimer = 0f;                           // 当前闲置计时
+    private PigItem BehitItem;
 
     void Start()
     {
@@ -54,12 +55,27 @@ public class PigItem : MonoBehaviour
             {
                 float step = speed * Time.deltaTime;
                 transform.position = Vector3.MoveTowards(transform.position, targetPosition, step);
-                if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
+                if (Vector3.Distance(transform.position, targetPosition) < 0.05f)
+                {
                     StopMoving();
+                    HitSelf();
+                    if (BehitItem != null)
+                    {
+                        //Debug.LogWarning("未找到被撞物体的 PigItem 组件");
+                        BehitItem.BeHit(); // 调用被撞对象的受击方法
+                    }
+                }
+                    
             }
             else
             {
                 StopMoving();
+                HitSelf();
+                if (BehitItem != null)
+                {
+                    //Debug.LogWarning("未找到被撞物体的 PigItem 组件");
+                    BehitItem.BeHit(); // 调用被撞对象的受击方法
+                }
             }
         }
     }
@@ -76,7 +92,8 @@ public class PigItem : MonoBehaviour
 
         if (hasObstacle)
         {
-            if (targetPosition != Vector3.zero)
+            //if (targetPosition != Vector3.zero)
+            if (Vector3.Distance(transform.position, targetPosition) > 0.05f||targetPosition != Vector3.zero)
             {
                 // 非紧邻障碍：移动到目标点
                 movingToTarget = true;
@@ -88,6 +105,11 @@ public class PigItem : MonoBehaviour
             {
                 // 紧邻障碍：播放自身受击动画
                 HitSelf();
+                if (BehitItem != null)
+                {
+                    //Debug.LogWarning("未找到被撞物体的 PigItem 组件");
+                    BehitItem.BeHit(); // 调用被撞对象的受击方法
+                }
             }
         }
         else
@@ -121,20 +143,18 @@ public class PigItem : MonoBehaviour
             int occupantId = Map.Instance.GetOccupantIdAtCell(checkGrid);
             if (occupantId != -1 && occupantId != mapItem.id)
             {
+                
+                BehitItem = Map.Instance.GetPlacedItem(occupantId)?.instance.GetComponent<PigItem>();
+                if (BehitItem == null)
+                {
+                    Debug.LogWarning("未找到被撞物体的 PigItem 组件");
+                    //BehitItem.BeHit(); // 调用被撞对象的受击方法
+                }
+                
                 // 紧邻障碍
                 if (checkGrid - forwardOffset == currentGrid)
                 {
                     target = Vector3.zero;
-
-                    PigItem hitItem = Map.Instance.GetPlacedItem(occupantId)?.instance.GetComponent<PigItem>();
-                    if (hitItem != null)
-                    {
-                        hitItem.BeHit(); // 调用被撞对象的受击方法
-                    }
-                    else
-                    {
-                        Debug.LogWarning("未找到被撞物体的 PigItem 组件");
-                    }
                     return true;
                 }
                 else
@@ -147,7 +167,7 @@ public class PigItem : MonoBehaviour
                             checkGrid = new Vector2Int(checkGrid.x+1, checkGrid.y);
                            break;  // 下
                         case 2: 
-                            checkGrid = new Vector2Int(checkGrid.x, checkGrid.y+1);
+                            checkGrid = new Vector2Int(checkGrid.x+2, checkGrid.y+1);
                             break; // 左
                         default: break; // 上
                     }

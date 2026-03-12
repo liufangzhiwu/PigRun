@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
@@ -500,8 +501,8 @@ public class Map : MonoBehaviour
         }
 
         FitMapToScreen(new Vector2(0.52f, 0.435f)); // 左移0.1，上移0.1（视口坐标）
-        GenerateGridUI();
-       
+        //GenerateGridUI();
+        CombineMeshesByMaterial();
     }
 
     public PlacedItem GetPlacedItem(int id)
@@ -917,6 +918,66 @@ public class Map : MonoBehaviour
     gridUICanvas = canvasObj;
 }
     
+  
+  
+
+public void CombineMeshesByMaterial()
+{
+    // 1. 获取所有需要合并的MeshRenderer（排除已合并的）
+    MeshRenderer[] allRenderers = GetComponentsInChildren<MeshRenderer>();
+    if (allRenderers.Length == 0) return;
+
+    // 按材质分组
+    var groups = allRenderers
+        .Where(r => r.enabled) // 只合并启用的
+        .GroupBy(r => r.sharedMaterial);
+
+    foreach (var group in groups)
+    {
+        Material material = group.Key;
+        List<CombineInstance> combineInstances = new List<CombineInstance>();
+
+        foreach (var renderer in group)
+        {
+            MeshFilter filter = renderer.GetComponent<MeshFilter>();
+            if (filter == null || filter.sharedMesh == null) continue;
+
+            CombineInstance ci = new CombineInstance
+            {
+                mesh = filter.sharedMesh,
+                transform = renderer.transform.localToWorldMatrix
+            };
+            combineInstances.Add(ci);
+        }
+
+        if (combineInstances.Count == 0) continue;
+
+        // 2. 创建合并后的Mesh
+        Mesh combinedMesh = new Mesh();
+        combinedMesh.CombineMeshes(combineInstances.ToArray(), true, true);
+
+        // 3. 创建合并后的GameObject
+        GameObject combinedObj = new GameObject("CombinedMesh_" + material.name);
+        combinedObj.transform.SetParent(transform); // 放在地图容器下
+        combinedObj.transform.position = Vector3.zero; // 因为合并时使用了世界矩阵，所以位置设为零
+        combinedObj.transform.rotation = Quaternion.identity;
+        combinedObj.transform.localScale = Vector3.one;
+
+        MeshFilter mf = combinedObj.AddComponent<MeshFilter>();
+        mf.sharedMesh = combinedMesh;
+        MeshRenderer mr = combinedObj.AddComponent<MeshRenderer>();
+        mr.sharedMaterial = material;
+
+        // 4. 隐藏原始物体的渲染（可选：禁用Renderer或直接移除）
+        foreach (var renderer in group)
+        {
+            renderer.enabled = false;
+            // 如果想彻底移除渲染组件，可以用 Destroy(renderer);
+        }
+    }
+
+    // 可选：移除空Renderer的物体（如果需要）
+}
     
 }
 
