@@ -106,9 +106,9 @@ public class PigItem : MonoBehaviour
     bool CalculateTargetPosition(out Vector3 target)
     {
         target = Vector3.zero;
-        Vector2Int forwardOffset = GetForwardOffset(out Vector2Int currentGrid);
+        Vector2Int checkGrid = GetForwardOffset(out Vector2Int currentGrid, out Vector2Int forwardOffset);
         //Vector2Int currentGrid = mapItem.gridPos;
-        Vector2Int checkGrid = currentGrid + forwardOffset;
+        //Vector2Int checkGrid = currentGrid + forwardOffset;
 
         while (true)
         {
@@ -139,6 +139,19 @@ public class PigItem : MonoBehaviour
                 }
                 else
                 {
+                    switch (mapItem.rotIndex)
+                    {
+                        //case 3: return new Vector2Int(1, 0); // 右
+                        case 0: break; // 向右边
+                        case 1:
+                            checkGrid = new Vector2Int(checkGrid.x+1, checkGrid.y);
+                           break;  // 下
+                        case 2: 
+                            checkGrid = new Vector2Int(checkGrid.x, checkGrid.y+1);
+                            break; // 左
+                        default: break; // 上
+                    }
+                    
                     // 非紧邻：计算目标位置
                     Vector2Int obstacleGrid = new Vector2Int(checkGrid.x, checkGrid.y);
                     Map.Instance.TryMoveItemTargetCell(mapItem, obstacleGrid, out target);
@@ -187,20 +200,30 @@ public class PigItem : MonoBehaviour
         animator.SetBool("IsFidget", false);
     }
 
-    Vector2Int GetForwardOffset(out Vector2Int currentGrid)
+    Vector2Int GetForwardOffset(out Vector2Int currentGrid,out Vector2Int forwardOffset)
     {
         currentGrid=mapItem.gridPos;
+        Vector2Int checkGrid=Vector2Int.zero;
         // 根据实际方向映射调整
         switch (mapItem.rotIndex)
         {
             //case 3: return new Vector2Int(1, 0); // 右
-            case 0: return new Vector2Int(1, 0); // 向右边
+            case 0: forwardOffset = new Vector2Int(1, 0); // 向右边
+                break;
             case 1:
-                currentGrid = new Vector2Int(mapItem.gridPos.x - 1, mapItem.gridPos.y);
-                return new Vector2Int(0, 1);  // 下
-            case 2: return new Vector2Int(-1, 0); // 左
-            default: return new Vector2Int(0, -1); // 上
+                currentGrid = new Vector2Int(mapItem.gridPos.x-1, mapItem.gridPos.y);
+                forwardOffset = new Vector2Int(0, 1);  // 下
+                break;
+            case 2: 
+                currentGrid = new Vector2Int(mapItem.gridPos.x, mapItem.gridPos.y-1);
+                forwardOffset = new Vector2Int(-1, 0); // 左
+                break;
+            default: forwardOffset= new Vector2Int(0, -1); // 上
+                break;
         }
+        
+        checkGrid=currentGrid+forwardOffset;
+        return checkGrid;
     }
 
     void StopMoving()

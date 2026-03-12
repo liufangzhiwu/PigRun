@@ -278,7 +278,7 @@ public class Map : MonoBehaviour
             // Step 1：遍历占用矩形范围并写入 id
             for (int r = 0; r < dims.x; r++)
             for (int c = 0; c < dims.y; c++)
-                occupancy[start.x + r*vector2Int.x-1, start.y + c*vector2Int.y] = id;
+                occupancy[start.x + r*vector2Int.x-1, start.y + c*vector2Int.y-1] = id;
         }
         if (rotIndex == 2) //向左
         {
@@ -291,14 +291,65 @@ public class Map : MonoBehaviour
 
         if (rotIndex == 0) //向右
         {
-            vector2Int = new Vector2Int(-1, -1);
+            vector2Int = new Vector2Int(-1, 1);
+            // Step 1：遍历占用矩形范围并写入 id
+            for (int r = 1; r < dims.x+1; r++)
+            for (int c = 0; c < dims.y; c++)
+                occupancy[start.x + r*vector2Int.x, start.y + c*vector2Int.y-1] = id;
+        }
+    }
+    
+    /// <summary>
+    /// 将itemid所在的格子重置为-1
+    /// </summary>
+    void ResetMarkAreaFormRotate(Vector2Int start, Vector2Int dims, int itemid,int rotIndex)
+    {
+        Vector2Int vector2Int=Vector2Int.one;
+
+        int id = -1;
+
+        if (rotIndex==-1)
+        {
+            vector2Int = new Vector2Int(1, 1);
             // Step 1：遍历占用矩形范围并写入 id
             for (int r = 0; r < dims.x; r++)
             for (int c = 0; c < dims.y; c++)
                 occupancy[start.x + r*vector2Int.x, start.y + c*vector2Int.y] = id;
         }
+        if (rotIndex == 1) //向下
+        {
+            vector2Int = new Vector2Int(-1, -1);
+            
+            // Step 1：遍历占用矩形范围并写入 id
+            for (int r = 0; r < dims.x; r++)
+            for (int c = 0; c < dims.y; c++)
+                occupancy[start.x + r*vector2Int.x-1, start.y + c*vector2Int.y-1] = id;
+        }
+        if (rotIndex == 2) //向左
+        {
+            vector2Int = new Vector2Int(1, -1);
+            // Step 1：遍历占用矩形范围并写入 id
+            for (int r = 0; r < dims.x; r++)
+            for (int c = 1; c < dims.y+1; c++)
+                occupancy[start.x + r*vector2Int.x-1, start.y + c*vector2Int.y] = id;
+        }
+
+        if (rotIndex == 0) //向右
+        {
+            vector2Int = new Vector2Int(-1, 1);
+            // Step 1：遍历占用矩形范围并写入 id
+            for (int r = 1; r < dims.x+1; r++)
+            for (int c = 0; c < dims.y; c++)
+                occupancy[start.x + r*vector2Int.x, start.y + c*vector2Int.y-1] = id;
+        }
         
-       
+        // for (int r = 0; r < rows; r++)
+        // for (int c = 0; c < cols; c++)
+        //     if (occupancy[r, c] == itemid)
+        //     {
+        //         occupancy[r, c] = -1;
+        //     }
+            
     }
 
     // ==================== 坐标转换 ====================
@@ -410,6 +461,7 @@ public class Map : MonoBehaviour
         dataAsset = data;
         rows = data.rows;
         cols = data.cols;
+        LevelFinish = false;
         //cellSize = data.cellSize;
         origin = data.origin;
         ResetOccupancy();
@@ -438,7 +490,7 @@ public class Map : MonoBehaviour
             var mi = obj.GetComponent<MapItem>();
             if (mi == null) mi = obj.AddComponent<MapItem>();
             mi.info = it.info;
-            mi.gridPos = it.gridPos;
+            mi.gridPos =  it.gridPos;
             mi.rotIndex = it.rotIndex;
             mi.baseRotation = baseRot;
             mi.id = nextId;
@@ -449,6 +501,7 @@ public class Map : MonoBehaviour
 
         FitMapToScreen(new Vector2(0.52f, 0.435f)); // 左移0.1，上移0.1（视口坐标）
         GenerateGridUI();
+       
     }
 
     public PlacedItem GetPlacedItem(int id)
@@ -513,8 +566,8 @@ public class Map : MonoBehaviour
         //int id = ResolveItemId(item);
         // Step 2：释放当前占用区域
         var dims = FootprintDims(item.info, item.rotIndex);
-        var curAnchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
-        MarkArea(curAnchor, dims, -1);
+        //var curAnchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
+        ResetMarkAreaFormRotate(item.gridPos, dims,item.id,item.rotIndex);
         // Step 3：计算目标占用并校验
         var targetAnchor = StartFromPivot(targetPivot, item.info, item.rotIndex);
         item.gridPos = targetPivot;
@@ -548,7 +601,7 @@ public class Map : MonoBehaviour
         //int id = ResolveItemId(item);
         var dims = FootprintDims(item.info, item.rotIndex);
         //var anchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
-        MarkAreaFormRotate(item.gridPos, dims, -1,item.rotIndex);
+        ResetMarkAreaFormRotate(item.gridPos, dims, item.id,item.rotIndex);
         items.Remove(item.id);
     }
 
