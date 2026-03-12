@@ -263,9 +263,13 @@ public class Map : MonoBehaviour
     {
         Vector2Int vector2Int=Vector2Int.one;
 
-        if (rotIndex == 0)
+        if (rotIndex == 0||rotIndex==-1)
         {
-            vector2Int = new Vector2Int(-1, 1);
+            vector2Int = new Vector2Int(1, 1);
+            // Step 1：遍历占用矩形范围并写入 id
+            for (int r = 0; r < dims.x; r++)
+            for (int c = 0; c < dims.y; c++)
+                occupancy[start.x + r*vector2Int.x, start.y + c*vector2Int.y] = id;
         }
         if (rotIndex == 1) //向下
         {
@@ -288,6 +292,10 @@ public class Map : MonoBehaviour
         if (rotIndex == 3)
         {
             vector2Int = new Vector2Int(0, 0);
+            // Step 1：遍历占用矩形范围并写入 id
+            for (int r = 0; r < dims.x; r++)
+            for (int c = 0; c < dims.y; c++)
+                occupancy[start.x + r*vector2Int.x, start.y + c*vector2Int.y] = id;
         }
         
        

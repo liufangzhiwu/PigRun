@@ -196,7 +196,7 @@ public class PigItem : MonoBehaviour
             case 0: return new Vector2Int(0, -1); // 上
             case 1: return new Vector2Int(0, 1);  // 下
             case 2: return new Vector2Int(-1, 0); // 左
-            default: return Vector2Int.zero;
+            default: return new Vector2Int(0, -1); // 上
         }
     }
 
