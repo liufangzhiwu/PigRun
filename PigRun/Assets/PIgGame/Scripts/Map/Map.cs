@@ -735,70 +735,83 @@ public class Map : MonoBehaviour
     private List<GameObject> gridUIItems = new List<GameObject>();
 
     void GenerateGridUI()
+{
+    // 清除旧 UI
+    if (gridUICanvas != null) Destroy(gridUICanvas);
+    gridUIItems.Clear();
+
+    // 创建世界空间 Canvas
+    GameObject canvasObj = new GameObject("GridUICanvas");
+    canvasObj.transform.SetParent(transform, false);
+    Canvas canvas = canvasObj.AddComponent<Canvas>();
+    canvas.renderMode = RenderMode.WorldSpace;
+    canvas.worldCamera = cam;
+
+    // 确保 Canvas 的世界旋转为恒等（不随父级旋转）
+    canvasObj.transform.rotation = Quaternion.identity;
+
+    RectTransform canvasRect = canvasObj.GetComponent<RectTransform>();
+    canvasRect.sizeDelta = new Vector2(100, 100); // 不影响子物体
+
+    // 加载格子预制体
+    GameObject gridPrefab = Resources.Load<GameObject>("UI/grid1");
+    if (gridPrefab == null)
     {
-        // 清除旧 UI
-        if (gridUICanvas != null) Destroy(gridUICanvas);
-        gridUIItems.Clear();
-
-        // 创建世界空间 Canvas
-        GameObject canvasObj = new GameObject("GridUICanvas");
-        canvasObj.transform.SetParent(transform, false);
-        Canvas canvas = canvasObj.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.WorldSpace;
-        canvas.worldCamera = cam;
-
-        // 确保 Canvas 的世界旋转为恒等（不随父级旋转）
-        canvasObj.transform.rotation = Quaternion.identity;
-
-        RectTransform canvasRect = canvasObj.GetComponent<RectTransform>();
-        canvasRect.sizeDelta = new Vector2(100, 100); // 不影响子物体
-
-        // 加载格子预制体
-        GameObject gridPrefab = Resources.Load<GameObject>("UI/grid1");
-        if (gridPrefab == null)
-        {
-            Debug.LogError("无法从 Resources/UI/grid1 加载格子 UI 预制体");
-            return;
-        }
-       
-
-        for (int r = 0; r < rows; r++)
-        {
-            for (int c = 0; c < cols; c++)
-            {
-                Vector3 worldPos = GridToWorld(new Vector2Int(r, c));
-                GameObject gridItem = Instantiate(gridPrefab, canvasObj.transform);
-                gridItem.name = $"Grid_{r}_{c}";
-
-                RectTransform rect = gridItem.GetComponent<RectTransform>();
-                Image gImage = gridItem.GetComponent<Image>();
-
-                if (rect != null)
-                {
-                    rect.localScale = Vector3.one;
-                    rect.position = worldPos;
-                    rect.sizeDelta = new Vector2(cellSize, cellSize);
-                    rect.anchorMin = new Vector2(0.5f, 0.5f);
-                    rect.anchorMax = new Vector2(0.5f, 0.5f);
-                    rect.pivot = new Vector2(0.5f, 0.5f);
-
-                    // 使格子平面水平（法线向上）
-                    rect.localRotation = Quaternion.Euler(90, 0, -10);
-                }
-
-                // 根据 (r+c) 的奇偶性分配图片（棋盘格效果）
-                if (gImage != null)
-                {
-                    bool isEven = (r + c) % 2 == 0;
-                    gImage.sprite = isEven ? grid01 : grid02;
-                }
-
-                gridUIItems.Add(gridItem);
-            }
-        }
-
-        gridUICanvas = canvasObj;
+        Debug.LogError("无法从 Resources/UI/grid1 加载格子 UI 预制体");
+        return;
     }
+
+    // 按3x3块生成UI
+    for (int r = 0; r < rows; r += 3)
+    {
+        for (int c = 0; c < cols; c += 3)
+        {
+            // 计算当前块实际覆盖的行列范围（处理边界）
+            int blockRows = Mathf.Min(3, rows - r);
+            int blockCols = Mathf.Min(3, cols - c);
+            if (blockRows <= 0 || blockCols <= 0) continue;
+
+            // 计算块的中心位置
+            Vector3 topLeft = GridToWorld(new Vector2Int(r, c));
+            Vector3 bottomRight = GridToWorld(new Vector2Int(r + blockRows - 1, c + blockCols - 1));
+            Vector3 center = (topLeft + bottomRight) * 0.5f;
+
+            // 实例化UI
+            GameObject gridItem = Instantiate(gridPrefab, canvasObj.transform);
+            int blockR = r / 3;
+            int blockC = c / 3;
+            gridItem.name = $"Block_{blockR}_{blockC}";
+
+            RectTransform rect = gridItem.GetComponent<RectTransform>();
+            Image gImage = gridItem.GetComponent<Image>();
+
+            if (rect != null)
+            {
+                rect.localScale = Vector3.one;
+                rect.position = center;
+                // 尺寸 = 块实际格子数 * cellSize
+                rect.sizeDelta = new Vector2(blockCols * cellSize, blockRows * cellSize);
+                rect.anchorMin = new Vector2(0.5f, 0.5f);
+                rect.anchorMax = new Vector2(0.5f, 0.5f);
+                rect.pivot = new Vector2(0.5f, 0.5f);
+
+                // 使格子平面水平（法线向上），保持原有旋转
+                rect.localRotation = Quaternion.Euler(90, 0, -10);
+            }
+
+            // 根据块的索引奇偶性分配图片
+            if (gImage != null)
+            {
+                bool isEven = (blockR + blockC) % 2 == 0;
+                gImage.sprite = isEven ? grid01 : grid02;
+            }
+
+            gridUIItems.Add(gridItem);
+        }
+    }
+
+    gridUICanvas = canvasObj;
+}
     
     
 }
