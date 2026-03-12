@@ -106,8 +106,8 @@ public class PigItem : MonoBehaviour
     bool CalculateTargetPosition(out Vector3 target)
     {
         target = Vector3.zero;
-        Vector2Int forwardOffset = GetForwardOffset();
-        Vector2Int currentGrid = mapItem.gridPos;
+        Vector2Int forwardOffset = GetForwardOffset(out Vector2Int currentGrid);
+        //Vector2Int currentGrid = mapItem.gridPos;
         Vector2Int checkGrid = currentGrid + forwardOffset;
 
         while (true)
@@ -187,14 +187,17 @@ public class PigItem : MonoBehaviour
         animator.SetBool("IsFidget", false);
     }
 
-    Vector2Int GetForwardOffset()
+    Vector2Int GetForwardOffset(out Vector2Int currentGrid)
     {
+        currentGrid=mapItem.gridPos;
         // 根据实际方向映射调整
         switch (mapItem.rotIndex)
         {
-            case 3: return new Vector2Int(-1, 0); // 右
-            case 0: return new Vector2Int(0, -1); // 上
-            case 1: return new Vector2Int(0, 1);  // 下
+            //case 3: return new Vector2Int(1, 0); // 右
+            case 0: return new Vector2Int(1, 0); // 向右边
+            case 1:
+                currentGrid = new Vector2Int(mapItem.gridPos.x - 1, mapItem.gridPos.y);
+                return new Vector2Int(0, 1);  // 下
             case 2: return new Vector2Int(-1, 0); // 左
             default: return new Vector2Int(0, -1); // 上
         }

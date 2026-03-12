@@ -175,7 +175,7 @@ public class Map : MonoBehaviour
         // Step 2：根据旋转索引计算 pivot 的映射位置
         if (rotIndex == 0) return new Vector2Int(dims0.x, 1);
         if (rotIndex == 1) return new Vector2Int(dims0.y, dims0.x);
-        if (rotIndex == 2) return new Vector2Int(0, dims0.y);
+        if (rotIndex == 2) return new Vector2Int(1, dims0.y);
         if (rotIndex == 3) return new Vector2Int(0, 0);
         //return new Vector2Int(dims0.y - 1 - pivot.y, dims0.x - 1 - pivot.x);
         return new Vector2Int(dims0.y - 1, dims0.x - 1);
@@ -263,7 +263,7 @@ public class Map : MonoBehaviour
     {
         Vector2Int vector2Int=Vector2Int.one;
 
-        if (rotIndex == 0||rotIndex==-1)
+        if (rotIndex==-1)
         {
             vector2Int = new Vector2Int(1, 1);
             // Step 1：遍历占用矩形范围并写入 id
@@ -278,7 +278,7 @@ public class Map : MonoBehaviour
             // Step 1：遍历占用矩形范围并写入 id
             for (int r = 0; r < dims.x; r++)
             for (int c = 0; c < dims.y; c++)
-                occupancy[start.x + r*vector2Int.x, start.y + c*vector2Int.y] = id;
+                occupancy[start.x + r*vector2Int.x-1, start.y + c*vector2Int.y] = id;
         }
         if (rotIndex == 2) //向左
         {
@@ -286,12 +286,12 @@ public class Map : MonoBehaviour
             // Step 1：遍历占用矩形范围并写入 id
             for (int r = 0; r < dims.x; r++)
             for (int c = 1; c < dims.y+1; c++)
-                occupancy[start.x + r*vector2Int.x, start.y + c*vector2Int.y] = id;
+                occupancy[start.x + r*vector2Int.x-1, start.y + c*vector2Int.y] = id;
         }
 
-        if (rotIndex == 3)
+        if (rotIndex == 0) //向右
         {
-            vector2Int = new Vector2Int(0, 0);
+            vector2Int = new Vector2Int(-1, -1);
             // Step 1：遍历占用矩形范围并写入 id
             for (int r = 0; r < dims.x; r++)
             for (int c = 0; c < dims.y; c++)
