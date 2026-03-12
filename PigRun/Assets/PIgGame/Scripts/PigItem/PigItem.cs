@@ -169,7 +169,9 @@ public class PigItem : MonoBehaviour
                         case 2: 
                             checkGrid = new Vector2Int(checkGrid.x+2, checkGrid.y+1);
                             break; // 左
-                        default: break; // 上
+                        default: 
+                            checkGrid = new Vector2Int(checkGrid.x, checkGrid.y+1);
+                            break; // 上
                     }
                     
                     // 非紧邻：计算目标位置

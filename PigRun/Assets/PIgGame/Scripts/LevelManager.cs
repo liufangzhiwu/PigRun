@@ -105,11 +105,20 @@ public class LevelManager : MonoBehaviour
             // 计算网格坐标
             int gridX = Mathf.RoundToInt((pig.position.x - mapData.origin.x) / cellSize);
             int gridY = Mathf.RoundToInt((pig.position.y - mapData.origin.y) / cellSize);
-            item.gridPos = new Vector2Int(gridX, gridY);
+            //item.gridPos = new Vector2Int(gridX, gridY);
 
             // 旋转索引 (0,1,2,3 对应 0°,90°,180°,270°)
             //item.rotIndex = pig.angle / 90;
             item.rotIndex = (pig.angle / 90-1) % 4;   // 新映射
+
+            if (item.rotIndex == -1)
+            {
+                item.gridPos = new Vector2Int(gridX-1, gridY-1);
+            }
+            else
+            {
+                item.gridPos = new Vector2Int(gridX, gridY);
+            }
             
             mapData.items.Add(item);
         }
