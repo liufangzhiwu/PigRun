@@ -204,6 +204,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02bbb6f1591c0734b8e2c52220b62998, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LevelText: {fileID: 8053579176618148174}
+  removeButton: {fileID: 6943801460078332383}
+  shuffleButton: {fileID: 4306368213891852145}
+  reverseButton: {fileID: 8175729748942739222}
 --- !u!1 &3161535949466257727
 GameObject:
   m_ObjectHideFlags: 0
@@ -328,7 +332,7 @@ GameObject:
   - component: {fileID: 2971173539803099866}
   - component: {fileID: 8175729748942739222}
   m_Layer: 5
-  m_Name: FanBtn
+  m_Name: reverseBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -812,7 +816,7 @@ GameObject:
   - component: {fileID: 3388151129317214840}
   - component: {fileID: 6943801460078332383}
   m_Layer: 5
-  m_Name: RemoveBtn
+  m_Name: removeBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1119,7 +1123,7 @@ GameObject:
   - component: {fileID: 3687175083668119266}
   - component: {fileID: 4306368213891852145}
   m_Layer: 5
-  m_Name: FixBtn
+  m_Name: shuffleBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

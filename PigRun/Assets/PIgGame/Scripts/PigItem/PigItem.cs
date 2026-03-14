@@ -100,6 +100,7 @@ public class PigItem : MonoBehaviour
                 movingForward = false;
                 isMoving = true;
                 animator.SetBool("IsRun", true);
+                //AudioManager.Instance.PlaySoundEffect("pig-run");
             }
             else
             {
@@ -120,6 +121,7 @@ public class PigItem : MonoBehaviour
             Map.Instance.UpdateMapItemArea(mapItem);
             isMoving = true;
             animator.SetBool("IsRun", true);
+            AudioManager.Instance.PlaySoundEffect("pig-run");
         }
 
         Debug.Log("PigItem Clicked");
@@ -190,7 +192,9 @@ public class PigItem : MonoBehaviour
     private void HitSelf()
     {
         animator.SetBool("IsHit", true);
+        //AudioManager.Instance.PlaySoundEffect("hit");
         StartCoroutine(ResetHitAfterDelay(0.5f)); // 根据动画长度调整
+        AudioManager.Instance.PlaySoundEffect("jump");
         ResetIdleTimer(); // 发生交互，重置闲置计时
     }
 

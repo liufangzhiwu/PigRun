@@ -11,10 +11,12 @@ namespace PigGame
         
         [SerializeField] private Button LevelButton;
         
-        // Start is called before the first frame update
-        void Start()
+
+        
+        protected override void InitButtonEvents()
         {
-            LevelButton.onClick.AddListener(ClickLevelButton);
+            base.InitButtonEvents();
+            LevelButton.AddClickAction(ClickLevelButton);
         }
 
         private void ClickLevelButton()

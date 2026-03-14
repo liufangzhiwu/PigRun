@@ -93,7 +93,7 @@ public abstract class UIBase : MonoBehaviour, IPointerDownHandler
         TryGetComponent(out _windowCanvas);
 
         // 初始化UI元素
-        InitializeUIComponents();
+        InitButtonEvents();
     }
 
     protected virtual void OnEnable()
@@ -242,7 +242,7 @@ public abstract class UIBase : MonoBehaviour, IPointerDownHandler
     /// 初始化UI组件
     /// Initialize UI components
     /// </summary>
-    protected virtual void InitializeUIComponents() { }
+    protected virtual void InitButtonEvents() { }
 
     /// <summary>
     /// 自定义打开动画
