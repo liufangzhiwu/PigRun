@@ -34,7 +34,17 @@ MonoBehaviour:
     prefab: {fileID: 2508230401924753788, guid: 9db9e8aad5c93044dad3ee3c85d17ff9,
       type: 3}
   - panelName: UseToolPanel
-    panelLayer: BasePanel
+    panelLayer: PopPanel
     spriteAtlasName: 
     prefab: {fileID: 2426500168314530211, guid: 440dac0f5e9034e4fa06eee4020e6bb6,
+      type: 3}
+  - panelName: DebugPanel
+    panelLayer: BasePanel
+    spriteAtlasName: 
+    prefab: {fileID: 2426500168314530211, guid: 274824d5c4284f04582375d3d8e484ea,
+      type: 3}
+  - panelName: SetPanel
+    panelLayer: PopPanel
+    spriteAtlasName: 
+    prefab: {fileID: 2426500168314530211, guid: 4a0c13d69fe777d4db3690e2ddb8a3e1,
       type: 3}

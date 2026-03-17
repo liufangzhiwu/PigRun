@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
+
+        Application.targetFrameRate = 90;
     }
     
     // Start is called before the first frame update

@@ -1,158 +1,94 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PigItem : MonoBehaviour
 {
     public Animator animator;
-    
-    private MapItem mapItem;
-    private bool isMoving = false;
-    
     [SerializeField] private float speed = 5f;
-    private Vector3 targetPosition;
-    private bool movingToTarget;
-    private bool movingForward;
-
-    // 新增：闲置触发 Fidget 相关
     [SerializeField] public float idleFidgetDelay = 30;   // 闲置多少秒后触发 Fidget
-    private float idleTimer = 0f;                           // 当前闲置计时
-    private PigItem BehitItem;
+
+    private MapItem mapItem;
+    private PigItem behitItem;          // 将要撞击的物体（用于移动结束时触发其 BeHit）
+    private IPigState currentState;
+
+    // 外部可访问的属性
+    public MapItem MapItem => mapItem;
+    public float Speed => speed;
+    public PigItem BehitItem => behitItem;
 
     void Start()
     {
         mapItem = GetComponent<MapItem>();
-        ResetIdleTimer(); // 初始化计时器
-        idleFidgetDelay = Random.Range(10, 400);
+        ChangeState(new IdleState(this));
     }
 
     void Update()
     {
-        // 闲置计时逻辑：仅在非移动状态下累加时间
-        if (!isMoving)
-        {
-            idleTimer += Time.deltaTime;
-            if (idleTimer >= idleFidgetDelay)
-            {
-                TriggerFidget();
-                ResetIdleTimer(); // 触发后重置计时
-            }
-        }
-
-        if (!isMoving) return;
-
-        if (movingForward)
-        {
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-            if (Map.Instance != null && IsOutOfScreen())
-            {
-                Map.Instance.RemoveItem(mapItem);
-                StopMoving();
-            }
-        }
-        else if (movingToTarget)
-        {
-            if (targetPosition != Vector3.zero)
-            {
-                float step = speed * Time.deltaTime;
-                transform.position = Vector3.MoveTowards(transform.position, targetPosition, step);
-                if (Vector3.Distance(transform.position, targetPosition) < 0.05f)
-                {
-                    StopMoving();
-                    HitSelf();
-                    if (BehitItem != null)
-                    {
-                        //Debug.LogWarning("未找到被撞物体的 PigItem 组件");
-                        BehitItem.BeHit(); // 调用被撞对象的受击方法
-                    }
-                }
-                    
-            }
-            else
-            {
-                StopMoving();
-                HitSelf();
-                if (BehitItem != null)
-                {
-                    //Debug.LogWarning("未找到被撞物体的 PigItem 组件");
-                    BehitItem.BeHit(); // 调用被撞对象的受击方法
-                }
-            }
-        }
+        currentState?.Update();
     }
 
     private void OnMouseUpAsButton()
     {
-        // 移动中不响应点击，避免干扰
-        if (isMoving) return;
-
-        // 点击即重置闲置计时
-        ResetIdleTimer();
-
-        bool hasObstacle = CalculateTargetPosition(out targetPosition);
-
-        if (hasObstacle)
+        if (UIManager.Instance.IsPanelTypeShowing())
         {
-            //if (targetPosition != Vector3.zero)
-            if (Vector3.Distance(transform.position, targetPosition) > 0.05f||targetPosition != Vector3.zero)
-            {
-                // 非紧邻障碍：移动到目标点
-                movingToTarget = true;
-                movingForward = false;
-                isMoving = true;
-                animator.SetBool("IsRun", true);
-                //AudioManager.Instance.PlaySoundEffect("pig-run");
-            }
-            else
-            {
-                // 紧邻障碍：播放自身受击动画
-                HitSelf();
-                if (BehitItem != null)
-                {
-                    //Debug.LogWarning("未找到被撞物体的 PigItem 组件");
-                    BehitItem.BeHit(); // 调用被撞对象的受击方法
-                }
-            }
+            Debug.Log("进入弹窗界面 不触发小猪逻辑");
+            return;
         }
-        else
-        {
-            // 无障碍：匀速向前
-            movingForward = true;
-            movingToTarget = false;
-            Map.Instance.UpdateMapItemArea(mapItem);
-            isMoving = true;
-            animator.SetBool("IsRun", true);
-            AudioManager.Instance.PlaySoundEffect("pig-run");
-        }
-
-        Debug.Log("PigItem Clicked");
+        
+        currentState?.HandleClick();
     }
 
-    bool CalculateTargetPosition(out Vector3 target)
+    /// <summary>
+    /// 被其他物体撞击时调用（由外部触发）
+    /// </summary>
+    public void BeHit()
+    {
+        ChangeState(new BeHitState(this));
+    }
+
+    /// <summary>
+    /// 自身撞击障碍时调用（内部触发）
+    /// </summary>
+    public void HitSelf()
+    {
+        ChangeState(new HitState(this));
+    }
+
+    /// <summary>
+    /// 切换状态
+    /// </summary>
+    public void ChangeState(IPigState newState)
+    {
+        currentState?.Exit();
+        currentState = newState;
+        currentState?.Enter();
+    }
+
+    /// <summary>
+    /// 计算移动目标位置（用于点击时）
+    /// </summary>
+    /// <param name="target">输出目标世界坐标</param>
+    /// <returns>true 表示前方有障碍，false 表示无障碍可直线前进</returns>
+    public bool CalculateTargetPosition(out Vector3 target)
     {
         target = Vector3.zero;
         Vector2Int checkGrid = GetForwardOffset(out Vector2Int currentGrid, out Vector2Int forwardOffset);
-        //Vector2Int currentGrid = mapItem.gridPos;
-        //Vector2Int checkGrid = currentGrid + forwardOffset;
 
         while (true)
         {
             if (checkGrid.x < 0 || checkGrid.x >= Map.Instance.rows ||
                 checkGrid.y < 0 || checkGrid.y >= Map.Instance.cols)
             {
-                return false;
+                return false; // 出界，无障碍
             }
 
             int occupantId = Map.Instance.GetOccupantIdAtCell(checkGrid);
             if (occupantId != -1 && occupantId != mapItem.id)
             {
-                
-                BehitItem = Map.Instance.GetPlacedItem(occupantId)?.instance.GetComponent<PigItem>();
-                if (BehitItem == null)
-                {
-                    Debug.LogWarning("未找到被撞物体的 PigItem 组件");
-                    //BehitItem.BeHit(); // 调用被撞对象的受击方法
-                }
-                
+                // 记录被撞物体
+                behitItem = Map.Instance.GetPlacedItem(occupantId)?.instance.GetComponent<PigItem>();
+
                 // 紧邻障碍
                 if (checkGrid - forwardOffset == currentGrid)
                 {
@@ -161,22 +97,15 @@ public class PigItem : MonoBehaviour
                 }
                 else
                 {
+                    // 根据旋转调整目标格子（原有逻辑）
                     switch (mapItem.rotIndex)
                     {
-                        //case 3: return new Vector2Int(1, 0); // 右
-                        case 0: break; // 向右边
-                        case 1:
-                            checkGrid = new Vector2Int(checkGrid.x+1, checkGrid.y);
-                           break;  // 下
-                        case 2: 
-                            checkGrid = new Vector2Int(checkGrid.x+2, checkGrid.y+1);
-                            break; // 左
-                        default: 
-                            checkGrid = new Vector2Int(checkGrid.x, checkGrid.y+1);
-                            break; // 上
+                        case 0: break;
+                        case 1: checkGrid = new Vector2Int(checkGrid.x + 1, checkGrid.y); break;
+                        case 2: checkGrid = new Vector2Int(checkGrid.x + 2, checkGrid.y + 1); break;
+                        default: checkGrid = new Vector2Int(checkGrid.x, checkGrid.y + 1); break;
                     }
-                    
-                    // 非紧邻：计算目标位置
+
                     Vector2Int obstacleGrid = new Vector2Int(checkGrid.x, checkGrid.y);
                     Map.Instance.TryMoveItemTargetCell(mapItem, obstacleGrid, out target);
                     return true;
@@ -187,81 +116,33 @@ public class PigItem : MonoBehaviour
     }
 
     /// <summary>
-    /// 自身受击（撞到紧邻障碍时播放）
+    /// 获取前进方向的偏移量和当前网格（考虑旋转）
     /// </summary>
-    private void HitSelf()
+    private Vector2Int GetForwardOffset(out Vector2Int currentGrid, out Vector2Int forwardOffset)
     {
-        animator.SetBool("IsHit", true);
-        //AudioManager.Instance.PlaySoundEffect("hit");
-        StartCoroutine(ResetHitAfterDelay(0.5f)); // 根据动画长度调整
-        AudioManager.Instance.PlaySoundEffect("jump");
-        ResetIdleTimer(); // 发生交互，重置闲置计时
+        currentGrid = mapItem.gridPos;
+        switch (mapItem.rotIndex)
+        {
+            case 0: forwardOffset = new Vector2Int(1, 0); break; // 右
+            case 1:
+                currentGrid = new Vector2Int(mapItem.gridPos.x - 1, mapItem.gridPos.y);
+                forwardOffset = new Vector2Int(0, 1); // 下
+                break;
+            case 2:
+                currentGrid = new Vector2Int(mapItem.gridPos.x, mapItem.gridPos.y - 1);
+                forwardOffset = new Vector2Int(-1, 0); // 左
+                break;
+            default:
+                forwardOffset = new Vector2Int(0, -1); // 上
+                break;
+        }
+        return currentGrid + forwardOffset;
     }
 
     /// <summary>
-    /// 被其他物体撞击时调用
+    /// 判断物体是否移出屏幕
     /// </summary>
-    public void BeHit()
-    {
-        animator.SetBool("IsBeHit", true);
-        StartCoroutine(ResetBeHitAfterDelay(0.5f));
-        ResetIdleTimer(); // 被撞也视为交互，重置闲置计时
-    }
-
-    private IEnumerator ResetHitAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        animator.SetBool("IsHit", false);
-    }
-
-    private IEnumerator ResetBeHitAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        animator.SetBool("IsBeHit", false);
-    }
-    
-    private IEnumerator ResetFidgetAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        animator.SetBool("IsFidget", false);
-    }
-
-    Vector2Int GetForwardOffset(out Vector2Int currentGrid,out Vector2Int forwardOffset)
-    {
-        currentGrid=mapItem.gridPos;
-        Vector2Int checkGrid=Vector2Int.zero;
-        // 根据实际方向映射调整
-        switch (mapItem.rotIndex)
-        {
-            //case 3: return new Vector2Int(1, 0); // 右
-            case 0: forwardOffset = new Vector2Int(1, 0); // 向右边
-                break;
-            case 1:
-                currentGrid = new Vector2Int(mapItem.gridPos.x-1, mapItem.gridPos.y);
-                forwardOffset = new Vector2Int(0, 1);  // 下
-                break;
-            case 2: 
-                currentGrid = new Vector2Int(mapItem.gridPos.x, mapItem.gridPos.y-1);
-                forwardOffset = new Vector2Int(-1, 0); // 左
-                break;
-            default: forwardOffset= new Vector2Int(0, -1); // 上
-                break;
-        }
-        
-        checkGrid=currentGrid+forwardOffset;
-        return checkGrid;
-    }
-
-    void StopMoving()
-    {
-        isMoving = false;
-        movingForward = false;
-        movingToTarget = false;
-        animator.SetBool("IsRun", false); // 只复位跑步动画
-        ResetIdleTimer(); // 移动结束，重置闲置计时
-    }
-
-    bool IsOutOfScreen()
+    public bool IsOutOfScreen()
     {
         Vector3 viewportPos = Camera.main.WorldToViewportPoint(transform.position);
         return viewportPos.z < -0.05f ||
@@ -269,21 +150,13 @@ public class PigItem : MonoBehaviour
                viewportPos.y < -0.05f || viewportPos.y > 1.05f;
     }
 
-    // 新增：触发 Fidget 动画
-    private void TriggerFidget()
+    // ========== 状态接口 ==========
+    public interface IPigState
     {
-        // 假设 Animator 中有一个 Trigger 参数 "Fidget"
-        animator.SetBool("IsFidget", true); // 只复位跑步动画
-        StartCoroutine(ResetFidgetAfterDelay(0.5f));
-        // 如果有多个 Fidget 动画，可以随机选择一个索引后再触发
-        // int index = Random.Range(0, 3); // 假设有 3 种
-        // animator.SetInteger("FidgetIndex", index);
-        // animator.SetTrigger("Fidget");
+        void Enter();
+        void Update();
+        void Exit();
+        void HandleClick() { } // 默认空实现
     }
-
-    // 新增：重置闲置计时器
-    private void ResetIdleTimer()
-    {
-        idleTimer = 0f;
-    }
+ 
 }

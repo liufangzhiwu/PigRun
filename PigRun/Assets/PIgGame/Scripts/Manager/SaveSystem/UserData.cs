@@ -162,10 +162,16 @@ public class UserData
      
     }
 
-
-    public void UpdateLevelIndex()
+    /// <summary>
+    /// 更新关卡进度
+    /// </summary>
+    /// <param name="value">变化值</param>
+    /// <param name="isSet">是否直接设置值</param>
+    /// <summary>
+    /// </summary>
+    public void UpdateLevelIndex(int value=1,bool isSet=false)
     {
-        LevelIndex += 1;
+        LevelIndex =isSet ? value : LevelIndex + value;
     }
 
     #endregion

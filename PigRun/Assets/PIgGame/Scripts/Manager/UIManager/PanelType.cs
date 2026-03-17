@@ -10,6 +10,8 @@ public class PanelType  // Renamed class
     public const string GamePanel = "GamePanel";  
     public const string FinishPanel = "FinishPanel";  
     public const string UseToolPanel = "UseToolPanel";  
+    public const string DebugPanel = "DebugPanel";  
+    public const string SetPanel = "SetPanel";  
     
 
     /// <summary>

@@ -6,13 +6,17 @@ using UnityEngine.UI;
 public class MenuPanel : UIBase
 {
     [SerializeField] private Text GoldText;
-    
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private Button gmButton;
+    [SerializeField] private Button setButton;
+
+
+    protected override void InitButtonEvents()
     {
-        
+        base.InitButtonEvents();
+        gmButton.AddClickAction(ClickGMButton);
+        setButton.AddClickAction(ClickSetButton);
     }
-    
+
 
     protected override void OnEnable()
     {
@@ -23,6 +27,16 @@ public class MenuPanel : UIBase
     private void InitUI()
     {
         GoldText.text = GameDataManager.Instance.UserData.Gold.ToString();
+    }
+    
+    private void ClickSetButton()
+    {
+        UIManager.Instance.ShowPanel(PanelType.SetPanel);
+    }
+
+    private void ClickGMButton()
+    {
+        UIManager.Instance.ShowPanel(PanelType.DebugPanel);
     }
 
 }
