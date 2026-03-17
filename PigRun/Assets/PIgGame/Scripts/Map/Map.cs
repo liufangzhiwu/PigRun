@@ -459,6 +459,7 @@ public class Map : MonoBehaviour
     public void LoadFromAsset(MapData data, bool clearExisting = true)
     {
         // Step 1：同步基础参数并重置占用表
+        nextId = 1;
         dataAsset = data;
         rows = data.rows;
         cols = data.cols;

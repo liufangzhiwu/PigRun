@@ -63,6 +63,8 @@ public class DebugPanel : UIBase
         }
 
         GameManager.instance.StartGamePanel();
+
+        ClickCloseButton();
     }
 
     private void ClickCloseButton()
