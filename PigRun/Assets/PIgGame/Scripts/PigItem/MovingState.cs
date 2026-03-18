@@ -37,11 +37,16 @@
             {
                 // 直线前进
                 pig.transform.Translate(Vector3.forward * pig.Speed * Time.deltaTime);
-                if (pig.IsOutOfScreen())
+                // 新增：如果当前是闲置状态且站在跑道上，立即进入跑道状态
+                if (Map.Instance.IsRunwayCell(pig.MapItem.gridPos))
                 {
-                    Map.Instance.RemoveItem(pig.MapItem);
-                    pig.ChangeState(new IdleState(pig));
+                    pig.ChangeState(new RunwayState(pig));
                 }
+                //if (pig.IsOutOfScreen())
+                // {
+                //     Map.Instance.RemoveItem(pig.MapItem);
+                //     pig.ChangeState(new IdleState(pig));
+                // }
             }
             else
             {
