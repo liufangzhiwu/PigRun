@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f008c075d6c78a42948d30f2e4b7704, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  info: {fileID: 11400000, guid: 6881cb60e5b24d244b3b9edd3e014241, type: 2}
+  info: {fileID: 11400000, guid: ddb731a680d086945b5ca74ea33b91f2, type: 2}
   gridPos: {x: 0, y: 0}
   rotIndex: 0
   id: 0
@@ -130,17 +130,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: ee8f501006f6f3242966312b017194cb,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.9
+      value: 0.89000005
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ee8f501006f6f3242966312b017194cb,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9
+      value: 0.89000005
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ee8f501006f6f3242966312b017194cb,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.9
+      value: 0.89000005
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ee8f501006f6f3242966312b017194cb,
         type: 3}

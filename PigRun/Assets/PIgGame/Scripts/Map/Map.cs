@@ -456,7 +456,7 @@ public class Map : MonoBehaviour
 
   // 在 Map 类中添加静态数组，用于存储可用的网格尺寸
 private static readonly int[] AvailableGridSizes = new int[] { 20, 23, 25,30 };
-private static readonly float[] mapScales = new float[] { 1.3f, 0.9f, 0.9f,0.87f };
+private static readonly float[] mapScales = new float[] { 1.3f, 0.9f, 0.9f,0.9f };
 
 /// <summary>
 /// 获取与目标尺寸最接近的可用网格尺寸
@@ -557,7 +557,7 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
     }
 
     // Step 6：可选——将地图适配到屏幕（根据加载后的物品）
-    FitMapToScreen(new Vector2(0.52f, 0.45f));
+    FitMapToScreen(new Vector2(0.535f, 0.5f));
 }
 
     public PlacedItem GetPlacedItem(int id)
