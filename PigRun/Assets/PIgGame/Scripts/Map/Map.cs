@@ -449,8 +449,8 @@ public class Map : MonoBehaviour
 
 
   // 在 Map 类中添加静态数组，用于存储可用的网格尺寸
-private static readonly int[] AvailableGridSizes = new int[] { 20, 25, 30 };
-private static readonly float[] mapScales = new float[] { 0.05f, 0.08f, 0.35f };
+private static readonly int[] AvailableGridSizes = new int[] { 20, 23, 28 };
+private static readonly float[] mapScales = new float[] { 0.05f, 0.15f, 0.38f };
 
 /// <summary>
 /// 获取与目标尺寸最接近的可用网格尺寸
@@ -766,9 +766,9 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
 
         // 初始化极值
         int minRow = int.MaxValue;
-        int maxRow = int.MinValue;
+        int maxRow = rows-1;
         int minCol = int.MaxValue;
-        int maxCol = int.MinValue;
+        int maxCol = cols-1;
 
         // 遍历所有已放置物品，收集占用的所有格子
         foreach (var kv in items)
@@ -777,10 +777,10 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
             var info = placed.info;
             var gridPos = placed.gridPos;
             var rotIndex = placed.rotIndex;
-
+        
             var dims = FootprintDims(info, rotIndex);
             var anchor = StartFromPivot(gridPos, info, rotIndex);
-
+        
             for (int r = 0; r < dims.x; r++)
             {
                 for (int c = 0; c < dims.y; c++)
@@ -794,6 +794,9 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
                 }
             }
         }
+        
+        maxRow = rows-1;
+        maxCol = cols-1;
 
         // 计算实际占用区域的尺寸（世界单位）
         float occupiedWidth = (maxCol - minCol + 1) * cellSize;
