@@ -455,8 +455,8 @@ public class Map : MonoBehaviour
 
 
   // 在 Map 类中添加静态数组，用于存储可用的网格尺寸
-private static readonly int[] AvailableGridSizes = new int[] { 20, 23, 28 };
-private static readonly float[] mapScales = new float[] { 0.05f, 0.15f, 0.38f };
+private static readonly int[] AvailableGridSizes = new int[] { 20, 23, 25,30 };
+private static readonly float[] mapScales = new float[] { 1.3f, 0.9f, 0.9f,0.87f };
 
 /// <summary>
 /// 获取与目标尺寸最接近的可用网格尺寸
@@ -587,30 +587,6 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
         //UpdateDataAssetMirror();
     }
 
-    // ==================== 项 ID 解析 ====================
-    /// <summary>
-    /// 解析地图项的 ID
-    /// 从占用表或实例字典中查找，未找到则分配新 ID
-    /// </summary>
-    int ResolveItemId(MapItem item)
-    {
-        // Step 1：尝试通过当前 anchor 在占用表中读取 id
-        var dims = FootprintDims(item.info, item.rotIndex);
-        var anchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
-        int id = occupancy[anchor.x, anchor.y];
-        if (id != -1) return id;
-        // Step 2：遍历记录表，匹配 GameObject 引用以获取 id
-        foreach (var kv in items)
-        {
-            if (kv.Value.instance == item.gameObject) return kv.Key;
-        }
-        // Step 3：若未记录，则分配新 id 并写入占用表
-        int nid = nextId++;
-        items[nid] = new PlacedItem { id = nid, info = item.info, gridPos = item.gridPos, rotIndex = item.rotIndex, instance = item.gameObject, baseRotation = item.baseRotation };
-        MarkArea(anchor, dims, nid);
-        return nid;
-    }
-
     // ==================== 公共 API ====================
     /// <summary>
     /// 尝试移动到指定地图坐标并同步位置
@@ -634,22 +610,6 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
         return true;
     }
 
-    /// <summary>
-    /// 检查区域是否空闲
-    /// 供外部组件调用，用于检查目标位置是否可放置
-    /// </summary>
-    public bool IsAreaFreeFor(MapItem item, Vector2Int targetPivot, int rotIndex, out bool outOfBounds)
-    {
-        // Step 1：计算目标占用范围
-        var dims = FootprintDims(item.info, rotIndex);
-        var targetAnchor = StartFromPivot(targetPivot, item.info, rotIndex);
-        // Step 2：输出越界标志并在越界时短路
-        outOfBounds = !InBounds(targetAnchor, dims);
-        if (outOfBounds) return false;
-        // Step 3：忽略自身占用，返回区域是否空闲
-        int ignoreId = ResolveItemId(item);
-        return AreaFree(targetAnchor, dims, ignoreId);
-    }
 
     public void UpdateMapItemArea(MapItem item)
     {
@@ -684,48 +644,6 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
         return true;
     }
 
-    /// <summary>
-    /// 更新数据资产镜像
-    /// 将当前地图状态同步到数据资产
-    /// </summary>
-    public void UpdateDataAssetMirror()
-    {
-        // // Step 1：若无数据资产则返回
-        // if (dataAsset == null) return;
-        // // Step 2：运行态仅更新内存副本（不改动资产）
-        // if (Application.isPlaying)
-        // {
-        //     if (runtimeData == null) return;
-        //     runtimeData.rows = rows;
-        //     runtimeData.cols = cols;
-        //     runtimeData.cellSize = cellSize;
-        //     runtimeData.origin = origin;
-        //     runtimeData.items.Clear();
-        //     for (int i = 0; i < transform.childCount; i++)
-        //     {
-        //         var mi = transform.GetChild(i).GetComponent<MapItem>();
-        //         if (mi == null || mi.info == null) continue;
-        //         var d = new MapData.MapItemData { info = mi.info, gridPos = mi.gridPos, rotIndex = mi.rotIndex };
-        //         runtimeData.items.Add(d);
-        //     }
-        //     return;
-        // }
-    }
-
-    /// <summary>
-    /// 获取地图项占用区的中心位置
-    /// 供外部组件调用，用于计算目标位置
-    /// </summary>
-    public Vector3 GetFootprintCenter(MapItem item, Vector2Int pivotGrid)
-    {
-        // Step 1：计算目标占用尺寸与起点
-        var dims = FootprintDims(item.info, item.rotIndex);
-        var anchor = StartFromPivot(pivotGrid, item.info, item.rotIndex);
-        // Step 2：返回占用中心世界坐标
-        return FootprintWorldCenter(anchor, dims);
-    }
-
-
     // 获取指定网格的占用者ID（-1表示空闲）
     public int GetOccupantIdAtCell(Vector2Int cell)
     {
@@ -733,23 +651,7 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
             return -1;
         return occupancy[cell.x, cell.y];
     }
-
-    
-    public int GetIdByItem(MapItem item)
-    {
-        foreach (var kv in items)
-        {
-            if (kv.Value.instance == item.gameObject)
-                return kv.Key;
-        }
-        // 若未找到，尝试通过占用表查找
-        var dims = FootprintDims(item.info, item.rotIndex);
-        var anchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
-        int id = occupancy[anchor.x, anchor.y];
-        if (id != -1) return id;
-        return -1; // 未找到
-    }
-    
+  
     
     /// <summary>
     /// 根据实际放置的物品占用区域，缩放并移动地图使其完整显示在屏幕内，并可指定目标屏幕位置（视口坐标）。
@@ -772,9 +674,9 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
 
         // 初始化极值
         int minRow = int.MaxValue;
-        int maxRow = rows-1;
+        int maxRow = int.MinValue;
         int minCol = int.MaxValue;
-        int maxCol = cols-1;
+        int maxCol = int.MinValue;
 
         // 遍历所有已放置物品，收集占用的所有格子
         foreach (var kv in items)
@@ -800,9 +702,6 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
                 }
             }
         }
-        
-        maxRow = rows-1;
-        maxCol = cols-1;
 
         // 计算实际占用区域的尺寸（世界单位）
         float occupiedWidth = (maxCol - minCol + 1) * cellSize;
@@ -828,9 +727,8 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
         {
             Debug.LogWarning($"地图尺寸 {rows}x{cols} 不在预定义列表中，使用默认缩放");
         }
-        scale = scale - mapScale;
         // 限制最大缩放不超过 1.3f
-        scale = Mathf.Min(scale, 1.3f);
+        scale = Mathf.Min(mapScale, 1.3f);
 
         // 应用均匀缩放
         transform.localScale = Vector3.one * scale;
