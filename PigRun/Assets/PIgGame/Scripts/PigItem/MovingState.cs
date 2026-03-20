@@ -38,10 +38,10 @@
                 // 直线前进
                 pig.transform.Translate(Vector3.forward * pig.Speed * Time.deltaTime);
                 // 新增：如果当前是闲置状态且站在跑道上，立即进入跑道状态
-                if (Map.Instance.IsRunwayCell(pig.MapItem.gridPos))
-                {
-                    pig.ChangeState(new RunwayState(pig));
-                }
+                // if (Map.Instance.IsRunwayCell(pig.MapItem.gridPos))
+                // {
+                //     pig.ChangeState(new RunwayState(pig));
+                // }
                 //if (pig.IsOutOfScreen())
                 // {
                 //     Map.Instance.RemoveItem(pig.MapItem);
@@ -73,7 +73,7 @@
 
         public void Exit()
         {
-            pig.animator.SetBool("IsRun", false);
+            //pig.animator.SetBool("IsRun", false);
         }
 
         // 移动中不响应点击，无需实现 HandleClick

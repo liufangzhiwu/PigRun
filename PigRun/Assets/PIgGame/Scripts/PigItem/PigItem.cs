@@ -1,4 +1,5 @@
 using System.Collections;
+using DG.Tweening;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -16,6 +17,14 @@ public class PigItem : MonoBehaviour
     public MapItem MapItem => mapItem;
     public float Speed => speed;
     public PigItem BehitItem => behitItem;
+    public IPigState CurrentState => currentState;
+    
+    public RunwayPath currentRunway;
+    public int currentSegmentIndex;
+    private bool isOnRunway;
+    
+    public int currentWaypointIndex; // 当前要移动到的路径点索引
+    
 
     void Start()
     {
@@ -64,6 +73,36 @@ public class PigItem : MonoBehaviour
         currentState = newState;
         currentState?.Enter();
     }
+    
+    
+    public void EnterRunway(RunwayPath runway, Vector3 enterPos)
+    {
+        // 根据您的状态设计，可能只允许从直线奔跑状态进入
+        if (currentState is MovingState)
+        {
+        
+            currentRunway = runway;
+            // 找到离进入点最近的路径点
+            currentWaypointIndex = runway.FindClosestWaypoint(enterPos);
+            // 将小猪直接放到该路径点上（可选，也可不移动，但吸附到路径上更精确）
+            transform.position = runway.waypoints[currentWaypointIndex].position;
+             
+             Debug.Log($"进入点: {enterPos}, 最近线段索引: {currentWaypointIndex}");
+        
+            // 切换到跑道状态
+            ChangeState(new RunwayState(this));
+        }
+    }
+
+    public void ExitRunway()
+    {
+        if (currentState is RunwayState)
+        {
+            isOnRunway = false;
+            ChangeState(new IdleState(this));
+        }
+    }
+    
 
     /// <summary>
     /// 计算移动目标位置（用于点击时）

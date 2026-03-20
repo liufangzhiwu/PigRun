@@ -812,7 +812,7 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
         float scaleWidth = screenWorldWidth / occupiedWidth;
         float scale = Mathf.Min(scaleHeight, scaleWidth);
 
-        scale = scale - 0.1f;
+        //scale = scale - 0.1f;
         // 限制最大缩放不超过 1.3f
         scale = Mathf.Min(scale, 1.3f);
 
