@@ -28,6 +28,7 @@ public class Map : MonoBehaviour
     /// 所有地图项被销毁时触发的事件
     /// </summary>
     public event System.Action OnAllItemsDestroyed;
+    public event System.Action OnLoadNewMap;
     
     // ==================== 视觉配置 ====================
     // 网格与选中高亮的视觉配置
@@ -133,6 +134,11 @@ public class Map : MonoBehaviour
         for (int r = 0; r < rows; r++)
             for (int c = 0; c < cols; c++)
                 occupancy[r, c] = -1;
+    }
+    
+    public void OnLoadNewMapEvent()
+    {
+        Map.Instance.OnLoadNewMap?.Invoke();
     }
 
     // ==================== 占用计算工具方法 ====================

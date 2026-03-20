@@ -37,6 +37,7 @@ public class GamePanel : UIBase
         if (Map.Instance != null)
         {
             Map.Instance.OnAllItemsDestroyed += ShowLevelComplete;
+            Map.Instance.OnLoadNewMap += InitUI;
         }
     }
 
@@ -56,6 +57,7 @@ public class GamePanel : UIBase
         if (Map.Instance != null)
         {
             Map.Instance.OnAllItemsDestroyed -= ShowLevelComplete;
+            Map.Instance.OnLoadNewMap -= InitUI;
         }
     }
 }

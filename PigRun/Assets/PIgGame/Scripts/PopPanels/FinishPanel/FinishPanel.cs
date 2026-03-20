@@ -23,6 +23,12 @@ namespace PigGame
         {
             UIManager.Instance.HidePanel(PanelType.FinishPanel);
             GameManager.instance.StartGamePanel();
+
+            if (Map.Instance != null)
+            {
+                Map.Instance.OnLoadNewMapEvent();
+            }
+           
         }
     }
 

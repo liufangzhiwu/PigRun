@@ -1,0 +1,754 @@
+{
+  "m_GameObject": {
+    "m_FileID": 0,
+    "m_PathID": 0
+  },
+  "m_Enabled": 1,
+  "m_Script": {
+    "m_FileID": 1,
+    "m_PathID": 531
+  },
+  "m_Name": "mao_78",
+  "Size": {
+    "x": 51.0,
+    "y": 51.0
+  },
+  "Time": 305,
+  "Tap": 100,
+  "CameraPos": {
+    "x": 26.0,
+    "y": 95.0,
+    "z": 24.5
+  },
+  "CameraAngle": {
+    "x": 90.0,
+    "y": 315.0,
+    "z": 0.0
+  },
+  "pigGroup": [
+    {
+      "position": {
+        "x": 29.0,
+        "y": 31.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 33.0,
+        "y": 38.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 30.0,
+        "y": 37.0
+      },
+      "angle": 270,
+      "type": 9,
+      "boomTime": 18
+    },
+    {
+      "position": {
+        "x": 29.0,
+        "y": 38.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 26.0,
+        "y": 26.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 17.0,
+        "y": 26.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 21.0,
+        "y": 35.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 26.0,
+        "y": 32.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 33.0,
+        "y": 31.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 35.0,
+        "y": 32.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 17.0,
+        "y": 25.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 18.0,
+        "y": 25.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 32.0,
+        "y": 43.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 17.0,
+        "y": 37.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 17.0,
+        "y": 38.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 18.0,
+        "y": 29.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 18.0,
+        "y": 38.0
+      },
+      "angle": 0,
+      "type": 9,
+      "boomTime": 25
+    },
+    {
+      "position": {
+        "x": 12.0,
+        "y": 31.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 21.0,
+        "y": 43.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 29.0,
+        "y": 46.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 30.0,
+        "y": 23.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 18.0,
+        "y": 22.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 24.0,
+        "y": 22.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 29.0,
+        "y": 23.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 39.0,
+        "y": 23.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 39.0,
+        "y": 22.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 38.0,
+        "y": 22.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 21.0,
+        "y": 31.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 33.0,
+        "y": 23.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 33.0,
+        "y": 17.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 30.0,
+        "y": 10.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 29.0,
+        "y": 10.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 29.0,
+        "y": 11.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 38.0,
+        "y": 16.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 30.0,
+        "y": 16.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 29.0,
+        "y": 19.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 21.0,
+        "y": 19.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 21.0,
+        "y": 11.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 26.0,
+        "y": 10.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 17.0,
+        "y": 10.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 17.0,
+        "y": 11.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 18.0,
+        "y": 14.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 23.0,
+        "y": 5.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 36.0,
+        "y": 10.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 12.0,
+        "y": 16.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 9.0,
+        "y": 34.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 38.0,
+        "y": 37.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 38.0,
+        "y": 44.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 39.0,
+        "y": 44.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 39.0,
+        "y": 43.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 39.0,
+        "y": 35.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 39.0,
+        "y": 31.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 44.0,
+        "y": 37.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 47.0,
+        "y": 38.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 26.0,
+        "y": 49.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 32.0,
+        "y": 47.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 38.0,
+        "y": 47.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 44.0,
+        "y": 17.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 39.0,
+        "y": 11.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 47.0,
+        "y": 26.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 47.0,
+        "y": 23.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 45.0,
+        "y": 29.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 18.0,
+        "y": 46.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 17.0,
+        "y": 46.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 45.0,
+        "y": 17.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 42.0,
+        "y": 16.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 20.0,
+        "y": 47.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 9.0,
+        "y": 37.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 6.0,
+        "y": 32.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 11.0,
+        "y": 26.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 11.0,
+        "y": 11.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 11.0,
+        "y": 19.0
+      },
+      "angle": 180,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 9.0,
+        "y": 22.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 6.0,
+        "y": 25.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 6.0,
+        "y": 17.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 35.0,
+        "y": 5.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 6.0,
+        "y": 31.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 9.0,
+        "y": 10.0
+      },
+      "angle": 270,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 14.0,
+        "y": 5.0
+      },
+      "angle": 90,
+      "type": 0,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 6.0,
+        "y": 5.0
+      },
+      "angle": 0,
+      "type": 0,
+      "boomTime": 0
+    }
+  ],
+  "obstacleGroup": [],
+  "roadSpeed": 10,
+  "is2Dir": false,
+  "isEatAnim": false
+}
