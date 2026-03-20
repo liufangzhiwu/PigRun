@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ public class Map : MonoBehaviour
     // 地图网格行列与单元大小、原点（本地坐标）
     public int rows = 10;
     public int cols = 10;
-    public float cellSize = 0.21f;
+    private float cellSize = 0.18f;
     public Vector3 origin;      
 
 
@@ -132,10 +133,6 @@ public class Map : MonoBehaviour
         for (int r = 0; r < rows; r++)
             for (int c = 0; c < cols; c++)
                 occupancy[r, c] = -1;
-        
-        // 清除网格 UI
-        if (gridUICanvas != null) Destroy(gridUICanvas);
-        gridUIItems.Clear();
     }
 
     // ==================== 占用计算工具方法 ====================
@@ -452,7 +449,8 @@ public class Map : MonoBehaviour
 
 
   // 在 Map 类中添加静态数组，用于存储可用的网格尺寸
-private static readonly int[] AvailableGridSizes = new int[] { 20, 50, 70 };
+private static readonly int[] AvailableGridSizes = new int[] { 20, 25, 30 };
+private static readonly float[] mapScales = new float[] { 0.05f, 0.08f, 0.35f };
 
 /// <summary>
 /// 获取与目标尺寸最接近的可用网格尺寸
@@ -553,9 +551,7 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
     }
 
     // Step 6：可选——将地图适配到屏幕（根据加载后的物品）
-    FitMapToScreen(new Vector2(0.52f, 0.435f));
-
-    //GenerateGridUI();
+    FitMapToScreen(new Vector2(0.52f, 0.45f));
 }
 
     public PlacedItem GetPlacedItem(int id)
@@ -811,8 +807,19 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
         float scaleHeight = screenWorldHeight / occupiedHeight;
         float scaleWidth = screenWorldWidth / occupiedWidth;
         float scale = Mathf.Min(scaleHeight, scaleWidth);
-
-        //scale = scale - 0.1f;
+        
+        // 在需要的地方使用
+        int mscaleid = Array.FindIndex(AvailableGridSizes, size => size == rows);
+        float mapScale = mapScales[mapScales.Length-1];
+        if (mscaleid >= 0)
+        {
+            mapScale = mapScales[mscaleid];
+        }
+        else
+        {
+            Debug.LogWarning($"地图尺寸 {rows}x{cols} 不在预定义列表中，使用默认缩放");
+        }
+        scale = scale - mapScale;
         // 限制最大缩放不超过 1.3f
         scale = Mathf.Min(scale, 1.3f);
 
@@ -843,135 +850,5 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
             Debug.LogWarning("相机视线未与地图平面相交，无法自动居中。");
         }
     }
-    
-    
-    
-    // 添加字段（与现有字段放在一起）
-    private GameObject gridUICanvas;
-    private List<GameObject> gridUIItems = new List<GameObject>();
-
-    void GenerateGridUI()
-    {
-        // 清除旧UI
-        if (gridUICanvas != null) Destroy(gridUICanvas);
-        gridUIItems.Clear();
-
-        // 如果没有任何物品，就不生成格子UI
-        if (items == null || items.Count == 0)
-        {
-            Debug.Log("没有物品，不生成格子UI。");
-            return;
-        }
-
-        // 创建世界空间Canvas
-        GameObject canvasObj = new GameObject("GridUICanvas");
-        canvasObj.transform.SetParent(transform, false);
-        Canvas canvas = canvasObj.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.WorldSpace;
-        canvas.worldCamera = cam;
-
-        // 确保Canvas的世界旋转为恒等（不随父级旋转）
-        canvasObj.transform.rotation = Quaternion.identity;
-
-        RectTransform canvasRect = canvasObj.GetComponent<RectTransform>();
-        canvasRect.sizeDelta = new Vector2(100, 100); // 不影响子物体
-
-        // 加载格子预制体
-        GameObject gridPrefab = Resources.Load<GameObject>("UI/grid1");
-        if (gridPrefab == null)
-        {
-            Debug.LogError("无法从 Resources/UI/grid1 加载格子 UI 预制体");
-            Destroy(canvasObj);
-            return;
-        }
-
-        // 计算所有物品占用的整体行列范围
-        int minRow = int.MaxValue;
-        int maxRow = int.MinValue;
-        int minCol = int.MaxValue;
-        int maxCol = int.MinValue;
-
-        foreach (var kv in items)
-        {
-            var placed = kv.Value;
-            var info = placed.info;
-            var gridPos = placed.gridPos;
-            var rotIndex = placed.rotIndex;
-
-            var dims = FootprintDims(info, rotIndex);
-            var anchor = StartFromPivot(gridPos, info, rotIndex);
-
-            for (int r = 0; r < dims.x; r++)
-            {
-                for (int c = 0; c < dims.y; c++)
-                {
-                    int row = anchor.x + r;
-                    int col = anchor.y + c;
-                    if (row < minRow) minRow = row;
-                    if (row > maxRow) maxRow = row;
-                    if (col < minCol) minCol = col;
-                    if (col > maxCol) maxCol = col;
-                }
-            }
-        }
-
-        // 以最小行和最小列为起点，步长3，生成格子UI，覆盖到最大行和最大列
-        for (int r = minRow; r <= maxRow; r += 3)
-        {
-            for (int c = minCol; c <= maxCol; c += 3)
-            {
-                // 计算当前块实际覆盖的行列范围（不超过 maxRow/maxCol）
-                int blockStartRow = r;
-                int blockStartCol = c;
-                int blockEndRow = Mathf.Min(r + 2, maxRow);
-                int blockEndCol = Mathf.Min(c + 2, maxCol);
-                int blockRows = blockEndRow - blockStartRow + 1;
-                int blockCols = blockEndCol - blockStartCol + 1;
-
-                if (blockRows <= 0 || blockCols <= 0) continue;
-
-                // 计算块的中心位置（基于网格世界坐标）
-                Vector3 topLeft = GridToWorld(new Vector2Int(blockStartRow, blockStartCol));
-                Vector3 bottomRight = GridToWorld(new Vector2Int(blockEndRow, blockEndCol));
-                Vector3 center = (topLeft + bottomRight) * 0.5f;
-
-                // 实例化UI
-                GameObject gridItem = Instantiate(gridPrefab, canvasObj.transform);
-                int blockR = (r - minRow) / 3; // 相对索引，用于命名和图片分配
-                int blockC = (c - minCol) / 3;
-                gridItem.name = $"Block_{blockR}_{blockC}";
-
-                RectTransform rect = gridItem.GetComponent<RectTransform>();
-                Image gImage = gridItem.GetComponent<Image>();
-
-                if (rect != null)
-                {
-                    rect.localScale = Vector3.one;
-                    rect.position = center; // 直接设置世界位置（忽略Canvas偏移）
-                    // 尺寸 = 块实际格子数 * cellSize
-                    rect.sizeDelta = new Vector2(blockCols * cellSize, blockRows * cellSize);
-                    rect.anchorMin = new Vector2(0.5f, 0.5f);
-                    rect.anchorMax = new Vector2(0.5f, 0.5f);
-                    rect.pivot = new Vector2(0.5f, 0.5f);
-
-                    // 使格子平面水平（法线向上），保持原有旋转
-                    rect.localRotation = Quaternion.Euler(90, 0, -10);
-                }
-
-                // 根据块的索引奇偶性分配图片
-                if (gImage != null)
-                {
-                    bool isEven = (blockR + blockC) % 2 == 0;
-                    gImage.sprite = isEven ? grid01 : grid02;
-                }
-
-                gridUIItems.Add(gridItem);
-            }
-        }
-
-        gridUICanvas = canvasObj;
-    }
-
-    
 }
 

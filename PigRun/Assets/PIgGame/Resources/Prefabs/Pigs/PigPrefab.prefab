@@ -99,8 +99,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.69825804, y: 0.5678721, z: 1.1396681}
-  m_Center: {x: -0.015051246, y: 0.3851513, z: 0.023345768}
+  m_Size: {x: 0.69825804, y: 0.31938744, z: 1.1396681}
+  m_Center: {x: -0.015051246, y: 0.26090893, z: 0.023345768}
 --- !u!114 &8939642119794021110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -116,6 +116,9 @@ MonoBehaviour:
   animator: {fileID: 3421955766904073414}
   speed: 5
   idleFidgetDelay: 30
+  currentRunway: {fileID: 0}
+  currentSegmentIndex: 0
+  currentWaypointIndex: 0
 --- !u!1001 &5746488402385903834
 PrefabInstance:
   m_ObjectHideFlags: 0
