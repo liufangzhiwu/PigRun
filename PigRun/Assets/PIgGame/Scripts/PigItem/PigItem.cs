@@ -83,14 +83,35 @@ public class PigItem : MonoBehaviour
         
             currentRunway = runway;
             // 找到离进入点最近的路径点
-            currentWaypointIndex = runway.FindClosestWaypoint(enterPos);
-            // 将小猪直接放到该路径点上（可选，也可不移动，但吸附到路径上更精确）
-            transform.position = runway.waypoints[currentWaypointIndex].position;
-             
-             Debug.Log($"进入点: {enterPos}, 最近线段索引: {currentWaypointIndex}");
+            int targetWaypointIndex = runway.FindClosestWaypoint(enterPos);
+            currentWaypointIndex = targetWaypointIndex;
         
-            // 切换到跑道状态
-            ChangeState(new RunwayState(this));
+            // 获取目标位置（最近的路径点）
+            Vector3 targetPos = runway.waypoints[currentWaypointIndex].position;
+        
+            // 转向目标
+            Vector3 dir = (targetPos - transform.position).normalized;
+            
+            if (dir != Vector3.zero)
+            {
+                Quaternion targetRot = Quaternion.LookRotation(dir);
+                transform.DORotateQuaternion(targetRot, 0.05f); // 0.2秒内旋转到目标
+            }
+            
+            // 先播放移动到目标点的动画，再切换状态
+            // 可以使用 DOTween 移动，并等待完成
+            transform.DOMove(targetPos, 0.05f) // 移动耗时0.3秒
+                .SetEase(Ease.OutQuad)        // 缓动效果
+                .OnComplete(() =>              // 移动完成后
+                {
+                    // 确保最终位置精确
+                    transform.position = targetPos;
+                    // 切换状态
+                    ChangeState(new RunwayState(this));
+                });
+        
+            // 可选：在移动过程中禁用点击或其他输入，防止重复触发
+            // 可设置一个标志位，或者暂时停用状态切换
         }
     }
 
