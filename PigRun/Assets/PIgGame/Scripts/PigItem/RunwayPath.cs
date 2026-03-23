@@ -26,6 +26,7 @@ public class RunwayPath : MonoBehaviour
     
         Debug.Log($"最终 waypoints 数量: {waypoints.Count}，SegmentCount: {waypoints.Count-1}");
     }
+
   
 
     /// <summary> 获取指定线段的起点和终点 </summary>
@@ -55,49 +56,33 @@ public class RunwayPath : MonoBehaviour
     }
     
     
-    public int FindClosestWaypoint(Vector3 worldPos)
+    /// <summary> 获取世界坐标在跑道上的投影点、所在线段索引及线段内进度 t </summary>
+    public (Vector3 point, int segmentIndex, float t) GetProjectedPointAndSegment(Vector3 worldPos)
     {
         int bestIdx = -1;
         float minDist = float.MaxValue;
-        for (int i = 0; i < waypoints.Count; i++)
+        Vector3 bestPoint = Vector3.zero;
+        float bestT = 0f;
+        for (int i = 0; i < waypoints.Count - 1; i++)
         {
-            float dist = Vector3.Distance(worldPos, waypoints[i].position);
+            Vector3 a = waypoints[i].position;
+            Vector3 b = waypoints[i + 1].position;
+            Vector3 ab = b - a;
+            float t = Vector3.Dot(worldPos - a, ab) / ab.sqrMagnitude;
+            t = Mathf.Clamp01(t);
+            Vector3 point = a + t * ab;
+            float dist = Vector3.Distance(worldPos, point);
             if (dist < minDist)
             {
                 minDist = dist;
                 bestIdx = i;
+                bestPoint = point;
+                bestT = t;
             }
         }
-        return bestIdx;
+        return (bestPoint, bestIdx, bestT);
     }
-
-    /// <summary> 获取当前线段的下一个目标点，并根据需要更新线段索引 </summary>
-    public Vector3 GetNextTarget(Vector3 currentPos, ref int segmentIndex)
-    {
-        if (segmentIndex < 0) segmentIndex = 0;
-        if (segmentIndex >= waypoints.Count - 1)
-            return waypoints[waypoints.Count - 1].position; // 已到终点
-
-        var (start, end) = GetSegment(segmentIndex);
-        Vector3 lineDir = end - start;
-        float lineLength = lineDir.magnitude;
-        lineDir.Normalize();
-
-        Vector3 toStart = currentPos - start;
-        float t = Vector3.Dot(toStart, lineDir) / lineLength;
-        t = Mathf.Clamp01(t);
-
-        // 如果非常接近终点，尝试切换到下一线段
-        if (t >= 0.99f && segmentIndex < waypoints.Count - 2)
-        {
-            segmentIndex++;
-            return waypoints[segmentIndex + 1].position; // 新线段的终点
-        }
-        else
-        {
-            return end; // 当前线段终点作为目标
-        }
-    }
+  
 
     /// <summary> 获取世界坐标在路径上的投影点，并返回所在线段索引 </summary>
     public Vector3 GetProjectedPoint(Vector3 worldPos, out int segmentIndex)

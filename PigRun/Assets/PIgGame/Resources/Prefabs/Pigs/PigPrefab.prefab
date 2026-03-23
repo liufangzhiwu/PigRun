@@ -114,11 +114,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 3421955766904073414}
-  speed: 5
+  speed: 4
   idleFidgetDelay: 30
   currentRunway: {fileID: 0}
   currentSegmentIndex: 0
-  currentWaypointIndex: 0
 --- !u!1001 &5746488402385903834
 PrefabInstance:
   m_ObjectHideFlags: 0

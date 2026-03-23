@@ -11,10 +11,11 @@ public class IdleState : PigItem.IPigState
 
     public void Enter()
     {
+        pig.animator.Play("Idle", 0, Random.Range(0f, 1f));
         idleTimer = 0f;
         pig.animator.SetBool("IsRun", false);
         // 随机化下次闲置触发时间（原有逻辑）
-        pig.idleFidgetDelay = Random.Range(10, 400);
+        pig.idleFidgetDelay = Random.Range(10, 200);
     }
 
     public void Update()

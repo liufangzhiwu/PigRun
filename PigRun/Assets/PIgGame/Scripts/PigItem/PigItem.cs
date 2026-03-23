@@ -6,7 +6,7 @@ using UnityEngine;
 public class PigItem : MonoBehaviour
 {
     public Animator animator;
-    [SerializeField] private float speed = 5f;
+    [SerializeField] private float speed = 2f;
     [SerializeField] public float idleFidgetDelay = 30;   // 闲置多少秒后触发 Fidget
 
     private MapItem mapItem;
@@ -22,8 +22,6 @@ public class PigItem : MonoBehaviour
     public RunwayPath currentRunway;
     public int currentSegmentIndex;
     private bool isOnRunway;
-    
-    public int currentWaypointIndex; // 当前要移动到的路径点索引
     
 
     void Start()
@@ -77,41 +75,26 @@ public class PigItem : MonoBehaviour
     
     public void EnterRunway(RunwayPath runway, Vector3 enterPos)
     {
-        // 根据您的状态设计，可能只允许从直线奔跑状态进入
         if (currentState is MovingState)
         {
-        
             currentRunway = runway;
-            // 找到离进入点最近的路径点
-            int targetWaypointIndex = runway.FindClosestWaypoint(enterPos);
-            currentWaypointIndex = targetWaypointIndex;
+            // 获取投影点、线段索引和线段内进度
+            var (projectedPoint, segmentIndex, t) = runway.GetProjectedPointAndSegment(enterPos);
         
-            // 获取目标位置（最近的路径点）
-            Vector3 targetPos = runway.waypoints[currentWaypointIndex].position;
+            // 将小猪直接放置到投影点（避免跳跃到路径点）
+            transform.position = projectedPoint;
+            currentSegmentIndex = segmentIndex; // 存储给状态使用
         
-            // 转向目标
-            Vector3 dir = (targetPos - transform.position).normalized;
-            
-            if (dir != Vector3.zero)
+            // 立即面向当前线段方向
+            if (segmentIndex < runway.waypoints.Count - 1)
             {
-                Quaternion targetRot = Quaternion.LookRotation(dir);
-                transform.DORotateQuaternion(targetRot, 0.05f); // 0.2秒内旋转到目标
+                Vector3 segmentDir = (runway.waypoints[segmentIndex + 1].position - runway.waypoints[segmentIndex].position).normalized;
+                if (segmentDir != Vector3.zero)
+                    transform.DORotateQuaternion(Quaternion.LookRotation(segmentDir),0.02f);
             }
-            
-            // 先播放移动到目标点的动画，再切换状态
-            // 可以使用 DOTween 移动，并等待完成
-            transform.DOMove(targetPos, 0.05f) // 移动耗时0.3秒
-                .SetEase(Ease.OutQuad)        // 缓动效果
-                .OnComplete(() =>              // 移动完成后
-                {
-                    // 确保最终位置精确
-                    transform.position = targetPos;
-                    // 切换状态
-                    ChangeState(new RunwayState(this));
-                });
         
-            // 可选：在移动过程中禁用点击或其他输入，防止重复触发
-            // 可设置一个标志位，或者暂时停用状态切换
+            // 切换到跑道状态
+            ChangeState(new RunwayState(this));
         }
     }
 
