@@ -1,55 +1,54 @@
 using System.Collections;
 using DG.Tweening;
-using Unity.VisualScripting;
 using UnityEngine;
 
-public class PigItem : MonoBehaviour
+public abstract class AnimalBase : MonoBehaviour
 {
+    [Header("动物属性")]
     public Animator animator;
-    [SerializeField] private float speed = 2f;
-    [SerializeField] public float idleFidgetDelay = 30;   // 闲置多少秒后触发 Fidget
+    [SerializeField] protected float speed = 2f;
+    [SerializeField] public float idleFidgetDelay = 30;   // 闲置多少秒后触发小动作
 
-    private MapItem mapItem;
-    private PigItem behitItem;          // 将要撞击的物体（用于移动结束时触发其 BeHit）
-    private IPigState currentState;
+    protected MapItem mapItem;
+    protected AnimalBase behitItem;          // 将要撞击的物体
+    protected IAnimalState currentState;
 
-    // 外部可访问的属性
-    public MapItem MapItem => mapItem;
-    public float Speed => speed;
-    public PigItem BehitItem => behitItem;
-    public IPigState CurrentState => currentState;
-    
+    // 跑道相关
     public RunwayPath currentRunway;
     public int currentSegmentIndex;
-    private bool isOnRunway;
-    
+    protected bool isOnRunway;
 
-    void Start()
+    // 公共属性
+    public MapItem MapItem => mapItem;
+    public float Speed => speed;
+    public AnimalBase BehitItem => behitItem;
+    public IAnimalState CurrentState => currentState;
+
+    protected virtual void Start()
     {
         mapItem = GetComponent<MapItem>();
         ChangeState(new IdleState(this));
     }
 
-    void Update()
+    protected virtual void Update()
     {
         currentState?.Update();
     }
 
-    private void OnMouseUpAsButton()
+    protected virtual void OnMouseUpAsButton()
     {
         if (UIManager.Instance.IsPanelTypeShowing())
         {
-            Debug.Log("进入弹窗界面 不触发小猪逻辑");
+            Debug.Log("进入弹窗界面，不触发动物逻辑");
             return;
         }
-        
         currentState?.HandleClick();
     }
 
     /// <summary>
-    /// 被其他物体撞击时调用（由外部触发）
+    /// 被其他物体撞击时调用（外部触发）
     /// </summary>
-    public void BeHit()
+    public virtual void BeHit()
     {
         ChangeState(new BeHitState(this));
     }
@@ -57,7 +56,7 @@ public class PigItem : MonoBehaviour
     /// <summary>
     /// 自身撞击障碍时调用（内部触发）
     /// </summary>
-    public void HitSelf()
+    public virtual void HitSelf()
     {
         ChangeState(new HitState(this));
     }
@@ -65,40 +64,34 @@ public class PigItem : MonoBehaviour
     /// <summary>
     /// 切换状态
     /// </summary>
-    public void ChangeState(IPigState newState)
+    public void ChangeState(IAnimalState newState)
     {
         currentState?.Exit();
         currentState = newState;
         currentState?.Enter();
     }
-    
-    
-    public void EnterRunway(RunwayPath runway, Vector3 enterPos)
+
+    public virtual void EnterRunway(RunwayPath runway, Vector3 enterPos)
     {
         if (currentState is MovingState)
         {
             currentRunway = runway;
-            // 获取投影点、线段索引和线段内进度
             var (projectedPoint, segmentIndex, t) = runway.GetProjectedPointAndSegment(enterPos);
-        
-            // 将小猪直接放置到投影点（避免跳跃到路径点）
             transform.position = projectedPoint;
-            currentSegmentIndex = segmentIndex; // 存储给状态使用
-        
-            // 立即面向当前线段方向
+            currentSegmentIndex = segmentIndex;
+
             if (segmentIndex < runway.waypoints.Count - 1)
             {
                 Vector3 segmentDir = (runway.waypoints[segmentIndex + 1].position - runway.waypoints[segmentIndex].position).normalized;
                 if (segmentDir != Vector3.zero)
-                    transform.DORotateQuaternion(Quaternion.LookRotation(segmentDir),0.02f);
+                    transform.DORotateQuaternion(Quaternion.LookRotation(segmentDir), 0.02f);
             }
-        
-            // 切换到跑道状态
+
             ChangeState(new RunwayState(this));
         }
     }
 
-    public void ExitRunway()
+    public virtual void ExitRunway()
     {
         if (currentState is RunwayState)
         {
@@ -106,14 +99,11 @@ public class PigItem : MonoBehaviour
             ChangeState(new IdleState(this));
         }
     }
-    
 
     /// <summary>
-    /// 计算移动目标位置（用于点击时）
+    /// 计算移动目标位置（用于点击）
     /// </summary>
-    /// <param name="target">输出目标世界坐标</param>
-    /// <returns>true 表示前方有障碍，false 表示无障碍可直线前进</returns>
-    public bool CalculateTargetPosition(out Vector3 target)
+    public virtual bool CalculateTargetPosition(out Vector3 target)
     {
         target = Vector3.zero;
         Vector2Int checkGrid = GetForwardOffset(out Vector2Int currentGrid, out Vector2Int forwardOffset);
@@ -129,8 +119,7 @@ public class PigItem : MonoBehaviour
             int occupantId = Map.Instance.GetOccupantIdAtCell(checkGrid);
             if (occupantId != -1 && occupantId != mapItem.id)
             {
-                // 记录被撞物体
-                behitItem = Map.Instance.GetPlacedItem(occupantId)?.instance.GetComponent<PigItem>();
+                behitItem = Map.Instance.GetPlacedItem(occupantId)?.instance.GetComponent<AnimalBase>();
 
                 // 紧邻障碍
                 if (checkGrid - forwardOffset == currentGrid)
@@ -158,10 +147,7 @@ public class PigItem : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 获取前进方向的偏移量和当前网格（考虑旋转）
-    /// </summary>
-    private Vector2Int GetForwardOffset(out Vector2Int currentGrid, out Vector2Int forwardOffset)
+    protected Vector2Int GetForwardOffset(out Vector2Int currentGrid, out Vector2Int forwardOffset)
     {
         currentGrid = mapItem.gridPos;
         switch (mapItem.rotIndex)
@@ -182,9 +168,6 @@ public class PigItem : MonoBehaviour
         return currentGrid + forwardOffset;
     }
 
-    /// <summary>
-    /// 判断物体是否移出屏幕
-    /// </summary>
     public bool IsOutOfScreen()
     {
         Vector3 viewportPos = Camera.main.WorldToViewportPoint(transform.position);
@@ -193,13 +176,12 @@ public class PigItem : MonoBehaviour
                viewportPos.y < -0.05f || viewportPos.y > 1.05f;
     }
 
-    // ========== 状态接口 ==========
-    public interface IPigState
+    // 状态接口
+    public interface IAnimalState
     {
         void Enter();
         void Update();
         void Exit();
-        void HandleClick() { } // 默认空实现
+        void HandleClick() { }
     }
- 
 }

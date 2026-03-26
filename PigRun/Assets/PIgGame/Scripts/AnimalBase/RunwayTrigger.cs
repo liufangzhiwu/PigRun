@@ -11,11 +11,10 @@ public class RunwayTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        PigItem pig = other.GetComponent<PigItem>();
-        if (pig != null&&pig.CurrentState is MovingState)
+        AnimalBase animal = other.GetComponent<AnimalBase>();
+        if (animal != null && animal.CurrentState is MovingState)
         {
-            // 小猪进入跑道，传递路径信息和进入点
-            pig.EnterRunway(runwayPath, other.transform.position);
+            animal.EnterRunway(runwayPath, other.transform.position);
         }
     }
 

@@ -3,26 +3,26 @@
 
     using UnityEngine;
 
-    public class MovingState : PigItem.IPigState
+    public class MovingState : AnimalBase.IAnimalState
     {
-        private readonly PigItem pig;
+        private readonly AnimalBase animal;
         private readonly Vector3 targetPosition; // 仅当 movingToTarget 为 true 时有效
         private readonly bool movingForward;     // true: 直线前进；false: 移动到目标格子
 
-        public MovingState(PigItem pig, Vector3 target, bool forward)
+        public MovingState(AnimalBase pig, Vector3 target, bool forward)
         {
-            this.pig = pig;
+            this.animal = pig;
             targetPosition = target;
             movingForward = forward;
         }
 
         public void Enter()
         {
-            pig.animator.SetBool("IsRun", true);
+            animal.animator.SetBool("IsRun", true);
             if (movingForward)
             {
                 // 直线前进时通知地图更新区域（原有逻辑）
-                Map.Instance.UpdateMapItemArea(pig.MapItem);
+                Map.Instance.UpdateMapItemArea(animal.MapItem);
                 AudioManager.Instance.PlaySoundEffect("pig-run");
             }
             else
@@ -36,7 +36,7 @@
             if (movingForward)
             {
                 // 直线前进
-                pig.transform.Translate(Vector3.forward * pig.Speed * Time.deltaTime);
+                animal.transform.Translate(Vector3.forward * animal.Speed * Time.deltaTime);
                 // 新增：如果当前是闲置状态且站在跑道上，立即进入跑道状态
                 // if (Map.Instance.IsRunwayCell(pig.MapItem.gridPos))
                 // {
@@ -53,20 +53,20 @@
                 // 移动到目标格子
                 if (targetPosition != Vector3.zero)
                 {
-                    float step = pig.Speed * Time.deltaTime;
-                    pig.transform.position = Vector3.MoveTowards(pig.transform.position, targetPosition, step);
-                    if (Vector3.Distance(pig.transform.position, targetPosition) < 0.05f)
+                    float step = animal.Speed * Time.deltaTime;
+                    animal.transform.position = Vector3.MoveTowards(animal.transform.position, targetPosition, step);
+                    if (Vector3.Distance(animal.transform.position, targetPosition) < 0.05f)
                     {
                         // 到达目标，触发碰撞
-                        pig.HitSelf();                // 自身受击
-                        pig.BehitItem?.BeHit();       // 被撞物体受击
+                        animal.HitSelf();                // 自身受击
+                        animal.BehitItem?.BeHit();       // 被撞物体受击
                     }
                 }
                 else
                 {
                     // 目标位置无效（容错）
-                    pig.HitSelf();
-                    pig.BehitItem?.BeHit();
+                    animal.HitSelf();
+                    animal.BehitItem?.BeHit();
                 }
             }
         }
