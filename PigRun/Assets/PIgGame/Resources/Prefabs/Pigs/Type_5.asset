@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b502b9062456a849bdb91f08dccffec, type: 3}
   m_Name: Type_5
   m_EditorClassIdentifier: 
-  prefab: {fileID: 6647560384166464273, guid: c252758fc9fe5c74f901baf82f477f7a, type: 3}
-  rows: 6
+  prefab: {fileID: 6647560384166464273, guid: 217d740936578b94bb8ad3ac4381250d, type: 3}
+  rows: 9
   cols: 3
   pivotRow: -1
   pivotCol: -1
