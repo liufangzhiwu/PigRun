@@ -37,7 +37,7 @@ public abstract class AnimalBase : MonoBehaviour
 
     protected virtual void OnMouseUpAsButton()
     {
-        if (UIManager.Instance.IsPanelTypeShowing())
+        if (UIManager.Instance.IsPanelTypeShowing()||!UIManager.Instance.PanelIsShowing(PanelType.GamePanel))
         {
             Debug.Log("进入弹窗界面，不触发动物逻辑");
             return;

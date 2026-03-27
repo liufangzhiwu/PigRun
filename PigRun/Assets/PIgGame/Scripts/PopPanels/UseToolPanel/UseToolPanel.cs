@@ -15,6 +15,7 @@ public class UseToolPanel : UIBase
     {
         base.OnEnable();
         InitUI();
+        EventDispatcher.instance.TriggerUpdateLayerCoin(true,false);
     }
 
     protected override void InitButtonEvents()
@@ -38,6 +39,11 @@ public class UseToolPanel : UIBase
     private void ClickCloseButton()
     {
         base.Close();
+    }
+    
+    protected override void OnDisable() 
+    {
+        EventDispatcher.instance.TriggerUpdateLayerCoin(true,true);
     }
    
 }

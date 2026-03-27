@@ -12,7 +12,8 @@ public class PanelType  // Renamed class
     public const string UseToolPanel = "UseToolPanel";  
     public const string DebugPanel = "DebugPanel";  
     public const string SetPanel = "SetPanel";  
-    
+    public const string FailPanel = "FailPanel";  
+    public const string BombPanel = "BombPanel";  
 
     /// <summary>
     /// 获取所有可用界面名称 (Get all available panel names)

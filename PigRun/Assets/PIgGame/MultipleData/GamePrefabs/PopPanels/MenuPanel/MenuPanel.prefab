@@ -346,6 +346,7 @@ MonoBehaviour:
   GoldText: {fileID: 6267269574116299687}
   gmButton: {fileID: 7537188135427826925}
   setButton: {fileID: 5673532709782126288}
+  ShopBtn: {fileID: 4927206535414759359}
 --- !u!1 &4732368726963434277
 GameObject:
   m_ObjectHideFlags: 0

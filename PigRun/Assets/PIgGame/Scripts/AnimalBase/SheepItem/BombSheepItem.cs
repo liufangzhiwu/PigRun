@@ -25,6 +25,13 @@ public class BombSheepItem : AnimalBase
 
     public override void HitSelf()
     {
+        hitCount--;
+        UpdateCountDisplay();
+        if (hitCount <= 0)
+        {
+            Explode();
+            return;
+        }
         base.HitSelf();
     }
     
@@ -74,7 +81,7 @@ public class BombSheepItem : AnimalBase
         // 游戏结束（失败）
         // 销毁自身
         Destroy(gameObject);
-        UIManager.Instance.ShowPanel(PanelType.FinishPanel);
+        UIManager.Instance.ShowPanel(PanelType.BombPanel);
     }
 }
 

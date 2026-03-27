@@ -48,3 +48,13 @@ MonoBehaviour:
     spriteAtlasName: 
     prefab: {fileID: 2426500168314530211, guid: 4a0c13d69fe777d4db3690e2ddb8a3e1,
       type: 3}
+  - panelName: FailPanel
+    panelLayer: PopPanel
+    spriteAtlasName: 
+    prefab: {fileID: 2508230401924753788, guid: d0de5e95f741e284294a3fae6d5bb0df,
+      type: 3}
+  - panelName: BombPanel
+    panelLayer: PopPanel
+    spriteAtlasName: 
+    prefab: {fileID: 2508230401924753788, guid: 987379a10d0633944b43ad5b1227ebbe,
+      type: 3}
