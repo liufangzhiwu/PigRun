@@ -68,7 +68,7 @@
         "y": 21.0
       },
       "angle": 180,
-      "type": 0,
+      "type": 7,
       "boomTime": 0
     },
     {
@@ -590,7 +590,7 @@
         "y": 15.0
       },
       "angle": 180,
-      "type": 0,
+      "type": 1,
       "boomTime": 0
     },
     {
@@ -726,7 +726,7 @@
       },
       "angle": 270,
       "type": 6,
-      "boomTime": 120
+      "boomTime": 30
     },
     {
       "position": {

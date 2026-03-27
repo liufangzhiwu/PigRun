@@ -1,9 +1,10 @@
 using UnityEngine;
 
-enum AnimalType
+public enum AnimalType
 {
     Pig=0,Elephant,BombSheep=2,Dog=5,TimeBombSheep=6, Kangaroo=7,Tortoise=9,Cattle=10,Donkey=11,Chick=12
 }
+
 
 /// <summary>
 /// 地图项组件
