@@ -6,12 +6,13 @@
     public class MovingState : AnimalBase.IAnimalState
     {
         private readonly AnimalBase animal;
-        private readonly Vector3 targetPosition; // 仅当 movingToTarget 为 true 时有效
-        private readonly bool movingForward;     // true: 直线前进；false: 移动到目标格子
+        private readonly Vector3 targetPosition;
+        private readonly bool movingForward;
+        private bool hasStarted = false;
 
-        public MovingState(AnimalBase pig, Vector3 target, bool forward)
+        public MovingState(AnimalBase animal, Vector3 target, bool forward)
         {
-            this.animal = pig;
+            this.animal = animal;
             targetPosition = target;
             movingForward = forward;
         }
@@ -19,34 +20,29 @@
         public void Enter()
         {
             animal.animator.SetBool("IsRun", true);
+        
+            //没有障碍物时
             if (movingForward)
             {
-                // 直线前进时通知地图更新区域（原有逻辑）
                 Map.Instance.UpdateMapItemArea(animal.MapItem);
-                AudioManager.Instance.PlaySoundEffect("pig-run");
+                AudioManager.Instance.PlaySoundEffect("animal-run");
             }
-            else
+            else //有障碍物时
             {
-                AudioManager.Instance.PlaySoundEffect("pig-run");
+                AudioManager.Instance.PlaySoundEffect("animal-run");
             }
+        
+            hasStarted = true;
         }
 
         public void Update()
         {
+            if (!hasStarted) return;
+        
             if (movingForward)
             {
                 // 直线前进
                 animal.transform.Translate(Vector3.forward * animal.Speed * Time.deltaTime);
-                // 新增：如果当前是闲置状态且站在跑道上，立即进入跑道状态
-                // if (Map.Instance.IsRunwayCell(pig.MapItem.gridPos))
-                // {
-                //     pig.ChangeState(new RunwayState(pig));
-                // }
-                //if (pig.IsOutOfScreen())
-                // {
-                //     Map.Instance.RemoveItem(pig.MapItem);
-                //     pig.ChangeState(new IdleState(pig));
-                // }
             }
             else
             {
@@ -55,6 +51,7 @@
                 {
                     float step = animal.Speed * Time.deltaTime;
                     animal.transform.position = Vector3.MoveTowards(animal.transform.position, targetPosition, step);
+                
                     if (Vector3.Distance(animal.transform.position, targetPosition) < 0.05f)
                     {
                         // 到达目标，触发碰撞
@@ -73,8 +70,7 @@
 
         public void Exit()
         {
-            //pig.animator.SetBool("IsRun", false);
+            // 退出时停止移动
+            animal.animator.SetBool("IsRun", false);
         }
-
-        // 移动中不响应点击，无需实现 HandleClick
     }

@@ -11,7 +11,6 @@ public class IdleState : AnimalBase.IAnimalState
 
     public void Enter()
     {
-        animal.animator.Play("Idle", 0, Random.Range(0f, 1f));
         idleTimer = 0f;
         animal.animator.SetBool("IsRun", false);
         animal.idleFidgetDelay = Random.Range(10, 200);

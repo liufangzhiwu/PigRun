@@ -12,6 +12,7 @@ public abstract class AnimalBase : MonoBehaviour
     protected MapItem mapItem;
     protected AnimalBase behitItem;          // 将要撞击的物体
     protected IAnimalState currentState;
+    protected Vector2Int startGrid;
 
     // 跑道相关
     public RunwayPath currentRunway;
@@ -28,6 +29,8 @@ public abstract class AnimalBase : MonoBehaviour
     {
         mapItem = GetComponent<MapItem>();
         ChangeState(new IdleState(this));
+        
+        startGrid=new Vector2Int(mapItem.gridPos.x, mapItem.gridPos.y);
     }
 
     protected virtual void Update()
@@ -107,7 +110,7 @@ public abstract class AnimalBase : MonoBehaviour
     {
         target = Vector3.zero;
         Vector2Int checkGrid = GetForwardOffset(out Vector2Int currentGrid, out Vector2Int forwardOffset);
-
+        
         while (true)
         {
             if (checkGrid.x < 0 || checkGrid.x >= Map.Instance.rows ||

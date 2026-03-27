@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6728409668075640222}
   - component: {fileID: -2356354976258558053}
   - component: {fileID: 5838655706163292422}
-  - component: {fileID: 8939642119794021110}
+  - component: {fileID: 8435895029301288081}
   m_Layer: 0
   m_Name: KangarooPrefab
   m_TagString: Untagged
@@ -103,7 +103,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.87874013, y: 0.53973144, z: 1.0594224}
   m_Center: {x: -0.02690205, y: 0.26986572, z: 0.029260457}
---- !u!114 &8939642119794021110
+--- !u!114 &8435895029301288081
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -112,14 +112,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 6647560384166464273}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 389a36c0d6f54574db7a454bef0ca14c, type: 3}
+  m_Script: {fileID: 11500000, guid: 2d06c51c20c91614f9fa2dd9029d1ce5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 2827792130874706186}
-  speed: 5
+  speed: 4
   idleFidgetDelay: 30
   currentRunway: {fileID: 0}
   currentSegmentIndex: 0
+  bounceHeight: 1
+  bounceDuration: 0.3
 --- !u!1001 &3711181675307559440
 PrefabInstance:
   m_ObjectHideFlags: 0
