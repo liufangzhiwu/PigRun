@@ -538,6 +538,8 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
         mi.gridPos = it.gridPos;
         mi.rotIndex = it.rotIndex;
         mi.baseRotation = baseRot;
+        mi.animalType = it.animalType;
+        mi.boomTime = it.boomTime;
 
         // 分配 ID 并记录
         int id = nextId++;

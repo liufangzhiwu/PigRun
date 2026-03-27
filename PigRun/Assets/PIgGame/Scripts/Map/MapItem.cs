@@ -1,5 +1,10 @@
 using UnityEngine;
 
+enum AnimalType
+{
+    Pig=0,Elephant,BombSheep=2,Dog=5,TimeBombSheep=6, Kangaroo=7,Tortoise=9,Cattle=10,Donkey=11,Chick=12
+}
+
 /// <summary>
 /// 地图项组件
 /// 附加到已放置的预制体实例上，记录其在地图上的位置和旋转信息
@@ -17,6 +22,8 @@ public class MapItem : MonoBehaviour
     // 顺时针旋转索引（0/1/2/3 分别对应 0/90/180/270°）
     public int rotIndex;
     public int id;
+    public int animalType;
+    public int boomTime;
     // 预制体的初始旋转（作为世界 Y 轴叠加的基底）
     public Quaternion baseRotation;
     #endregion

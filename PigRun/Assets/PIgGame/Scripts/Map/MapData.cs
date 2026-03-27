@@ -35,6 +35,8 @@ public class MapData : ScriptableObject
         public Vector2Int gridPos;
         // 旋转索引（0/1/2/3 对应 0°/90°/180°/270°）
         public int rotIndex;
+        public int animalType;
+        public int boomTime;
     }
     #endregion
     

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5838655706163292422}
   - component: {fileID: 593845278806892295}
   m_Layer: 0
-  m_Name: BombPrefab
+  m_Name: TimeBombPrefab
   m_TagString: Pig
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

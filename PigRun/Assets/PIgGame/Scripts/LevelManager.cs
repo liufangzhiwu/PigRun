@@ -110,6 +110,8 @@ public class LevelManager : MonoBehaviour
             // 旋转索引 (0,1,2,3 对应 0°,90°,180°,270°)
             //item.rotIndex = pig.angle / 90;
             item.rotIndex = (pig.angle / 90-1) % 4;   // 新映射
+            item.animalType = pig.type;   // 动物类型
+            item.boomTime = pig.boomTime;   // 爆炸时间
 
             if (item.rotIndex == -1)
             {
