@@ -53,6 +53,8 @@ MonoBehaviour:
   gridPos: {x: 0, y: 0}
   rotIndex: 0
   id: 0
+  animalType: 0
+  boomTime: 0
   baseRotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!54 &-2356354976258558053
 Rigidbody:
@@ -119,6 +121,7 @@ MonoBehaviour:
   idleFidgetDelay: 30
   currentRunway: {fileID: 0}
   currentSegmentIndex: 0
+  countText: {fileID: 2648391904583777370}
 --- !u!1 &8069324571547198265
 GameObject:
   m_ObjectHideFlags: 0
