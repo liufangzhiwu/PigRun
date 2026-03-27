@@ -1,4 +1,5 @@
 using System;
+using PigGame;
 using UnityEngine;
 
 public class BombSheepItem : AnimalBase
@@ -46,7 +47,10 @@ public class BombSheepItem : AnimalBase
             if (hitCount == 3)
                 countText.color = Color.green;
             else if (hitCount == 2)
+            {
                 countText.color = Color.yellow;
+                UIManager.Instance.ShowPanel(PanelType.TipAnimalPanel);
+            }
             else
                 countText.color = Color.red;
         }

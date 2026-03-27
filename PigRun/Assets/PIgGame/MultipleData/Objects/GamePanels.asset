@@ -58,3 +58,8 @@ MonoBehaviour:
     spriteAtlasName: 
     prefab: {fileID: 2508230401924753788, guid: 987379a10d0633944b43ad5b1227ebbe,
       type: 3}
+  - panelName: TipAnimalPanel
+    panelLayer: PopPanel
+    spriteAtlasName: 
+    prefab: {fileID: 2508230401924753788, guid: 4deface615766c243a8c9d7e581b7c08,
+      type: 3}
