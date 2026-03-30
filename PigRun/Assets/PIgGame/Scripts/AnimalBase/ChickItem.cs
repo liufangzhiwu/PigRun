@@ -211,6 +211,7 @@ public class ChickItem : AnimalBase
             ShowPath();
             
             Debug.Log($"小鸡找到跑出边界的路径，需要移动 {currentPath.Count} 步，跑出方向: {exitDir}");
+            
             return true;
         }
         

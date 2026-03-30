@@ -653,7 +653,6 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
             OnAllItemsDestroyed?.Invoke();
             LevelFinish = true;
         }
-
         return true;
     }
 

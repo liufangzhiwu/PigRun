@@ -29,6 +29,7 @@ public class AutoMovingState : AnimalBase.IAnimalState
         }
         
         Debug.Log($"小鸡进入自动移动状态，需要移动 {path.Count} 个路点");
+        Map.Instance.UpdateMapItemArea(chick.MapItem);
     }
     
     public void Update()
