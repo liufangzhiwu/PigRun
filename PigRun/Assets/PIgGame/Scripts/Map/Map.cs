@@ -44,6 +44,10 @@ public class Map : MonoBehaviour
    
     public bool LevelFinish = false;
     
+    // 添加事件委托
+    public delegate void AnimalEscapedDelegate(AnimalBase animal);
+    public event AnimalEscapedDelegate OnAnimalEscaped;
+    
     // ==================== 数据资产 ====================
     public MapData dataAsset;
     //MapData runtimeData;
@@ -621,6 +625,13 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
         //var anchor = StartFromPivot(item.gridPos, item.info, item.rotIndex);
         ResetMarkAreaFormRotate(item.gridPos, dims, item.id,item.rotIndex);
         items.Remove(item.id);
+    }
+
+    public void RunOutRemoveItem(AnimalBase animal)
+    {
+        // 动物到达终点，触发跑出事件
+        OnAnimalEscaped?.Invoke(animal);
+        RemoveItem(animal.MapItem);
     }
 
     /// <summary>

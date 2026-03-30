@@ -950,8 +950,8 @@
         "y": 18.0
       },
       "angle": 90,
-      "type": 0,
-      "boomTime": 0
+      "type": 9,
+      "boomTime": 6
     },
     {
       "position": {
