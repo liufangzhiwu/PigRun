@@ -16,6 +16,11 @@ public class RunwayTrigger : MonoBehaviour
         {
             animal.EnterRunway(runwayPath, other.transform.position);
         }
+        
+        if (animal != null && animal.CurrentState is AutoMovingState)
+        {
+            animal.EnterRunway(runwayPath, other.transform.position);
+        }
     }
 
     // private void OnTriggerExit(Collider other)
