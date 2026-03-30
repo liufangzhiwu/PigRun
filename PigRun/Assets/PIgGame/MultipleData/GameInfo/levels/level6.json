@@ -122,7 +122,16 @@
         "y": 21.0
       },
       "angle": 180,
-      "type": 0,
+      "type": 12,
+      "boomTime": 0
+    },
+    {
+      "position": {
+        "x": 7.0,
+        "y": 18.0
+      },
+      "angle": 180,
+      "type": 12,
       "boomTime": 0
     },
     {
