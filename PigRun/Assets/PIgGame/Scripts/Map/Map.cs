@@ -43,6 +43,8 @@ public class Map : MonoBehaviour
     public bool showOccupancyTable = true;
    
     public bool LevelFinish = false;
+    public MedicineCowItem medicineCowItem;
+    public SickDonkeyItem sickDonkeyItem;
     
     // 添加事件委托
     public delegate void AnimalEscapedDelegate(AnimalBase animal);
@@ -560,6 +562,34 @@ public void LoadFromAsset(MapData data, bool clearExisting = true)
 
         // 更新占用表
         MarkAreaFormRotate(it.gridPos, dims, id, mi.rotIndex);
+        
+        if ((AnimalType)it.animalType == AnimalType.Cattle)
+        {
+            medicineCowItem=mi.info.prefab.GetComponent<MedicineCowItem>();
+            if (medicineCowItem == null)
+            {
+                Debug.LogError("药牛数据获取异常！");
+            }
+
+            if (sickDonkeyItem != null)
+            {
+                medicineCowItem.SetLinkedDonkey(sickDonkeyItem);
+            }
+        }
+        
+        if ((AnimalType)it.animalType == AnimalType.Donkey)
+        {
+            sickDonkeyItem=mi.info.prefab.GetComponent<SickDonkeyItem>();
+            if (sickDonkeyItem == null)
+            {
+                Debug.LogError("病驴数据获取异常！");
+            }
+            
+            if (medicineCowItem != null)
+            {
+                medicineCowItem.SetLinkedDonkey(sickDonkeyItem);
+            }
+        }
     }
 
     // Step 6：可选——将地图适配到屏幕（根据加载后的物品）

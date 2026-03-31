@@ -5,15 +5,12 @@ public class SickDonkeyItem : AnimalBase
 {
     [Header("病驴设置")]
     [SerializeField] private bool isSick = true;
-    [SerializeField] private string sickSound = "sick_sound";
-    [SerializeField] private string healSound = "heal_sound";
     
     [Header("视觉效果")]
     [SerializeField] private Color sickColor = new Color(0.5f, 0.5f, 0.5f);
     [SerializeField] private Color healColor = Color.white;
     
-    private bool isHealed = false;
-    private MedicineCowItem linkedMedicineCow = null;
+    private bool isHealed;
     
     public bool IsHealed => isHealed;
     
@@ -30,7 +27,7 @@ public class SickDonkeyItem : AnimalBase
         StartCoroutine(SickEffect());
         
         // 播放生病音效
-        AudioManager.Instance.PlaySoundEffect(sickSound);
+        //AudioManager.Instance.PlaySoundEffect(sickSound);
         
         Debug.Log("病驴已激活，需要药牛跑出后才能治愈");
     }
@@ -68,14 +65,7 @@ public class SickDonkeyItem : AnimalBase
             renderer.color = healColor;
         }
     }
-    
-    /// <summary>
-    /// 设置关联的药牛
-    /// </summary>
-    public void SetLinkedMedicineCow(MedicineCowItem medicineCow)
-    {
-        linkedMedicineCow = medicineCow;
-    }
+
     
     /// <summary>
     /// 治愈病驴
@@ -87,13 +77,12 @@ public class SickDonkeyItem : AnimalBase
         isHealed = true;
         
         // 播放治愈音效
-        AudioManager.Instance.PlaySoundEffect(healSound);
+        //AudioManager.Instance.PlaySoundEffect(healSound);
         
         // 显示治愈特效
         ShowHealEffect();
         
         // 停止生病特效协程
-        StopAllCoroutines();
         StartCoroutine(HealedEffect());
         
         Debug.Log("病驴已被治愈，现在可以点击移动了");
@@ -117,19 +106,8 @@ public class SickDonkeyItem : AnimalBase
     
     private void ShowHealEffect()
     {
-        GameObject effectObj = new GameObject("HealEffect");
-        effectObj.transform.position = transform.position + Vector3.up * 0.5f;
-        
-        var textMesh = effectObj.AddComponent<TextMesh>();
-        textMesh.text = "✨ 病驴已被治愈！现在可以移动了 ✨";
-        textMesh.color = Color.green;
-        textMesh.fontSize = 35;
-        textMesh.characterSize = 0.05f;
-        textMesh.anchor = TextAnchor.MiddleCenter;
-        textMesh.alignment = TextAlignment.Center;
-        
-        effectObj.AddComponent<Billboard>();
-        StartCoroutine(FadeAndDestroy(effectObj, 1.5f));
+        string str = "✨ 病驴已被治愈！现在可以移动了 ✨";
+        MessageSystem.Instance.ShowTip(str);
         
         // 粒子特效
         StartCoroutine(CreateHealParticles());
@@ -194,7 +172,6 @@ public class SickDonkeyItem : AnimalBase
     {
         if (!isHealed)
         {
-            ShowCannotRemoveTip();
             return;
         }
         
@@ -208,7 +185,6 @@ public class SickDonkeyItem : AnimalBase
     {
         if (!isHealed)
         {
-            ShowCannotRemoveTip();
             return;
         }
         
@@ -217,58 +193,8 @@ public class SickDonkeyItem : AnimalBase
     
     private void ShowCannotMoveTip()
     {
-        GameObject tipObj = new GameObject("CannotMoveTip");
-        tipObj.transform.position = transform.position + Vector3.up * 1.2f;
-        
-        var textMesh = tipObj.AddComponent<TextMesh>();
-        textMesh.text = "🤒 病驴需要药牛跑出后才能移动！\n💊 点击药牛让它跑向终点吧！";
-        textMesh.color = Color.red;
-        textMesh.fontSize = 30;
-        textMesh.characterSize = 0.05f;
-        textMesh.anchor = TextAnchor.MiddleCenter;
-        textMesh.alignment = TextAlignment.Center;
-        
-        tipObj.AddComponent<Billboard>();
-        StartCoroutine(FadeAndDestroy(tipObj, 2f));
-        
-        AudioManager.Instance.PlaySoundEffect("cannot_move");
+        string str = "🤒 病驴需要药牛跑出后才能移动！\n💊 点击药牛让它跑向终点吧！";
+        MessageSystem.Instance.ShowTip(str);
     }
-    
-    private void ShowCannotRemoveTip()
-    {
-        GameObject tipObj = new GameObject("CannotRemoveTip");
-        tipObj.transform.position = transform.position + Vector3.up * 1.2f;
-        
-        var textMesh = tipObj.AddComponent<TextMesh>();
-        textMesh.text = "🤒 病驴需要先治愈才能被移除！";
-        textMesh.color = Color.red;
-        textMesh.fontSize = 30;
-        textMesh.characterSize = 0.05f;
-        textMesh.anchor = TextAnchor.MiddleCenter;
-        textMesh.alignment = TextAlignment.Center;
-        
-        tipObj.AddComponent<Billboard>();
-        StartCoroutine(FadeAndDestroy(tipObj, 1.2f));
-    }
-    
-    private IEnumerator FadeAndDestroy(GameObject obj, float duration)
-    {
-        float elapsed = 0;
-        TextMesh textMesh = obj.GetComponent<TextMesh>();
-        
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            if (textMesh != null)
-            {
-                Color color = textMesh.color;
-                color.a = 1 - (elapsed / duration);
-                textMesh.color = color;
-            }
-            obj.transform.Translate(Vector3.up * Time.deltaTime * 0.3f);
-            yield return null;
-        }
-        
-        Destroy(obj);
-    }
+
 }

@@ -37,53 +37,6 @@ public class BombSheepItem : AnimalBase
         base.HitSelf();
     }
     
-    /// <summary>
-    /// 显示撞击效果
-    /// </summary>
-    private void ShowHitEffect()
-    {
-        // 创建浮动文字显示"-2s"
-        GameObject textObj = new GameObject("TimeReduction");
-        textObj.transform.position = transform.position + Vector3.up * 1.5f;
-        var textMesh = textObj.AddComponent<TextMesh>();
-        textMesh.text = "-1";
-        textMesh.color = Color.red;
-        textMesh.fontSize = 40;
-        textMesh.characterSize = 0.05f;
-        textMesh.anchor = TextAnchor.MiddleCenter;
-        textMesh.alignment = TextAlignment.Center;
-        
-        // 添加 Billboard 效果
-        textObj.AddComponent<Billboard>();
-        
-        // 淡出并销毁
-        StartCoroutine(FadeAndDestroy(textObj, 0.5f));
-    }
-    
-    /// <summary>
-    /// 淡出并销毁物体
-    /// </summary>
-    private IEnumerator FadeAndDestroy(GameObject obj, float duration)
-    {
-        float elapsed = 0;
-        TextMesh textMesh = obj.GetComponent<TextMesh>();
-        
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            if (textMesh != null)
-            {
-                Color color = textMesh.color;
-                color.a = 1 - (elapsed / duration);
-                textMesh.color = color;
-            }
-            obj.transform.Translate(Vector3.up * Time.deltaTime * 0.5f);
-            yield return null;
-        }
-        
-        Destroy(obj);
-    }
-    
     
     private void UpdateCountDisplay()
     {
@@ -103,24 +56,7 @@ public class BombSheepItem : AnimalBase
                 countText.color = Color.red;
         }
     }
-    
-    private void CreateCountDisplay()
-    {
-        GameObject textObj = new GameObject("HitCountDisplay");
-        textObj.transform.SetParent(transform);
-        textObj.transform.localPosition = new Vector3(0, 1.5f, 0);
-        
-        countText = textObj.AddComponent<TextMesh>();
-        countText.text = "3";
-        countText.fontSize = 40;
-        countText.characterSize = 0.05f;
-        countText.anchor = TextAnchor.MiddleCenter;
-        countText.alignment = TextAlignment.Center;
-        countText.color = Color.white;
-        
-        // 让文字面向摄像机
-        textObj.AddComponent<Billboard>();
-    }
+
 
     private void Explode()
     {

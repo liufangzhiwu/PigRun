@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 6728409668075640222}
   - component: {fileID: -2356354976258558053}
   - component: {fileID: 5838655706163292422}
-  - component: {fileID: 854035440897883395}
+  - component: {fileID: 7997538930939045544}
   m_Layer: 0
-  m_Name: DonkeyPrefab
+  m_Name: MedicineCowPrefab
   m_TagString: Pig
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -103,7 +103,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.69825804, y: 0.31938744, z: 0.94272023}
   m_Center: {x: -0.015051246, y: 0.26090893, z: 0.041202873}
---- !u!114 &854035440897883395
+--- !u!114 &7997538930939045544
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -112,7 +112,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6647560384166464273}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 756b773c93929404ab964a9d4e81d133, type: 3}
+  m_Script: {fileID: 11500000, guid: c5f8aae44a17af3429548e1213731df9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 3421955766904073414}
@@ -120,11 +120,10 @@ MonoBehaviour:
   idleFidgetDelay: 30
   currentRunway: {fileID: 0}
   currentSegmentIndex: 0
-  isSick: 1
-  sickSound: sick_sound
+  isMedicine: 1
+  moveSound: cow_move
   healSound: heal_sound
-  sickColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  healColor: {r: 1, g: 1, b: 1, a: 1}
+  medicineGlowColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1001 &5746488402385903834
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -232,7 +231,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: d38e2c13a65e11447b48b4e67a8647ff, type: 2}
+      objectReference: {fileID: 2100000, guid: ed06615896099b442b35142d44634639, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

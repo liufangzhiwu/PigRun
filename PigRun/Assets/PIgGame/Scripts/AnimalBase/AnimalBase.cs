@@ -15,7 +15,7 @@ public abstract class AnimalBase : MonoBehaviour
     protected Vector2Int startGrid;
 
     // 跑道相关
-    public RunwayPath currentRunway;
+    [HideInInspector] public RunwayPath currentRunway;
     public int currentSegmentIndex;
     protected bool isOnRunway;
 
