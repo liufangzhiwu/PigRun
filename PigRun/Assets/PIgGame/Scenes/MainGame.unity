@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 6699274}
   - component: {fileID: 6699275}
   - component: {fileID: 6699276}
+  - component: {fileID: 6699277}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -192,6 +193,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d9c7f57b1cb60774ba9c24b2bab7e1d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6699277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6699272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 451c5af7a74bb3949ba7f58f2e7a8617, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &13973583
@@ -3790,6 +3803,8 @@ MonoBehaviour:
   grid02: {fileID: 0}
   showOccupancyTable: 1
   LevelFinish: 0
+  medicineCowItem: {fileID: 0}
+  sickDonkeyItem: {fileID: 0}
   dataAsset: {fileID: 11400000, guid: 97cd5047f9327404db3ed8e687a92141, type: 2}
 --- !u!1 &1848731254
 GameObject:

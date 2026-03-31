@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
@@ -18,6 +19,9 @@ public abstract class AnimalBase : MonoBehaviour
     [HideInInspector] public RunwayPath currentRunway;
     public int currentSegmentIndex;
     protected bool isOnRunway;
+    
+    public event Action<AnimalBase> OnAnimalClicked;
+
 
     // 公共属性
     public MapItem MapItem => mapItem;
@@ -45,7 +49,16 @@ public abstract class AnimalBase : MonoBehaviour
             Debug.Log("进入弹窗界面，不触发动物逻辑");
             return;
         }
-        currentState?.HandleClick();
+        
+        //只有在选择模式下触发事件
+        if (OnAnimalClicked != null && mapItem != null)
+        {
+            OnAnimalClicked(this);
+        }
+        
+        if(OnAnimalClicked==null)
+            currentState?.HandleClick();
+
     }
 
     /// <summary>
