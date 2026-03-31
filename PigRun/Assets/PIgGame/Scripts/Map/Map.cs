@@ -460,141 +460,141 @@ public class Map : MonoBehaviour
     }
 
 
-  // 在 Map 类中添加静态数组，用于存储可用的网格尺寸
-private static readonly int[] AvailableGridSizes = new int[] { 20, 23, 25,30 };
-private static readonly float[] mapScales = new float[] { 1.3f, 0.9f, 0.9f,0.9f };
+   // 在 Map 类中添加静态数组，用于存储可用的网格尺寸
+    private static readonly int[] AvailableGridSizes = new int[] { 20, 23, 25,30 };
+    private static readonly float[] mapScales = new float[] { 1.3f, 0.9f, 0.9f,0.9f };
 
-/// <summary>
-/// 获取与目标尺寸最接近的可用网格尺寸
-/// </summary>
-private int GetClosestGridSize(int target)
-{
-    int closest = AvailableGridSizes[0];
-    int minDiff = Mathf.Abs(target - closest);
-
-    for (int i = 1; i < AvailableGridSizes.Length; i++)
+    /// <summary>
+    /// 获取与目标尺寸最接近的可用网格尺寸
+    /// </summary>
+    private int GetClosestGridSize(int target)
     {
-        int diff = Mathf.Abs(target - AvailableGridSizes[i]);
-        if (diff < minDiff)
+        int closest = AvailableGridSizes[0];
+        int minDiff = Mathf.Abs(target - closest);
+
+        for (int i = 1; i < AvailableGridSizes.Length; i++)
         {
-            minDiff = diff;
-            closest = AvailableGridSizes[i];
-        }
-        else if (diff == minDiff)
-        {
-            // 如果距离相同，选择较大的尺寸（更保守）
-            if (AvailableGridSizes[i] > closest)
+            int diff = Mathf.Abs(target - AvailableGridSizes[i]);
+            if (diff < minDiff)
+            {
+                minDiff = diff;
                 closest = AvailableGridSizes[i];
-        }
-    }
-    return closest;
-}
-
-/// <summary>
-/// 从数据资产加载地图
-/// 同步参数并实例化所有地图项（仅加载在选定网格范围内的物品）
-/// </summary>
-public void LoadFromAsset(MapData data, bool clearExisting = true)
-{
-    // Step 1：根据数据中的宽度选择最接近的固定网格尺寸
-    int targetWidth = data.rows;  // 假设数据中的 rows 代表地图宽度
-    int gridSize = GetClosestGridSize(targetWidth);
-    rows = gridSize;
-    cols = gridSize;
-
-    // Step 2：重置占用表（使用选定尺寸）
-    ResetOccupancy();
-
-    // Step 3：重置其他状态
-    nextId = 1;
-    dataAsset = data;
-    LevelFinish = false;
-    origin = data.origin;  // 保持原点不变
-
-    // Step 4：清理现有子对象（如果指定）
-    if (clearExisting)
-    {
-        for (int i = transform.childCount - 1; i >= 0; i--)
-            Destroy(transform.GetChild(i).gameObject);
-    }
-
-    // Step 5：遍历数据中的物品，只加载完全在网格范围内的
-    foreach (var it in data.items)
-    {
-        if (it.info == null || it.info.prefab == null) continue;
-
-        // 计算该物品在指定旋转下的占用尺寸
-        var dims = FootprintDims(it.info, it.rotIndex);
-        // 计算锚点位置（左下角网格坐标）
-        var anchor = StartFromPivot(it.gridPos, it.info, it.rotIndex);
-
-        // 检查是否完全在网格边界内
-        if (!InBounds(anchor, dims)) continue;  // 超出部分不加载
-
-        // 实例化预制体
-        var obj = Instantiate(it.info.prefab, transform);
-        var baseRot = obj.transform.rotation;
-        obj.transform.rotation = Quaternion.AngleAxis(it.rotIndex * 90f, Vector3.up) * baseRot;
-        obj.transform.position = FootprintWorldCenter(anchor, dims);
-
-        // 添加/获取 MapItem 组件并设置属性
-        var mi = obj.GetComponent<MapItem>();
-        if (mi == null) mi = obj.AddComponent<MapItem>();
-        mi.info = it.info;
-        mi.gridPos = it.gridPos;
-        mi.rotIndex = it.rotIndex;
-        mi.baseRotation = baseRot;
-        mi.animalType = it.animalType;
-        mi.boomTime = it.boomTime;
-
-        // 分配 ID 并记录
-        int id = nextId++;
-        mi.id = id;
-        items[id] = new PlacedItem
-        {
-            id = id,
-            info = it.info,
-            gridPos = it.gridPos,
-            rotIndex = it.rotIndex,
-            instance = obj,
-            baseRotation = baseRot
-        };
-
-        // 更新占用表
-        MarkAreaFormRotate(it.gridPos, dims, id, mi.rotIndex);
-        
-        if ((AnimalType)it.animalType == AnimalType.Cattle)
-        {
-            medicineCowItem=mi.info.prefab.GetComponent<MedicineCowItem>();
-            if (medicineCowItem == null)
-            {
-                Debug.LogError("药牛数据获取异常！");
             }
-
-            if (sickDonkeyItem != null)
+            else if (diff == minDiff)
             {
-                medicineCowItem.SetLinkedDonkey(sickDonkeyItem);
+                // 如果距离相同，选择较大的尺寸（更保守）
+                if (AvailableGridSizes[i] > closest)
+                    closest = AvailableGridSizes[i];
             }
         }
-        
-        if ((AnimalType)it.animalType == AnimalType.Donkey)
+        return closest;
+    }
+
+    /// <summary>
+    /// 从数据资产加载地图
+    /// 同步参数并实例化所有地图项（仅加载在选定网格范围内的物品）
+    /// </summary>
+    public void LoadFromAsset(MapData data, bool clearExisting = true)
+    {
+        // Step 1：根据数据中的宽度选择最接近的固定网格尺寸
+        int targetWidth = data.rows;  // 假设数据中的 rows 代表地图宽度
+        int gridSize = GetClosestGridSize(targetWidth);
+        rows = gridSize;
+        cols = gridSize;
+
+        // Step 2：重置占用表（使用选定尺寸）
+        ResetOccupancy();
+
+        // Step 3：重置其他状态
+        nextId = 1;
+        dataAsset = data;
+        LevelFinish = false;
+        origin = data.origin;  // 保持原点不变
+
+        // Step 4：清理现有子对象（如果指定）
+        if (clearExisting)
         {
-            sickDonkeyItem=mi.info.prefab.GetComponent<SickDonkeyItem>();
-            if (sickDonkeyItem == null)
+            for (int i = transform.childCount - 1; i >= 0; i--)
+                Destroy(transform.GetChild(i).gameObject);
+        }
+
+        // Step 5：遍历数据中的物品，只加载完全在网格范围内的
+        foreach (var it in data.items)
+        {
+            if (it.info == null || it.info.prefab == null) continue;
+
+            // 计算该物品在指定旋转下的占用尺寸
+            var dims = FootprintDims(it.info, it.rotIndex);
+            // 计算锚点位置（左下角网格坐标）
+            var anchor = StartFromPivot(it.gridPos, it.info, it.rotIndex);
+
+            // 检查是否完全在网格边界内
+            if (!InBounds(anchor, dims)) continue;  // 超出部分不加载
+
+            // 实例化预制体
+            var obj = Instantiate(it.info.prefab, transform);
+            var baseRot = obj.transform.rotation;
+            obj.transform.rotation = Quaternion.AngleAxis(it.rotIndex * 90f, Vector3.up) * baseRot;
+            obj.transform.position = FootprintWorldCenter(anchor, dims);
+
+            // 添加/获取 MapItem 组件并设置属性
+            var mi = obj.GetComponent<MapItem>();
+            if (mi == null) mi = obj.AddComponent<MapItem>();
+            mi.info = it.info;
+            mi.gridPos = it.gridPos;
+            mi.rotIndex = it.rotIndex;
+            mi.baseRotation = baseRot;
+            mi.animalType = it.animalType;
+            mi.boomTime = it.boomTime;
+
+            // 分配 ID 并记录
+            int id = nextId++;
+            mi.id = id;
+            items[id] = new PlacedItem
             {
-                Debug.LogError("病驴数据获取异常！");
+                id = id,
+                info = it.info,
+                gridPos = it.gridPos,
+                rotIndex = it.rotIndex,
+                instance = obj,
+                baseRotation = baseRot
+            };
+
+            // 更新占用表
+            MarkAreaFormRotate(it.gridPos, dims, id, mi.rotIndex);
+            
+            if ((AnimalType)it.animalType == AnimalType.Cattle)
+            {
+                medicineCowItem=mi.info.prefab.GetComponent<MedicineCowItem>();
+                if (medicineCowItem == null)
+                {
+                    Debug.LogError("药牛数据获取异常！");
+                }
+
+                if (sickDonkeyItem != null)
+                {
+                    medicineCowItem.SetLinkedDonkey(sickDonkeyItem);
+                }
             }
             
-            if (medicineCowItem != null)
+            if ((AnimalType)it.animalType == AnimalType.Donkey)
             {
-                medicineCowItem.SetLinkedDonkey(sickDonkeyItem);
+                sickDonkeyItem=mi.info.prefab.GetComponent<SickDonkeyItem>();
+                if (sickDonkeyItem == null)
+                {
+                    Debug.LogError("病驴数据获取异常！");
+                }
+                
+                if (medicineCowItem != null)
+                {
+                    medicineCowItem.SetLinkedDonkey(sickDonkeyItem);
+                }
             }
         }
-    }
 
-    // Step 6：可选——将地图适配到屏幕（根据加载后的物品）
-    FitMapToScreen(new Vector2(0.535f, 0.5f));
-}
+        // Step 6：可选——将地图适配到屏幕（根据加载后的物品）
+        FitMapToScreen(new Vector2(0.535f, 0.5f));
+    }
 
     public PlacedItem GetPlacedItem(int id)
     {
