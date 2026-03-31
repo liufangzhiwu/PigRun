@@ -41,8 +41,8 @@
         "y": 28.0
       },
       "angle": 270,
-      "type": 0,
-      "boomTime": 0
+      "type": 9,
+      "boomTime": 10
     },
     {
       "position": {

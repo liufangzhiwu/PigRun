@@ -153,7 +153,7 @@ public class TimerBombSheepItem : AnimalBase
         UpdateCountDisplay();
         
         // 显示撞击效果
-        ShowHitEffect();
+        //ShowHitEffect();
         
         // 调用基类的受击逻辑（播放动画等）
         base.BeHit();

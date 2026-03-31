@@ -239,8 +239,8 @@
         "y": 12.0
       },
       "angle": 270,
-      "type": 0,
-      "boomTime": 0
+      "type": 6,
+      "boomTime": 60
     },
     {
       "position": {

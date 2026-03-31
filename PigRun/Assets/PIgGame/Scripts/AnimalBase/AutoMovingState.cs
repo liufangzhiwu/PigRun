@@ -140,10 +140,10 @@ public class AutoMovingState : AnimalBase.IAnimalState
             chick.transform.Translate( Vector3.forward* chick.Speed * Time.deltaTime);
             
             //检查是否跑出屏幕
-            if (chick.IsOutOfScreen())
-            {
-                //OnEscape();
-            }
+            // if (chick.IsOutOfScreen())
+            // {
+            //     //OnEscape();
+            // }
         }
     }
     
