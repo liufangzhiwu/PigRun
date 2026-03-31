@@ -11,6 +11,8 @@ public class SelectionModeManager : MonoBehaviour
 {
     public static SelectionModeManager Instance;
     
+    public GameObject mask;
+    
     public bool IsInSelectionMode { get; private set; } = false;
     public int MaxSelectCount { get; private set; } = 2;
     public int CurrentSelectCount => selectedAnimals.Count;
@@ -29,6 +31,7 @@ public class SelectionModeManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            mask.gameObject.SetActive(false);
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -51,7 +54,7 @@ public class SelectionModeManager : MonoBehaviour
             Debug.LogWarning("已经在选择模式中，请先退出");
             return;
         }
-        
+        mask.gameObject.SetActive(true);
         IsInSelectionMode = true;
         MaxSelectCount = maxCount;
         onSelectionComplete = onComplete;
@@ -192,6 +195,7 @@ public class SelectionModeManager : MonoBehaviour
     {
         if (!IsInSelectionMode) return;
         
+        mask.gameObject.SetActive(false);
         // 取消注册事件
         RegisterAnimalClickEvents(false);
         
