@@ -139,7 +139,7 @@ public class SickDonkeyItem : AnimalBase
             return;
         }
         
-        if (isHealed)
+        if (Map.Instance.sickDonkeyItem.isHealed)
         {
             // 治愈后可以正常点击移动
             base.OnMouseUpAsButton();
