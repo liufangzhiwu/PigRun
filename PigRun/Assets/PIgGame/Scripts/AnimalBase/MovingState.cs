@@ -55,7 +55,7 @@
                     if (Vector3.Distance(animal.transform.position, targetPosition) < 0.05f)
                     {
                         // 到达目标，触发碰撞
-                        animal.animator.SetBool("IsRun", false);
+                        //animal.animator.SetBool("IsRun", false);
                         animal.HitSelf();                // 自身受击
                         animal.BehitItem?.BeHit();       // 被撞物体受击
                         animal.runParticleSystem.Stop();
@@ -74,6 +74,6 @@
         public void Exit()
         {
             // 退出时停止移动
-            //animal.animator.SetBool("IsRun", false);
+            animal.animator.SetBool("IsRun", false);
         }
     }

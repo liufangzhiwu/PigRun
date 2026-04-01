@@ -57,7 +57,7 @@ public class GameDataManager :MonoBehaviour
         HandlePauseState(pauseState);
     }
 
-    private new void OnApplicationQuit()
+    private void OnApplicationQuit()
     {
         HandleQuitEvent();
     }

@@ -3,9 +3,6 @@ using UnityEngine;
 
 public class SickDonkeyItem : AnimalBase
 {
-    [Header("病驴设置")]
-    [SerializeField] private bool isSick = true;
-    
     [Header("视觉效果")]
     [SerializeField] private Color sickColor = new Color(0.5f, 0.5f, 0.5f);
     [SerializeField] private Color healColor = Color.white;

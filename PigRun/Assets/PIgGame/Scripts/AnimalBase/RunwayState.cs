@@ -45,7 +45,7 @@ public class RunwayState : AnimalBase.IAnimalState
 
         isMoving = true;
         if (animal.animator != null)
-            animal.animator.SetBool("Run", true);
+            animal.animator.SetBool("IsRun", true);
     }
 
     public void Update()
@@ -145,7 +145,7 @@ public class RunwayState : AnimalBase.IAnimalState
     {
         isMoving = false;
         if (animal.animator != null)
-            animal.animator.SetBool("Run", false);
+            animal.animator.SetBool("IsRun", false);
         Map.Instance.RunOutRemoveItem(animal);
         animal.ChangeState(new IdleState(animal));
         
@@ -154,7 +154,7 @@ public class RunwayState : AnimalBase.IAnimalState
     public void Exit()
     {
         if (animal.animator != null)
-            animal.animator.SetBool("Run", false);
+            animal.animator.SetBool("IsRun", false);
     }
 
     public void HandleClick() { }

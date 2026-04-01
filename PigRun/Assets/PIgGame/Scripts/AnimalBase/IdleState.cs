@@ -29,6 +29,8 @@ public class IdleState : AnimalBase.IAnimalState
 
     public void HandleClick()
     {
+        if (!(animal.CurrentState is IdleState)) return;
+        
         bool hasObstacle = animal.CalculateTargetPosition(out Vector3 targetPos);
         if (hasObstacle)
         {

@@ -51,13 +51,7 @@ public abstract class UIBase : MonoBehaviour, IPointerDownHandler
 
     [Tooltip("界面动画控制器")]
     protected Animator _windowAnimator;
-
-    [Header("Transition Settings")]
-    [Tooltip("打开动画时间")]
-    private float _openDuration = 0.3f;
-
-    [Tooltip("关闭动画时间")]
-    private float _closeDuration = 0.3f;
+  
 
     // 窗口状态
     private WindowState _currentState = WindowState.Closed;

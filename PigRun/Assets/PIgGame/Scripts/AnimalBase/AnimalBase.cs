@@ -23,6 +23,8 @@ public abstract class AnimalBase : MonoBehaviour
     
     public event Action<AnimalBase> OnAnimalClicked;
 
+    // 性能分析开关（可在运行时动态开启/关闭）
+    public static bool EnableProfiling = true;  // 建议在游戏启动时设置为 true，分析后改为 false
 
     // 公共属性
     public MapItem MapItem => mapItem;
@@ -34,8 +36,7 @@ public abstract class AnimalBase : MonoBehaviour
     {
         mapItem = GetComponent<MapItem>();
         ChangeState(new IdleState(this));
-        
-        startGrid=new Vector2Int(mapItem.gridPos.x, mapItem.gridPos.y);
+        startGrid = new Vector2Int(mapItem.gridPos.x, mapItem.gridPos.y);
     }
 
     protected virtual void Update()
@@ -45,21 +46,41 @@ public abstract class AnimalBase : MonoBehaviour
 
     protected virtual void OnMouseUpAsButton()
     {
-        if (UIManager.Instance.IsPanelTypeShowing()||!UIManager.Instance.PanelIsShowing(PanelType.GamePanel))
+        float startTime = 0f;
+        if (EnableProfiling)
+        {
+            startTime = Time.realtimeSinceStartup;
+        }
+
+        if (UIManager.Instance.IsPanelTypeShowing() || !UIManager.Instance.PanelIsShowing(PanelType.GamePanel))
         {
             Debug.Log("进入弹窗界面，不触发动物逻辑");
+            if (EnableProfiling)
+            {
+                float elapsed = Time.realtimeSinceStartup - startTime;
+                if (elapsed > 0.001f)
+                    Debug.LogWarning($"[Perf] OnMouseUpAsButton (early exit) on {name} took {elapsed * 1000:F2} ms");
+            }
             return;
         }
-        
-        //只有在选择模式下触发事件
+
+        // 只有在选择模式下触发事件
         if (OnAnimalClicked != null && mapItem != null)
         {
             OnAnimalClicked(this);
         }
-        
-        if(OnAnimalClicked==null)
-            currentState?.HandleClick();
 
+        if (OnAnimalClicked == null)
+        {
+            currentState?.HandleClick();
+        }
+
+        if (EnableProfiling)
+        {
+            float elapsed = Time.realtimeSinceStartup - startTime;
+            if (elapsed > 0.005f) // 超过5毫秒输出警告
+                Debug.LogWarning($"[Perf] OnMouseUpAsButton on {name} took {elapsed * 1000:F2} ms");
+        }
     }
 
     /// <summary>
@@ -67,7 +88,18 @@ public abstract class AnimalBase : MonoBehaviour
     /// </summary>
     public virtual void BeHit()
     {
-        ChangeState(new BeHitState(this));
+        if (EnableProfiling)
+        {
+            float start = Time.realtimeSinceStartup;
+            ChangeState(new BeHitState(this));
+            float elapsed = Time.realtimeSinceStartup - start;
+            if (elapsed > 0.002f)
+                Debug.LogWarning($"[Perf] BeHit on {name} took {elapsed * 1000:F2} ms");
+        }
+        else
+        {
+            ChangeState(new BeHitState(this));
+        }
     }
 
     /// <summary>
@@ -75,7 +107,18 @@ public abstract class AnimalBase : MonoBehaviour
     /// </summary>
     public virtual void HitSelf()
     {
-        ChangeState(new HitState(this));
+        if (EnableProfiling)
+        {
+            float start = Time.realtimeSinceStartup;
+            ChangeState(new HitState(this));
+            float elapsed = Time.realtimeSinceStartup - start;
+            if (elapsed > 0.002f)
+                Debug.LogWarning($"[Perf] HitSelf on {name} took {elapsed * 1000:F2} ms");
+        }
+        else
+        {
+            ChangeState(new HitState(this));
+        }
     }
 
     /// <summary>
@@ -83,28 +126,64 @@ public abstract class AnimalBase : MonoBehaviour
     /// </summary>
     public void ChangeState(IAnimalState newState)
     {
-        currentState?.Exit();
-        currentState = newState;
-        currentState?.Enter();
+        if (EnableProfiling)
+        {
+            float start = Time.realtimeSinceStartup;
+            currentState?.Exit();
+            currentState = newState;
+            currentState?.Enter();
+            float elapsed = Time.realtimeSinceStartup - start;
+            if (elapsed > 0.001f)
+                Debug.LogWarning($"[Perf] ChangeState to {newState.GetType().Name} on {name} took {elapsed * 1000:F2} ms");
+        }
+        else
+        {
+            currentState?.Exit();
+            currentState = newState;
+            currentState?.Enter();
+        }
     }
 
     public virtual void EnterRunway(RunwayPath runway, Vector3 enterPos)
     {
         if (currentState is MovingState)
         {
-            currentRunway = runway;
-            var (projectedPoint, segmentIndex, t) = runway.GetProjectedPointAndSegment(enterPos);
-            transform.position = projectedPoint;
-            currentSegmentIndex = segmentIndex;
-
-            if (segmentIndex < runway.waypoints.Count - 1)
+            if (EnableProfiling)
             {
-                Vector3 segmentDir = (runway.waypoints[segmentIndex + 1].position - runway.waypoints[segmentIndex].position).normalized;
-                if (segmentDir != Vector3.zero)
-                    transform.DORotateQuaternion(Quaternion.LookRotation(segmentDir), 0.02f);
-            }
+                float start = Time.realtimeSinceStartup;
+                currentRunway = runway;
+                var (projectedPoint, segmentIndex, t) = runway.GetProjectedPointAndSegment(enterPos);
+                transform.position = projectedPoint;
+                currentSegmentIndex = segmentIndex;
 
-            ChangeState(new RunwayState(this));
+                if (segmentIndex < runway.waypoints.Count - 1)
+                {
+                    Vector3 segmentDir = (runway.waypoints[segmentIndex + 1].position - runway.waypoints[segmentIndex].position).normalized;
+                    if (segmentDir != Vector3.zero)
+                        transform.DORotateQuaternion(Quaternion.LookRotation(segmentDir), 0.02f);
+                }
+
+                ChangeState(new RunwayState(this));
+                float elapsed = Time.realtimeSinceStartup - start;
+                if (elapsed > 0.005f)
+                    Debug.LogWarning($"[Perf] EnterRunway on {name} took {elapsed * 1000:F2} ms");
+            }
+            else
+            {
+                currentRunway = runway;
+                var (projectedPoint, segmentIndex, t) = runway.GetProjectedPointAndSegment(enterPos);
+                transform.position = projectedPoint;
+                currentSegmentIndex = segmentIndex;
+
+                if (segmentIndex < runway.waypoints.Count - 1)
+                {
+                    Vector3 segmentDir = (runway.waypoints[segmentIndex + 1].position - runway.waypoints[segmentIndex].position).normalized;
+                    if (segmentDir != Vector3.zero)
+                        transform.DORotateQuaternion(Quaternion.LookRotation(segmentDir), 0.02f);
+                }
+
+                ChangeState(new RunwayState(this));
+            }
         }
     }
 
@@ -122,26 +201,48 @@ public abstract class AnimalBase : MonoBehaviour
     /// </summary>
     public virtual bool CalculateTargetPosition(out Vector3 target)
     {
+        float startTime = 0f;
+        if (EnableProfiling)
+        {
+            startTime = Time.realtimeSinceStartup;
+        }
+
         target = Vector3.zero;
         Vector2Int checkGrid = GetForwardOffset(out Vector2Int currentGrid, out Vector2Int forwardOffset);
-        
+
+        // 缓存 Map 实例和尺寸，减少属性访问
+        var map = Map.Instance;
+        int rows = map.rows;
+        int cols = map.cols;
+
         while (true)
         {
-            if (checkGrid.x < 0 || checkGrid.x >= Map.Instance.rows ||
-                checkGrid.y < 0 || checkGrid.y >= Map.Instance.cols)
+            if (checkGrid.x < 0 || checkGrid.x >= rows || checkGrid.y < 0 || checkGrid.y >= cols)
             {
-                return false; // 出界，无障碍
+                if (EnableProfiling)
+                {
+                    float elapsed = Time.realtimeSinceStartup - startTime;
+                    if (elapsed > 0.002f)
+                        Debug.LogWarning($"[Perf] CalculateTargetPosition (exit boundary) on {name} took {elapsed * 1000:F2} ms");
+                }
+                return false;
             }
 
-            int occupantId = Map.Instance.GetOccupantIdAtCell(checkGrid);
+            int occupantId = map.GetOccupantIdAtCell(checkGrid);
             if (occupantId != -1 && occupantId != mapItem.id)
             {
-                behitItem = Map.Instance.GetPlacedItem(occupantId)?.instance.GetComponent<AnimalBase>();
+                behitItem = map.GetPlacedItem(occupantId)?.instance.GetComponent<AnimalBase>();
 
                 // 紧邻障碍
                 if (checkGrid - forwardOffset == currentGrid)
                 {
                     target = Vector3.zero;
+                    if (EnableProfiling)
+                    {
+                        float elapsed = Time.realtimeSinceStartup - startTime;
+                        if (elapsed > 0.002f)
+                            Debug.LogWarning($"[Perf] CalculateTargetPosition (adjacent obstacle) on {name} took {elapsed * 1000:F2} ms");
+                    }
                     return true;
                 }
                 else
@@ -156,7 +257,13 @@ public abstract class AnimalBase : MonoBehaviour
                     }
 
                     Vector2Int obstacleGrid = new Vector2Int(checkGrid.x, checkGrid.y);
-                    Map.Instance.TryMoveItemTargetCell(mapItem, obstacleGrid, out target);
+                    map.TryMoveItemTargetCell(mapItem, obstacleGrid, out target);
+                    if (EnableProfiling)
+                    {
+                        float elapsed = Time.realtimeSinceStartup - startTime;
+                        if (elapsed > 0.002f)
+                            Debug.LogWarning($"[Perf] CalculateTargetPosition (non-adjacent obstacle) on {name} took {elapsed * 1000:F2} ms");
+                    }
                     return true;
                 }
             }
