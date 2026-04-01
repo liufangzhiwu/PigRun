@@ -21,12 +21,9 @@ public abstract class AnimalBase : MonoBehaviour
     public int currentSegmentIndex;
     protected bool isOnRunway;
     
-   public readonly int IsRunHash = Animator.StringToHash("IsRun");
+    public readonly int IsRunHash = Animator.StringToHash("IsRun");
     
     public event Action<AnimalBase> OnAnimalClicked;
-
-    // 性能分析开关（可在运行时动态开启/关闭）
-    public static bool EnableProfiling = true;  // 建议在游戏启动时设置为 true，分析后改为 false
 
     // 公共属性
     public MapItem MapItem => mapItem;
@@ -48,21 +45,9 @@ public abstract class AnimalBase : MonoBehaviour
 
     protected virtual void OnMouseUpAsButton()
     {
-        float startTime = 0f;
-        if (EnableProfiling)
-        {
-            startTime = Time.realtimeSinceStartup;
-        }
-
         if (UIManager.Instance.IsPanelTypeShowing() || !UIManager.Instance.PanelIsShowing(PanelType.GamePanel))
         {
             Debug.Log("进入弹窗界面，不触发动物逻辑");
-            if (EnableProfiling)
-            {
-                float elapsed = Time.realtimeSinceStartup - startTime;
-                if (elapsed > 0.001f)
-                    Debug.LogWarning($"[Perf] OnMouseUpAsButton (early exit) on {name} took {elapsed * 1000:F2} ms");
-            }
             return;
         }
 
@@ -76,13 +61,6 @@ public abstract class AnimalBase : MonoBehaviour
         {
             currentState?.HandleClick();
         }
-
-        if (EnableProfiling)
-        {
-            float elapsed = Time.realtimeSinceStartup - startTime;
-            if (elapsed > 0.005f) // 超过5毫秒输出警告
-                Debug.LogWarning($"[Perf] OnMouseUpAsButton on {name} took {elapsed * 1000:F2} ms");
-        }
     }
 
     /// <summary>
@@ -90,18 +68,7 @@ public abstract class AnimalBase : MonoBehaviour
     /// </summary>
     public virtual void BeHit()
     {
-        if (EnableProfiling)
-        {
-            float start = Time.realtimeSinceStartup;
-            ChangeState(new BeHitState(this));
-            float elapsed = Time.realtimeSinceStartup - start;
-            if (elapsed > 0.002f)
-                Debug.LogWarning($"[Perf] BeHit on {name} took {elapsed * 1000:F2} ms");
-        }
-        else
-        {
-            ChangeState(new BeHitState(this));
-        }
+        ChangeState(new BeHitState(this));
     }
 
     /// <summary>
@@ -109,18 +76,7 @@ public abstract class AnimalBase : MonoBehaviour
     /// </summary>
     public virtual void HitSelf()
     {
-        if (EnableProfiling)
-        {
-            float start = Time.realtimeSinceStartup;
-            ChangeState(new HitState(this));
-            float elapsed = Time.realtimeSinceStartup - start;
-            if (elapsed > 0.002f)
-                Debug.LogWarning($"[Perf] HitSelf on {name} took {elapsed * 1000:F2} ms");
-        }
-        else
-        {
-            ChangeState(new HitState(this));
-        }
+        ChangeState(new HitState(this));
     }
 
     /// <summary>
@@ -128,64 +84,28 @@ public abstract class AnimalBase : MonoBehaviour
     /// </summary>
     public void ChangeState(IAnimalState newState)
     {
-        if (EnableProfiling)
-        {
-            float start = Time.realtimeSinceStartup;
-            currentState?.Exit();
-            currentState = newState;
-            currentState?.Enter();
-            float elapsed = Time.realtimeSinceStartup - start;
-            if (elapsed > 0.001f)
-                Debug.LogWarning($"[Perf] ChangeState to {newState.GetType().Name} on {name} took {elapsed * 1000:F2} ms");
-        }
-        else
-        {
-            currentState?.Exit();
-            currentState = newState;
-            currentState?.Enter();
-        }
+        currentState?.Exit();
+        currentState = newState;
+        currentState?.Enter();
     }
 
     public virtual void EnterRunway(RunwayPath runway, Vector3 enterPos)
     {
         if (currentState is MovingState)
         {
-            if (EnableProfiling)
+            currentRunway = runway;
+            var (projectedPoint, segmentIndex, t) = runway.GetProjectedPointAndSegment(enterPos);
+            transform.position = projectedPoint;
+            currentSegmentIndex = segmentIndex;
+
+            if (segmentIndex < runway.waypoints.Count - 1)
             {
-                float start = Time.realtimeSinceStartup;
-                currentRunway = runway;
-                var (projectedPoint, segmentIndex, t) = runway.GetProjectedPointAndSegment(enterPos);
-                transform.position = projectedPoint;
-                currentSegmentIndex = segmentIndex;
-
-                if (segmentIndex < runway.waypoints.Count - 1)
-                {
-                    Vector3 segmentDir = (runway.waypoints[segmentIndex + 1].position - runway.waypoints[segmentIndex].position).normalized;
-                    if (segmentDir != Vector3.zero)
-                        transform.DORotateQuaternion(Quaternion.LookRotation(segmentDir), 0.02f);
-                }
-
-                ChangeState(new RunwayState(this));
-                float elapsed = Time.realtimeSinceStartup - start;
-                if (elapsed > 0.005f)
-                    Debug.LogWarning($"[Perf] EnterRunway on {name} took {elapsed * 1000:F2} ms");
+                Vector3 segmentDir = (runway.waypoints[segmentIndex + 1].position - runway.waypoints[segmentIndex].position).normalized;
+                if (segmentDir != Vector3.zero)
+                    transform.DORotateQuaternion(Quaternion.LookRotation(segmentDir), 0.02f);
             }
-            else
-            {
-                currentRunway = runway;
-                var (projectedPoint, segmentIndex, t) = runway.GetProjectedPointAndSegment(enterPos);
-                transform.position = projectedPoint;
-                currentSegmentIndex = segmentIndex;
 
-                if (segmentIndex < runway.waypoints.Count - 1)
-                {
-                    Vector3 segmentDir = (runway.waypoints[segmentIndex + 1].position - runway.waypoints[segmentIndex].position).normalized;
-                    if (segmentDir != Vector3.zero)
-                        transform.DORotateQuaternion(Quaternion.LookRotation(segmentDir), 0.02f);
-                }
-
-                ChangeState(new RunwayState(this));
-            }
+            ChangeState(new RunwayState(this));
         }
     }
 
@@ -203,12 +123,6 @@ public abstract class AnimalBase : MonoBehaviour
     /// </summary>
     public virtual bool CalculateTargetPosition(out Vector3 target)
     {
-        float startTime = 0f;
-        if (EnableProfiling)
-        {
-            startTime = Time.realtimeSinceStartup;
-        }
-
         target = Vector3.zero;
         Vector2Int checkGrid = GetForwardOffset(out Vector2Int currentGrid, out Vector2Int forwardOffset);
 
@@ -221,12 +135,6 @@ public abstract class AnimalBase : MonoBehaviour
         {
             if (checkGrid.x < 0 || checkGrid.x >= rows || checkGrid.y < 0 || checkGrid.y >= cols)
             {
-                if (EnableProfiling)
-                {
-                    float elapsed = Time.realtimeSinceStartup - startTime;
-                    if (elapsed > 0.002f)
-                        Debug.LogWarning($"[Perf] CalculateTargetPosition (exit boundary) on {name} took {elapsed * 1000:F2} ms");
-                }
                 return false;
             }
 
@@ -239,12 +147,6 @@ public abstract class AnimalBase : MonoBehaviour
                 if (checkGrid - forwardOffset == currentGrid)
                 {
                     target = Vector3.zero;
-                    if (EnableProfiling)
-                    {
-                        float elapsed = Time.realtimeSinceStartup - startTime;
-                        if (elapsed > 0.002f)
-                            Debug.LogWarning($"[Perf] CalculateTargetPosition (adjacent obstacle) on {name} took {elapsed * 1000:F2} ms");
-                    }
                     return true;
                 }
                 else
@@ -260,12 +162,6 @@ public abstract class AnimalBase : MonoBehaviour
 
                     Vector2Int obstacleGrid = new Vector2Int(checkGrid.x, checkGrid.y);
                     map.TryMoveItemTargetCell(mapItem, obstacleGrid, out target);
-                    if (EnableProfiling)
-                    {
-                        float elapsed = Time.realtimeSinceStartup - startTime;
-                        if (elapsed > 0.002f)
-                            Debug.LogWarning($"[Perf] CalculateTargetPosition (non-adjacent obstacle) on {name} took {elapsed * 1000:F2} ms");
-                    }
                     return true;
                 }
             }

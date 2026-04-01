@@ -1,26 +1,29 @@
 // ========== 被撞击状态 ==========
-
-using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 
 public class BeHitState : AnimalBase.IAnimalState
 {
-    private readonly AnimalBase pig;
+    private readonly AnimalBase animal;
+    private static readonly int IsBeHitHash = Animator.StringToHash("IsBeHit");
 
-    public BeHitState(AnimalBase pig) { this.pig = pig; }
+    public BeHitState(AnimalBase animal)
+    {
+        this.animal = animal;
+    }
 
     public void Enter()
     {
-        pig.animator.SetBool("IsBeHit", true);
-        pig.StartCoroutine(ResetAfterDelay(0.5f));
-    }
-
-    private IEnumerator ResetAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        pig.animator.SetBool("IsBeHit", false);
-        yield return new WaitForSeconds(delay);
-        pig.ChangeState(new IdleState(pig));
+        animal.animator.SetBool(IsBeHitHash, true);
+        
+        // 延迟 0.5 秒关闭受击动画
+        DOVirtual.DelayedCall(0.5f, () => {
+            animal.animator.SetBool(IsBeHitHash, false);
+            // 再延迟 0.5 秒切换回闲置状态
+            DOVirtual.DelayedCall(0.5f, () => {
+                animal.ChangeState(new IdleState(animal));
+            });
+        });
     }
 
     public void Update() { }

@@ -1,29 +1,32 @@
 // ========== 自身撞击状态 ==========
-
-using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 
 public class HitState : AnimalBase.IAnimalState
 {
     private readonly AnimalBase animal;
+    private static readonly int IsHitHash = Animator.StringToHash("IsHit");
 
-    public HitState(AnimalBase pig) { this.animal = pig; }
+    public HitState(AnimalBase animal) 
+    { 
+        this.animal = animal; 
+    }
 
     public void Enter()
     {
-        animal.animator.SetBool("IsHit", true);
+        animal.animator.SetBool(IsHitHash, true);
         AudioManager.Instance.PlaySoundEffect("jump");
-        animal.StartCoroutine(ResetAfterDelay(0.5f));
+        
+        // 延迟 0.5s 关闭受击动画
+        DOVirtual.DelayedCall(0.5f, () => {
+            animal.animator.SetBool(IsHitHash, false);
+            // 再延迟 0.5s 切换回闲置状态
+            DOVirtual.DelayedCall(0.5f, () => {
+                animal.ChangeState(new IdleState(animal));
+            });
+        });
     }
 
-    private IEnumerator ResetAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        animal.animator.SetBool("IsHit", false);
-        yield return new WaitForSeconds(delay);
-        animal.ChangeState(new IdleState(animal));
-    }
-
-    public void Update() { } // 无需每帧逻辑
+    public void Update() { }
     public void Exit() { }
 }
