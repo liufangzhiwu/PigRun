@@ -19,7 +19,7 @@
 
         public void Enter()
         {
-            animal.animator.SetBool("IsRun", true);
+            animal.animator.SetBool(animal.IsRunHash, true);
             animal.runParticleSystem.Play();
             //没有障碍物时
             if (movingForward)
@@ -74,6 +74,6 @@
         public void Exit()
         {
             // 退出时停止移动
-            animal.animator.SetBool("IsRun", false);
+            animal.animator.SetBool(animal.IsRunHash, false);
         }
     }

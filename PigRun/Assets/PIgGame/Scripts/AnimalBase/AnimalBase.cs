@@ -21,6 +21,8 @@ public abstract class AnimalBase : MonoBehaviour
     public int currentSegmentIndex;
     protected bool isOnRunway;
     
+   public readonly int IsRunHash = Animator.StringToHash("IsRun");
+    
     public event Action<AnimalBase> OnAnimalClicked;
 
     // 性能分析开关（可在运行时动态开启/关闭）
