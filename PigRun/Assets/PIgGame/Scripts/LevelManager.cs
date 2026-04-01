@@ -49,6 +49,10 @@ public class LevelManager : MonoBehaviour
         int targetWidth = mapData.rows;
         int gridSize =Map.Instance.GetClosestGridSize(targetWidth);
         
+        // 【新增】重置地图变换，避免位置偏移
+        Map.Instance.transform.position = Vector3.zero;
+        Map.Instance.transform.localScale = Vector3.one;
+        
         Map.Instance.rows = gridSize;
         Map.Instance.cols = gridSize;
         Map.Instance.ResetOccupancy();               // 需要 public
@@ -74,7 +78,7 @@ public class LevelManager : MonoBehaviour
         }
 
         // 4. 所有物品加载完成，适配屏幕并触发事件
-        Map.Instance.FitMapToScreen(new Vector2(0.53f, 0.5f));
+        Map.Instance.FitMapToScreen(new Vector2(0.55f, 0.45f));
         Map.Instance.OnLoadNewMapEvent();
 
         Debug.Log($"关卡 {levelid} 加载完成，共 {totalCount} 个动物");
