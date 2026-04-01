@@ -56,13 +56,13 @@ public class UseToolPanel : UIBase
         switch (currentToolType)
         {
             case ToolType.Remove:
-                tipText.text = "使用移除道具\n点击「使用」后，再点击2只动物即可移除它们";
+                tipText.text = "移除道具\n点击[使用]后,再点击2只动物即可移除它们";
                 break;
             case ToolType.Shuffle:
-                tipText.text = "使用洗牌道具\n可重新排列地图中的所有动物";
+                tipText.text = "洗牌道具\n可重新排列地图中的所有动物";
                 break;
             case ToolType.Reverse:
-                tipText.text = "使用翻转道具\n可翻转地图中所有动物的方向";
+                tipText.text = "翻转道具\n可翻转地图中所有动物的方向";
                 break;
         }
     }

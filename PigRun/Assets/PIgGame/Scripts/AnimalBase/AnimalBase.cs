@@ -7,6 +7,7 @@ public abstract class AnimalBase : MonoBehaviour
 {
     [Header("动物属性")]
     public Animator animator;
+    public ParticleSystem runParticleSystem;
     [SerializeField] protected float speed = 4f;
     [SerializeField] public float idleFidgetDelay = 30;   // 闲置多少秒后触发小动作
 
