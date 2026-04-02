@@ -29,11 +29,13 @@ namespace ThreePeakGame
 
         public void EnterGameScene(int cost = -1)
         {
+            group.gameObject.Hide();
 
             //PowerCount.text = (PowerRoot.self.energySave.GamePower - cost).ToString();
             ReduceCount.text = "-" + Mathf.Abs(cost);
 
             Sequence sequence = DOTween.Sequence();
+            // 修改 EnterGameScene 中的第一句动画
             sequence.Append(mat.DOFloat(1f, "_Float0", 1f).From(0).SetEase(Ease.InSine));
             sequence.Append(group.DOFade(1, 0.5f).From(0).SetEase(Ease.Linear).OnStart(() =>
             {

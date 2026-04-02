@@ -51,7 +51,7 @@ public class UIManager : MonoBehaviour
     private Dictionary<string, UIBase> _loadedPanels = new Dictionary<string, UIBase>(); // 已加载面板字典
     private List<string> _pendingShowPanels = new List<string>(); // 等待显示的面板队列
     private GamePanels _panelConfig; // UI配置数据
-    public Transform _uiRoot; // UI根节点
+    private Transform _uiRoot; // UI根节点
 
     public event PanelSystemEventHandler PanelEvent; // UI面板事件
 
