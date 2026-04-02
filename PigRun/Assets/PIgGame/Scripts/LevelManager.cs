@@ -141,8 +141,8 @@ public class LevelManager : MonoBehaviour
             item.animalType = pig.type;
             item.boomTime = pig.boomTime;
 
-            if (item.rotIndex == -1)
-                item.gridPos = new Vector2Int(gridX - 1, gridY - 1);
+            if (item.rotIndex == -1) //0度
+                item.gridPos = new Vector2Int(gridX - 1, gridY-1);
             else
                 item.gridPos = new Vector2Int(gridX, gridY);
 
