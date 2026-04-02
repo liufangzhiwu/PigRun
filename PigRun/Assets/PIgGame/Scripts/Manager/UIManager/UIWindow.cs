@@ -220,7 +220,7 @@ public abstract class UIBase : MonoBehaviour, IPointerDownHandler
 
         // 恢复默认动画
         if (_windowAnimator != null)
-            _windowAnimator.SetBool("IsHidden", false);
+            _windowAnimator.SetBool("IsShow", false);
 
         // 动画结束处理
         CloseImmediately();     
@@ -259,7 +259,7 @@ public abstract class UIBase : MonoBehaviour, IPointerDownHandler
     protected virtual void CustomCloseAnimation()
     {
         if (_windowAnimator != null)
-            _windowAnimator.SetBool("IsHidden", true);
+            _windowAnimator.SetBool("IsShow", true);
         else
         {
             _onWindowClosed?.Invoke();

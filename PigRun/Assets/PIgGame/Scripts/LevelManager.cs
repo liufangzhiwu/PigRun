@@ -111,7 +111,7 @@ public class LevelManager : MonoBehaviour
         {
             MapData.MapItemData item = new MapData.MapItemData();
 
-            if (pigPrefabMap.TryGetValue(pig.type, out PrefabInfo info))
+            if (pigPrefabMap.TryGetValue((int)pig.type, out PrefabInfo info))
             {
                 item.info = info;
             }
@@ -123,7 +123,7 @@ public class LevelManager : MonoBehaviour
                 if (loadedInfo != null)
                 {
                     item.info = loadedInfo;
-                    pigPrefabMap[pig.type] = loadedInfo;
+                    pigPrefabMap[(int)pig.type] = loadedInfo;
                 }
                 else
                 {
@@ -134,9 +134,9 @@ public class LevelManager : MonoBehaviour
 
             int gridX = Mathf.RoundToInt((pig.position.x - mapData.origin.x) / cellSize);
             int gridY = Mathf.RoundToInt((pig.position.y - mapData.origin.y) / cellSize);
-            item.rotIndex = (pig.angle / 90 - 1) % 4;
-            item.animalType = pig.type;
-            item.boomTime = pig.boomTime;
+            item.rotIndex = ((int)pig.angle / 90 - 1) % 4;
+            item.animalType = (int)pig.type;
+            item.boomTime = (int)pig.boomTime;
 
             if (item.rotIndex == -1) //0度
                 item.gridPos = new Vector2Int(gridX - 1, gridY-1);

@@ -1,20 +1,20 @@
 {
   "m_GameObject": {
-    "m_FileID": 0,
-    "m_PathID": 0
+    "m_FileID": 0.0,
+    "m_PathID": 0.0
   },
-  "m_Enabled": 1,
+  "m_Enabled": 1.0,
   "m_Script": {
-    "m_FileID": 1,
-    "m_PathID": 531
+    "m_FileID": 1.0,
+    "m_PathID": 531.0
   },
   "m_Name": "LevelNew1",
   "Size": {
     "x": 20.0,
     "y": 20.0
   },
-  "Time": 300,
-  "Tap": 130,
+  "Time": 300.0,
+  "Tap": 130.0,
   "CameraPos": {
     "x": 7.1,
     "y": 40.86,
@@ -31,58 +31,58 @@
         "x": 3.0,
         "y": 4.0
       },
-      "angle": 270,
-      "type": 0,
-      "boomTime": 0
+      "angle": 270.0,
+      "type": 0.0,
+      "boomTime": 0.0
     },
     {
       "position": {
         "x": 5.0,
         "y": 10.0
       },
-      "angle": 180,
-      "type": 0,
-      "boomTime": 0
+      "angle": 180.0,
+      "type": 0.0,
+      "boomTime": 0.0
     },
     {
       "position": {
         "x": 8.0,
         "y": 10.0
       },
-      "angle": 180,
-      "type": 0,
-      "boomTime": 0
+      "angle": 180.0,
+      "type": 0.0,
+      "boomTime": 0.0
     },
     {
       "position": {
         "x": 3.0,
         "y": 13.0
       },
-      "angle": 270,
-      "type": 0,
-      "boomTime": 0
+      "angle": 270.0,
+      "type": 0.0,
+      "boomTime": 0.0
     },
     {
       "position": {
         "x": 11.0,
         "y": 7.0
       },
-      "angle": 180,
-      "type": 0,
-      "boomTime": 0
+      "angle": 180.0,
+      "type": 0.0,
+      "boomTime": 0.0
     },
     {
       "position": {
         "x": 11.0,
         "y": 13.0
       },
-      "angle": 180,
-      "type": 0,
-      "boomTime": 0
+      "angle": 180.0,
+      "type": 0.0,
+      "boomTime": 0.0
     }
   ],
   "obstacleGroup": [],
-  "roadSpeed": 10,
+  "roadSpeed": 10.0,
   "is2Dir": false,
   "isEatAnim": false
 }
