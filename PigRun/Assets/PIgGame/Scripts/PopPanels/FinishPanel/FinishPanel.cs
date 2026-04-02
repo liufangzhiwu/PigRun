@@ -22,7 +22,9 @@ namespace PigGame
         private void ClickLevelButton()
         {
             UIManager.Instance.HidePanel(PanelType.FinishPanel);
-            GameManager.instance.StartGamePanel();
+            
+            if(LevelManager.Instance!=null)
+                LevelManager.Instance.LoadLevel(GameDataManager.Instance.UserData.LevelIndex);
 
             if (Map.Instance != null)
             {

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,18 +16,14 @@ public class LevelManager : MonoBehaviour
     public float cellSize = 1f;
     public List<PigTypeMapping> pigTypeMappings;
 
-    // 加载完成事件
-    public System.Action OnLevelLoaded;
-
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+    }
+
+    private void OnEnable()
+    {
+        LoadLevel(GameDataManager.Instance.UserData.LevelIndex);
     }
 
     /// <summary>
@@ -82,7 +79,7 @@ public class LevelManager : MonoBehaviour
         Map.Instance.OnLoadNewMapEvent();
 
         Debug.Log($"关卡 {levelid} 加载完成，共 {totalCount} 个动物");
-        OnLevelLoaded?.Invoke();
+        GameManager.instance.OverLevelLoadedEvent();
     }
 
     /// <summary>

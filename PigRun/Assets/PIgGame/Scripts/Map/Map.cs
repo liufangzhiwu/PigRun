@@ -282,7 +282,7 @@ public class Map : MonoBehaviour
     }
 
     // ==================== 地图尺寸适配 ====================
-    private static readonly int[] AvailableGridSizes = { 20, 23, 25, 30 };
+    private static readonly int[] AvailableGridSizes = { 20, 23, 25, 50 };
     private static readonly float[] MapScales = { 1.3f, 0.9f, 0.9f, 0.9f };
 
     /// <summary>获取与目标尺寸最接近的可用网格尺寸</summary>

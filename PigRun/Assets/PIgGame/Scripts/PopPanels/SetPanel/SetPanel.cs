@@ -35,7 +35,7 @@ public class SetPanel : UIBase
     private void ClickHomeButton()
     {
         UIManager.Instance.HidePanel(PanelType.GamePanel);
-        UIManager.Instance.ShowPanel(PanelType.MainPanel);
+        GameRoot.self.BackHomeScene();
 
         ClosePanel();
     }
@@ -53,7 +53,10 @@ public class SetPanel : UIBase
         
         yield return new WaitForSeconds(0.5f);
         
-        GameManager.instance.StartGamePanel();
+        //GameManager.instance.StartGamePanel();
+        
+        if(LevelManager.Instance!=null)
+            LevelManager.Instance.LoadLevel(GameDataManager.Instance.UserData.LevelIndex);
 
         ClosePanel();
     }

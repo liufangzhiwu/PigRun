@@ -19,7 +19,11 @@ public class EventDispatcher:MonoBehaviour
 
     private void Awake()
     {
-        instance = this;
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(this);
+        }    
     }
 
     #region 公共事件接口

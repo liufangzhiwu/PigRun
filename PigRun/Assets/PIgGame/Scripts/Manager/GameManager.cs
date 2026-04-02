@@ -5,34 +5,53 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    
+    // 加载完成事件
+    public event System.Action OnLevelLoaded;
 
     private void Awake()
     {
-        instance = this;
-        //Application.targetFrameRate = 90;
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(this);
+        }    
     }
     
-    void Start()
+    void OnEnable()
     {
-        UIManager.Instance.ShowPanel(PanelType.MainPanel);
-        UIManager.Instance.ShowPanel(PanelType.MenuPanel);
-
         // 订阅关卡加载完成事件
-        LevelManager.Instance.OnLevelLoaded += OnLevelLoaded;
+        OnLevelLoaded += OnLevelLoadedEvent;
+
+        StartCoroutine(ShowMainPanel());
     }
 
+    IEnumerator ShowMainPanel()
+    {
+        yield return new WaitForSeconds(0.001f);
+        UIManager.Instance.ShowPanel(PanelType.MainPanel);
+        UIManager.Instance.ShowPanel(PanelType.MenuPanel);
+    }
+
+    public void OverLevelLoadedEvent()
+    {
+        OnLevelLoaded?.Invoke();
+    }
+    
+    
     public void StartGamePanel()
     {
-        UIManager.Instance.HidePanel(PanelType.MainPanel);
+        //UIManager.Instance.HidePanel(PanelType.MainPanel);
+        UIManager.Instance.HidePanel(PanelType.MenuPanel);
+
+        GameRoot.self.EnterGameScene();
         // 先不显示 GamePanel，等加载完成后再显示
         // UIManager.Instance.ShowPanel(PanelType.GamePanel);
-        
-        LevelManager.Instance.LoadLevel(GameDataManager.Instance.UserData.LevelIndex);
         // 音乐在加载完成后播放，避免加载时播放导致卡顿
         // AudioManager.Instance.PlayBackgroundMusic("game-bgm");
     }
     
-    private void OnLevelLoaded()
+    private void OnLevelLoadedEvent()
     {
         UIManager.Instance.ShowPanel(PanelType.GamePanel);
         AudioManager.Instance.PlayBackgroundMusic("game-bgm");
@@ -45,7 +64,6 @@ public class GameManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (LevelManager.Instance != null)
-            LevelManager.Instance.OnLevelLoaded -= OnLevelLoaded;
+          OnLevelLoaded -= OnLevelLoadedEvent;
     }
 }

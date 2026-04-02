@@ -17,7 +17,7 @@ public class LoadingScene : MonoBehaviour
     IEnumerator LoadMainScene()
     {
         float startTime = Time.time;
-        AsyncOperation operation = SceneManager.LoadSceneAsync("MainGame");
+        AsyncOperation operation = SceneManager.LoadSceneAsync("Home");
         operation.allowSceneActivation = false; // 先不自动激活
 
         while (!operation.isDone)

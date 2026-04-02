@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// UI系统管理器 - 负责所有UI面板的加载、显示、隐藏和层级管理
@@ -51,7 +52,6 @@ public class UIManager : MonoBehaviour
     private List<string> _pendingShowPanels = new List<string>(); // 等待显示的面板队列
     private GamePanels _panelConfig; // UI配置数据
     public Transform _uiRoot; // UI根节点
-    public Camera MainCamera;     // 主摄像机引用
 
     public event PanelSystemEventHandler PanelEvent; // UI面板事件
 
@@ -65,8 +65,41 @@ public class UIManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            SetPanelRootOnLoadScene();
         }
-        InitializeUIRoot();
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+    
+    private void SetPanelRootOnLoadScene()
+    {
+        SceneManager.sceneUnloaded += OnSceneUnloaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    
+    void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
+    {
+        var all = FindObjectsOfType<Canvas>();
+        foreach (var item in all)
+        {
+            if (item.name == "Canvas")
+            {
+                _uiRoot = item.transform;
+                return;
+            }
+        }        
+    }
+
+    public void ClearUIBase()
+    {
+        _loadedPanels.Clear();
+    }
+
+    void OnSceneUnloaded(Scene arg0)
+    {
+        _loadedPanels.Clear();
     }
 
     private void Start()
@@ -176,15 +209,6 @@ public class UIManager : MonoBehaviour
 
     #region 私有方法
 
-    private void InitializeUIRoot()
-    {
-        if (_uiRoot == null)
-        {
-            GameObject rootObj = new GameObject("UIRoot");
-            _uiRoot = rootObj.transform;
-            DontDestroyOnLoad(rootObj);
-        }
-    }
 
     private void LoadPanelConfiguration()
     {
