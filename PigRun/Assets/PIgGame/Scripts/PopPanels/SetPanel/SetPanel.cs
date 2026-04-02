@@ -53,10 +53,10 @@ public class SetPanel : UIBase
         
         yield return new WaitForSeconds(0.5f);
         
-        //GameManager.instance.StartGamePanel();
+        GameManager.instance.StartGamePanel();
         
-        if(LevelManager.Instance!=null)
-            LevelManager.Instance.LoadLevel(GameDataManager.Instance.UserData.LevelIndex);
+        // if(LevelManager.Instance!=null)
+        //     LevelManager.Instance.LoadLevel(GameDataManager.Instance.UserData.LevelIndex);
 
         ClosePanel();
     }

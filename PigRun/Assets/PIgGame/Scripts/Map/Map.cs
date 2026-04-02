@@ -282,8 +282,8 @@ public class Map : MonoBehaviour
     }
 
     // ==================== 地图尺寸适配 ====================
-    private static readonly int[] AvailableGridSizes = { 20, 23, 25, 50 };
-    private static readonly float[] MapScales = { 1.3f, 0.9f, 0.9f, 0.9f };
+    private static readonly int[] AvailableGridSizes = { 20, 23, 25, 30 };
+    private static readonly float[] MapScales = { 1.1f, 0.9f, 0.9f, 0.9f };
 
     /// <summary>获取与目标尺寸最接近的可用网格尺寸</summary>
     public int GetClosestGridSize(int target)
@@ -356,85 +356,6 @@ public class Map : MonoBehaviour
             if (sickDonkeyItem != null && medicineCowItem != null)
                 medicineCowItem.SetLinkedDonkey(sickDonkeyItem);
         }
-    }
-
-    /// <summary>从数据资产加载地图（同步方法，适用于编辑器或小型关卡）</summary>
-    public void LoadFromAsset(MapData data, bool clearExisting = true)
-    {
-        int targetWidth = data.rows;
-        int gridSize = GetClosestGridSize(targetWidth);
-        rows = gridSize;
-        cols = gridSize;
-
-        ResetOccupancy();
-        nextId = 1;
-        dataAsset = data;
-        LevelFinish = false;
-        origin = data.origin;
-
-        if (clearExisting)
-        {
-            // 销毁所有子物体并清空字典
-            for (int i = transform.childCount - 1; i >= 0; i--)
-                Destroy(transform.GetChild(i).gameObject);
-            items.Clear();
-        }
-
-        // 遍历数据中的物品并实例化
-        foreach (var it in data.items)
-        {
-            if (it.info == null || it.info.prefab == null) continue;
-
-            var dims = FootprintDims(it.info, it.rotIndex);
-            var anchor = StartFromPivot(it.gridPos, it.info, it.rotIndex);
-            if (!InBounds(anchor, dims)) continue;
-
-            var obj = Instantiate(it.info.prefab, transform);
-            var baseRot = obj.transform.rotation;
-            obj.transform.rotation = Quaternion.AngleAxis(it.rotIndex * 90f, Vector3.up) * baseRot;
-            obj.transform.position = FootprintWorldCenter(anchor, dims);
-
-            var mi = obj.GetComponent<MapItem>();
-            if (mi == null) mi = obj.AddComponent<MapItem>();
-            mi.info = it.info;
-            mi.gridPos = it.gridPos;
-            mi.rotIndex = it.rotIndex;
-            mi.baseRotation = baseRot;
-            mi.animalType = it.animalType;
-            mi.boomTime = it.boomTime;
-
-            int id = nextId++;
-            mi.id = id;
-
-            var placed = new PlacedItem
-            {
-                id = id,
-                info = it.info,
-                gridPos = it.gridPos,
-                rotIndex = it.rotIndex,
-                instance = obj,
-                baseRotation = baseRot,
-                occupiedCells = ComputeOccupiedCells(it.gridPos, it.info, it.rotIndex)
-            };
-            items[id] = placed;
-            MarkArea(placed);
-
-            // 关联药牛和病驴（特殊逻辑）
-            if ((AnimalType)it.animalType == AnimalType.Cattle)
-            {
-                medicineCowItem = mi.info.prefab.GetComponent<MedicineCowItem>();
-                if (medicineCowItem != null && sickDonkeyItem != null)
-                    medicineCowItem.SetLinkedDonkey(sickDonkeyItem);
-            }
-            if ((AnimalType)it.animalType == AnimalType.Donkey)
-            {
-                sickDonkeyItem = mi.info.prefab.GetComponent<SickDonkeyItem>();
-                if (sickDonkeyItem != null && medicineCowItem != null)
-                    medicineCowItem.SetLinkedDonkey(sickDonkeyItem);
-            }
-        }
-
-        FitMapToScreen(new Vector2(0.535f, 0.5f));
     }
 
     /// <summary>获取放置的物品数据（通过 ID）</summary>
@@ -512,25 +433,22 @@ public class Map : MonoBehaviour
     /// <summary>自动将地图缩放并居中到屏幕（根据当前物品分布）</summary>
     /// <summary>自动将地图缩放并居中到屏幕（保证完整显示地图网格）</summary>
     /// <param name="targetScreenUV">目标屏幕位置，视口坐标 (0,0) 左下角到 (1,1) 右上角。默认 null 表示屏幕中心 (0.5,0.5)。</param>
-   public void FitMapToScreen(Vector2? targetScreenUV = null, bool useItemBounds = true, float padding = 0.9f)
-{
-    if (!cam.orthographic)
+    /// <summary>
+    /// 自动将地图缩放并居中到屏幕
+    /// </summary>
+    /// <param name="targetScreenUV">目标屏幕位置，视口坐标 (0,0) 左下角到 (1,1) 右上角。默认 null 表示屏幕中心 (0.5,0.5)。</param>
+    /// <param name="padding">缩放边距（0~1），数值越小地图越小，1 表示刚好填满屏幕无留白，默认 0.9。</param>
+      /// <summary>自动将地图缩放并居中到屏幕（根据当前物品分布）</summary>
+    public void FitMapToScreen(Vector2? targetScreenUV = null)
     {
-        Debug.LogWarning("相机不是正交相机，此方法仅适用于正交相机。");
-        return;
-    }
+        if (!cam.orthographic) return;
 
-    if (items.Count == 0)
-    {
-        Debug.Log("没有物品，不进行缩放适配。");
-        return;
-    }
+        if (items.Count == 0)
+        {
+            Debug.Log("没有物品，不进行缩放适配。");
+            return;
+        }
 
-    float mapWidth, mapHeight;
-    Vector3 mapCenter;
-
-    if (useItemBounds)
-    {
         // 计算所有物品占用的最小/最大行列
         int minRow = int.MaxValue, maxRow = int.MinValue, minCol = int.MaxValue, maxCol = int.MinValue;
         foreach (var kv in items)
@@ -549,47 +467,33 @@ public class Map : MonoBehaviour
                 }
         }
 
-        // 物品占用的宽高（格子数）
-        int itemWidth = maxCol - minCol + 1;
-        int itemHeight = maxRow - minRow + 1;
-        mapWidth = itemWidth * cellSize;
-        mapHeight = itemHeight * cellSize;
+        float occupiedWidth = (maxCol - minCol + 1) * cellSize;
+        float occupiedHeight = (maxRow - minRow + 1) * cellSize;
+        float screenWorldHeight = 2f * cam.orthographicSize;
+        float screenWorldWidth = screenWorldHeight * cam.aspect;
+        float scaleHeight = screenWorldHeight / occupiedHeight;
+        float scaleWidth = screenWorldWidth / occupiedWidth;
+        float scale = Mathf.Min(scaleHeight, scaleWidth);
 
-        // 物品占用的中心
-        Vector2Int itemAnchor = new Vector2Int(minRow, minCol);
-        Vector2Int itemDims = new Vector2Int(itemHeight, itemWidth);
-        mapCenter = FootprintWorldCenter(itemAnchor, itemDims);
+        // 根据网格尺寸选择预设缩放系数
+        int mscaleid = Array.FindIndex(AvailableGridSizes, size => size == rows);
+        float mapScale = mscaleid >= 0 ? MapScales[mscaleid] : MapScales[MapScales.Length - 1];
+        scale = Mathf.Min(mapScale, 1.3f);
+        transform.localScale = Vector3.one * scale;
+
+        // 计算中心点
+        Vector2Int occupiedAnchor = new Vector2Int(minRow, minCol);
+        Vector2Int occupiedDims = new Vector2Int(maxRow - minRow + 1, maxCol - minCol + 1);
+        Vector3 occupiedCenter = FootprintWorldCenter(occupiedAnchor, occupiedDims);
+
+        Vector2 screenUV = targetScreenUV ?? new Vector2(0.5f, 0.5f);
+        Ray camRay = cam.ViewportPointToRay(screenUV);
+        Plane groundPlane = new Plane(Vector3.up, occupiedCenter);
+        if (groundPlane.Raycast(camRay, out float enter))
+        {
+            Vector3 targetWorldPoint = camRay.GetPoint(enter);
+            transform.position += targetWorldPoint - occupiedCenter;
+        }
     }
-    else
-    {
-        // 使用整个地图网格尺寸
-        mapWidth = cols * cellSize;
-        mapHeight = rows * cellSize;
-        Vector2Int mapAnchor = new Vector2Int(0, 0);
-        Vector2Int mapDims = new Vector2Int(rows, cols);
-        mapCenter = FootprintWorldCenter(mapAnchor, mapDims);
-    }
 
-    float screenWorldHeight = 2f * cam.orthographicSize;
-    float screenWorldWidth = screenWorldHeight * cam.aspect;
-
-    float scaleHeight = screenWorldHeight / mapHeight;
-    float scaleWidth = screenWorldWidth / mapWidth;
-    float scale = Mathf.Min(scaleHeight, scaleWidth) * padding;
-
-    int mscaleid = Array.FindIndex(AvailableGridSizes, size => size == rows);
-    float mapScale = mscaleid >= 0 ? MapScales[mscaleid] : MapScales[MapScales.Length - 1];
-    scale = Mathf.Min(scale, mapScale);
-
-    transform.localScale = Vector3.one * scale;
-
-    Vector2 screenUV = targetScreenUV ?? new Vector2(0.5f, 0.5f);
-    Ray camRay = cam.ViewportPointToRay(screenUV);
-    Plane groundPlane = new Plane(Vector3.up, mapCenter);
-    if (groundPlane.Raycast(camRay, out float enter))
-    {
-        Vector3 targetWorldPoint = camRay.GetPoint(enter);
-        transform.position += targetWorldPoint - mapCenter;
-    }
-}
 }

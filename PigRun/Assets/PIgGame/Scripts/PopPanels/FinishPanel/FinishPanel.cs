@@ -11,8 +11,6 @@ namespace PigGame
         
         [SerializeField] private Button LevelButton;
         
-
-        
         protected override void InitButtonEvents()
         {
             base.InitButtonEvents();
@@ -23,14 +21,16 @@ namespace PigGame
         {
             UIManager.Instance.HidePanel(PanelType.FinishPanel);
             
-            if(LevelManager.Instance!=null)
-                LevelManager.Instance.LoadLevel(GameDataManager.Instance.UserData.LevelIndex);
+            // if(LevelManager.Instance!=null)
+            //     LevelManager.Instance.LoadLevel(GameDataManager.Instance.UserData.LevelIndex);
 
             if (Map.Instance != null)
             {
                 Map.Instance.OnLoadNewMapEvent();
             }
-           
+
+            GameManager.instance.StartGamePanel();
+
         }
     }
 

@@ -23,9 +23,9 @@ public class ChickItem : AnimalBase
     
     public bool IsAutoMoving => isMoving;
     
-    protected override void Start()
+    private void OnEnable()
     {
-        base.Start();
+        //CreateCountDisplay();
         
         if (mapItem != null)
         {
@@ -34,12 +34,15 @@ public class ChickItem : AnimalBase
         
         if (autoMoveEnabled)
         {
-            StartAutoMove();
+            DOVirtual.DelayedCall(0.5f, () => {
+                StartAutoMove();
+            });
         }
         
         Debug.Log($"小鸡已激活，当前位置网格: {mapItem.gridPos}");
     }
     
+
     protected void OnDestroy()
     {
         StopAutoMove();
@@ -69,6 +72,7 @@ public class ChickItem : AnimalBase
             }
         }
     }
+    
     
     public void StartAutoMove()
     {

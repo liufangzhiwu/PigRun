@@ -75,7 +75,7 @@ public class LevelManager : MonoBehaviour
         }
 
         // 4. 所有物品加载完成，适配屏幕并触发事件
-        Map.Instance.FitMapToScreen(new Vector2(0.55f, 0.45f));
+        Map.Instance.FitMapToScreen(new Vector2(0.53f, 0.48f));
         Map.Instance.OnLoadNewMapEvent();
 
         Debug.Log($"关卡 {levelid} 加载完成，共 {totalCount} 个动物");
