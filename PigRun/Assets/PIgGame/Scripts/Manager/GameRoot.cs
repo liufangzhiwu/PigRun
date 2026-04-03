@@ -19,8 +19,8 @@ public class GameRoot : MonoBehaviour
             self = this;
             DontDestroyOnLoad(this);
         }      
-
-        //Application.targetFrameRate = 60;
+     
+        Application.targetFrameRate = 90;
     }
 
     public void EnterGameScene(int cost = -1)

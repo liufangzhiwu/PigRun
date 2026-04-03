@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/PIgGame/Scenes/Start.unity
     guid: 4b66a20dd321bff41a11ab89b2d0d815
   - enabled: 1
-    path: Assets/PIgGame/Scenes/MainGame.unity
+    path: Assets/PIgGame/Scenes/Home.unity
+    guid: cd0a3b59f41349649b810afe421456b1
+  - enabled: 1
+    path: Assets/PIgGame/Scenes/Level.unity
     guid: 86ee66ea88ab0524b834af10e316aa68
   m_configObjects: {}

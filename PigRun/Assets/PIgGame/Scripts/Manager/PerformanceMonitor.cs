@@ -67,7 +67,7 @@ public class PerformanceMonitor : MonoBehaviour
         // 输出到控制台
         if (logToConsole && Time.frameCount % 60 == 0) // 每秒输出一次
         {
-            Debug.Log(GetFormattedMetrics());
+            //Debug.Log(GetFormattedMetrics());
         }
     }
 

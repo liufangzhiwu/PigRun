@@ -1,7 +1,7 @@
 using System;
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using Newtonsoft.Json;
 
 /// <summary>
@@ -14,11 +14,16 @@ public class LevelManager : MonoBehaviour
     [Header("配置")]
     public string LevelName = "level";
     public float cellSize = 1f;
-    public List<PigTypeMapping> pigTypeMappings;
+
+    // 缓存已加载的 PrefabInfo，避免重复从 Resources 加载
+    private Dictionary<int, PrefabInfo> prefabInfoCache = new Dictionary<int, PrefabInfo>();
 
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
     }
 
     private void OnEnable()
@@ -42,17 +47,16 @@ public class LevelManager : MonoBehaviour
         MapData mapData = ParseToMapData(levelTextAsset.ToString(), cellSize);
 
         // 2. 准备地图（清空、重置占用表等）
-        Map.Instance.ClearAllItems();               // 清空现有物品
+        Map.Instance.ClearAllItems();
         int targetWidth = mapData.rows;
-        int gridSize =Map.Instance.GetClosestGridSize(targetWidth);
-        
-        // 【新增】重置地图变换，避免位置偏移
+        int gridSize = Map.Instance.GetClosestGridSize(targetWidth);
+
         Map.Instance.transform.position = Vector3.zero;
         Map.Instance.transform.localScale = Vector3.one;
-        
+
         Map.Instance.rows = gridSize;
         Map.Instance.cols = gridSize;
-        Map.Instance.ResetOccupancy();               // 需要 public
+        Map.Instance.ResetOccupancy();
         Map.Instance.dataAsset = mapData;
         Map.Instance.origin = mapData.origin;
         Map.Instance.LevelFinish = false;
@@ -60,7 +64,7 @@ public class LevelManager : MonoBehaviour
         // 3. 分批实例化物品
         List<MapData.MapItemData> itemsToLoad = mapData.items;
         int totalCount = itemsToLoad.Count;
-        int batchSize = 3;  // 每帧实例化数量，可根据性能调整
+        int batchSize = 3;
         int loaded = 0;
 
         while (loaded < totalCount)
@@ -68,10 +72,10 @@ public class LevelManager : MonoBehaviour
             int end = Mathf.Min(loaded + batchSize, totalCount);
             for (int i = loaded; i < end; i++)
             {
-                Map.Instance.InstantiateItem(itemsToLoad[i]);   // 需要添加的方法
+                Map.Instance.InstantiateItem(itemsToLoad[i]);
             }
             loaded = end;
-            yield return null; // 等待下一帧
+            yield return null;
         }
 
         // 4. 所有物品加载完成，适配屏幕并触发事件
@@ -83,7 +87,31 @@ public class LevelManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 将 JSON 字符串转换为 MapData
+    /// 根据类型 ID 动态加载 PrefabInfo（自动从 Resources 中按规则加载）
+    /// </summary>
+    private PrefabInfo LoadPrefabInfoByType(int typeId)
+    {
+        // 先从缓存查找
+        if (prefabInfoCache.TryGetValue(typeId, out var cached))
+            return cached;
+
+        // 构建资源路径，格式：Prefabs/Pigs/Type_{typeId}
+        // 注意：根据你的目录结构，Type_0, Type_1, ... 等预制体直接放在 Prefabs/Pigs 下
+        string path = $"Prefabs/Pigs/Type_{typeId}";
+        PrefabInfo loadedInfo = Resources.Load<PrefabInfo>(path);
+        if (loadedInfo == null)
+        {
+            Debug.LogError($"无法加载PrefabInfo预制体，路径: {path}");
+            return null;
+        }
+
+        // 缓存并返回
+        prefabInfoCache[typeId] = loadedInfo;
+        return loadedInfo;
+    }
+
+    /// <summary>
+    /// 将 JSON 字符串转换为 MapData（自动加载 PrefabInfo）
     /// </summary>
     private MapData ParseToMapData(string jsonContent, float cellSize)
     {
@@ -97,49 +125,23 @@ public class LevelManager : MonoBehaviour
         mapData.version = "1.0";
         mapData.items = new List<MapData.MapItemData>();
 
-        // 构建映射字典
-        Dictionary<int, PrefabInfo> pigPrefabMap = new Dictionary<int, PrefabInfo>();
-        foreach (var mapping in pigTypeMappings)
-        {
-            if (!pigPrefabMap.ContainsKey(mapping.typeId))
-                pigPrefabMap.Add(mapping.typeId, mapping.prefabInfo);
-            else
-                Debug.LogWarning($"重复的猪类型 ID: {mapping.typeId}");
-        }
-
         foreach (var pig in level.pigGroup)
         {
-            MapData.MapItemData item = new MapData.MapItemData();
+            int typeId = (int)pig.type;
+            PrefabInfo info = LoadPrefabInfoByType(typeId);
+            if (info == null) continue;
 
-            if (pigPrefabMap.TryGetValue((int)pig.type, out PrefabInfo info))
-            {
-                item.info = info;
-            }
-            else
-            {
-                Debug.LogWarning($"未找到类型 {pig.type} 对应的 PrefabInfo，尝试从 Resources 加载...");
-                string resPath = $"Prefabs/Pigs/Type_{pig.type}";
-                PrefabInfo loadedInfo = Resources.Load<PrefabInfo>(resPath);
-                if (loadedInfo != null)
-                {
-                    item.info = loadedInfo;
-                    pigPrefabMap[(int)pig.type] = loadedInfo;
-                }
-                else
-                {
-                    Debug.LogError($"无法加载 PrefabInfo，路径: {resPath}");
-                    continue;
-                }
-            }
+            MapData.MapItemData item = new MapData.MapItemData();
+            item.info = info;
 
             int gridX = Mathf.RoundToInt((pig.position.x - mapData.origin.x) / cellSize);
             int gridY = Mathf.RoundToInt((pig.position.y - mapData.origin.y) / cellSize);
             item.rotIndex = ((int)pig.angle / 90 - 1) % 4;
-            item.animalType = (int)pig.type;
+            item.animalType = typeId;
             item.boomTime = (int)pig.boomTime;
 
-            if (item.rotIndex == -1) //0度
-                item.gridPos = new Vector2Int(gridX - 1, gridY-1);
+            if (item.rotIndex == -1) // 0度
+                item.gridPos = new Vector2Int(gridX - 1, gridY - 1);
             else
                 item.gridPos = new Vector2Int(gridX, gridY);
 
@@ -148,11 +150,4 @@ public class LevelManager : MonoBehaviour
 
         return mapData;
     }
-}
-
-[System.Serializable]
-public class PigTypeMapping
-{
-    public int typeId;
-    public PrefabInfo prefabInfo;
 }
