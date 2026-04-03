@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using static Map;
+using Random = UnityEngine.Random;
 
 /// <summary>
 /// 地图管理器核心类
@@ -121,15 +123,6 @@ public class Map : MonoBehaviour
         return rotIndex % 2 == 0 ? new Vector2Int(info.rows, info.cols) : new Vector2Int(info.cols, info.rows);
     }
 
-    /// <summary>获取未旋转时的锚点行列（-1 时取几何中心）</summary>
-    private Vector2Int PivotRC(PrefabInfo info)
-    {
-        if (info == null) return Vector2Int.zero;
-        int pr = info.pivotRow >= 0 ? info.pivotRow : Mathf.FloorToInt((info.rows - 1) * 0.5f);
-        int pc = info.pivotCol >= 0 ? info.pivotCol : Mathf.FloorToInt((info.cols - 1) * 0.5f);
-        return new Vector2Int(pr, pc);
-    }
-
     /// <summary>顺时针旋转后，锚点在占用矩阵中的行列索引映射</summary>
     private Vector2Int RotatedPivot(int rotIndex, Vector2Int dims0)
     {
@@ -187,25 +180,6 @@ public class Map : MonoBehaviour
         if (start.x + dims.x > rows) return false;
         if (start.y + dims.y > cols) return false;
         return true;
-    }
-
-    /// <summary>检查指定区域是否空闲（忽略 ignoreId）</summary>
-    private bool AreaFree(Vector2Int start, Vector2Int dims, int ignoreId)
-    {
-        for (int r = 0; r < dims.x; r++)
-            for (int c = 0; c < dims.y; c++)
-            {
-                int id = occupancy[start.x + r, start.y + c];
-                if (id != -1 && id != ignoreId) return false;
-            }
-        return true;
-    }
-
-    /// <summary>综合检查是否可以放置物品</summary>
-    private bool CanPlace(PrefabInfo info, Vector2Int start, int rotIndex, int ignoreId)
-    {
-        var dims = FootprintDims(info, rotIndex);
-        return InBounds(start, dims) && AreaFree(start, dims, ignoreId);
     }
 
     // ==================== 坐标转换 ====================
@@ -429,7 +403,133 @@ public class Map : MonoBehaviour
         if (cell.x < 0 || cell.x >= rows || cell.y < 0 || cell.y >= cols) return -1;
         return occupancy[cell.x, cell.y];
     }
+    
+    /// <summary>
+    /// 洗牌：随机翻转指定数量的动物（旋转180度）
+    /// </summary>
+    /// <param name="count">需要翻转的动物数量</param>
+    public void ShuffleAnimals(int count)
+    {
+        // 获取所有普通动物（排除药牛、病驴等特殊动物）
+        List<PlacedItem> animalItems = new List<PlacedItem>();
+        foreach (var kv in items)
+        {
+            var placed = kv.Value;
+            // 根据animalType判断是否为特殊动物？这里简单通过组件判断
+            var animal = placed.instance.GetComponent<AnimalBase>();
+            if (animal == null) continue;
+            if (animal is MedicineCowItem || animal is SickDonkeyItem) continue;
+            animalItems.Add(placed);
+        }
 
+        if (animalItems.Count == 0)
+        {
+            Debug.Log("没有可洗牌的动物");
+            return;
+        }
+
+        // 随机选择 count 个（不超过总数）
+        int shuffleCount = Mathf.Min(count, animalItems.Count);
+        // 随机打乱列表
+        for (int i = 0; i < shuffleCount; i++)
+        {
+            int randomIndex = Random.Range(i, animalItems.Count);
+            var temp = animalItems[i];
+            animalItems[i] = animalItems[randomIndex];
+            animalItems[randomIndex] = temp;
+        }
+
+        // 对前 shuffleCount 个动物进行旋转180度
+        for (int i = 0; i < shuffleCount; i++)
+        {
+            RotateAnimal180(animalItems[i]);
+        }
+    }
+
+
+    /// <summary>
+    /// 将动物旋转180度（使用 DOTween 动画）
+    /// </summary>
+   /// <summary>
+/// 将动物旋转180度（使用 DOTween 动画）
+/// </summary>
+private void RotateAnimal180(PlacedItem placed)
+{
+    // 计算新的旋转索引（+2 模4）
+    int newRotIndex = (placed.rotIndex + 2) % 4;
+
+    // 获取 MapItem 组件
+    MapItem mi = placed.instance.GetComponent<MapItem>();
+    if (mi == null) return;
+
+    // 清除当前占用（防止动画期间其他动物进入该格子）
+    //ClearArea(placed);
+
+    // 获取当前的网格位置
+    Vector2Int originalGridPos = mi.gridPos;
+    
+    // 计算旋转后的新网格位置
+    // 旋转180度后，左上角会变为原来的右下角
+    Vector2Int newGridPos = CalculateRotatedGridPos(originalGridPos, placed.rotIndex, newRotIndex, mi.info.rows, mi.info.cols);
+    
+    // 更新内存中的旋转索引和网格位置
+    placed.rotIndex = newRotIndex;
+    placed.gridPos = newGridPos; // 如果有这个字段的话
+    mi.rotIndex = newRotIndex;
+    mi.gridPos = newGridPos;
+
+    Debug.Log($"Rotated grid pos is {newGridPos}");
+    
+    // 计算目标旋转四元数
+    Quaternion targetRotation = Quaternion.AngleAxis(placed.rotIndex * 90f, Vector3.up) * placed.baseRotation;
+    
+    // 执行 DOTween 旋转动画，时长1秒
+    placed.instance.transform.DORotateQuaternion(targetRotation, 1f)
+        .SetEase(Ease.InOutQuad); // 缓动曲线，使动画更自然
+}
+
+
+    
+    /// <summary>
+    /// 计算旋转后的网格位置
+    /// </summary>
+    /// <param name="originalPos">原始网格位置（左上角）</param>
+    /// <param name="oldRot">原始旋转索引</param>
+    /// <param name="newRot">新旋转索引</param>
+    /// <param name="rows">行数（高度）</param>
+    /// <param name="cols">列数（宽度）</param>
+    /// <returns>旋转后的网格位置（新的左上角）</returns>
+    private Vector2Int CalculateRotatedGridPos(Vector2Int originalPos, int oldRot, int newRot, int rows, int cols)
+    {
+        // 计算旋转的角度差（90度的倍数）
+        int rotDiff = (newRot - oldRot + 4) % 4;
+    
+        // 如果旋转不是180度，返回原位置（或者需要单独处理90度旋转）
+        if (rotDiff != 2) return originalPos;
+    
+        // 旋转180度：需要考虑原始朝向
+        // 旋转索引：0=右，1=下，2=左，3=上
+        switch (oldRot)
+        {
+            case 0: // 原本朝右，旋转180度后朝左
+                // 右转左：新的左上角在原位置的左上方
+                return new Vector2Int(originalPos.x - rows, originalPos.y - cols);
+            
+            case 1: // 原本朝下，旋转180度后朝上
+                // 下转上：新的左上角在原位置的左上方
+                return new Vector2Int(originalPos.x - cols, originalPos.y - rows);
+            
+            case 2: // 原本朝左，旋转180度后朝右
+                // 左转右：新的左上角在原位置的右下方
+                return new Vector2Int(originalPos.x + rows, originalPos.y + cols);
+            
+           // 原本朝上，旋转180度后朝下
+           // 上转下：新的左上角在原位置的右下方
+            default:
+                return new Vector2Int(originalPos.x + cols, originalPos.y + rows);
+        }
+    }
+    
     /// <summary>自动将地图缩放并居中到屏幕（根据当前物品分布）</summary>
     /// <summary>自动将地图缩放并居中到屏幕（保证完整显示地图网格）</summary>
     /// <param name="targetScreenUV">目标屏幕位置，视口坐标 (0,0) 左下角到 (1,1) 右上角。默认 null 表示屏幕中心 (0.5,0.5)。</param>

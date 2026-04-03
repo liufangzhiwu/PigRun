@@ -59,7 +59,7 @@ public class UseToolPanel : UIBase
                 tipText.text = "移除道具\n点击[使用]后,再点击2只动物即可移除它们";
                 break;
             case ToolType.Shuffle:
-                tipText.text = "洗牌道具\n可重新排列地图中的所有动物";
+                tipText.text = "洗牌道具\n点击[使用]后,4只动物随机反转";
                 break;
             case ToolType.Reverse:
                 tipText.text = "翻转道具\n可翻转地图中所有动物的方向";
@@ -154,9 +154,12 @@ public class UseToolPanel : UIBase
     {
         // 关闭道具界面
         Close();
-        
-        // TODO: 实现洗牌功能
-        MessageSystem.Instance.ShowTip("洗牌道具开发中...");
+      
+        // 关闭道具界面
+        Close();
+        // 执行洗牌（随机翻转5只动物）
+        Map.Instance.ShuffleAnimals(5);
+        MessageSystem.Instance.ShowTip("已随机翻转5只动物...");
     }
     
     /// <summary>
