@@ -32,11 +32,6 @@ public class SelectionModeManager : MonoBehaviour
         {
             Instance = this;
             mask.gameObject.SetActive(false);
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
         }
     }
     
