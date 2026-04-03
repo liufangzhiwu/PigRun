@@ -130,33 +130,21 @@ public class UseToolPanel : UIBase
         // 关闭当前道具界面
         Close();
         
-        // 使用选择模式管理器
+        
         SelectionModeManager.Instance.StartSelectionMode(
             maxCount: 2,
-            onComplete: OnRemoveComplete,
-            onCancel: OnRemoveCancel,
+            onComplete: () => {
+                // 移除完成后的逻辑（如关闭面板、刷新UI等）
+                Close();
+            },
+            onCancel: () => {
+                MessageSystem.Instance.ShowTip("已取消移除操作");
+                Close();
+            },
             filter: (animal) => {
-                // 筛选条件：不能是药牛和病驴
                 return !(animal is MedicineCowItem || animal is SickDonkeyItem);
             }
         );
-    }
-    
-    /// <summary>
-    /// 移除完成回调
-    /// </summary>
-    private void OnRemoveComplete(List<AnimalBase> selectedAnimals)
-    {
-        // 使用 SelectionModeManager 执行移除
-        SelectionModeManager.Instance.RemoveAnimals(selectedAnimals);
-    }
-    
-    /// <summary>
-    /// 移除取消回调
-    /// </summary>
-    private void OnRemoveCancel()
-    {
-        MessageSystem.Instance.ShowTip("已取消移除操作");
     }
     
     /// <summary>

@@ -15,12 +15,12 @@ public class SelectionModeManager : MonoBehaviour
     
     public bool IsInSelectionMode { get; private set; } = false;
     public int MaxSelectCount { get; private set; } = 2;
-    public int CurrentSelectCount => selectedAnimals.Count;
+    public int CurrentSelectCount => removedCount;
     
-    private List<AnimalBase> selectedAnimals = new List<AnimalBase>();
+    private int removedCount = 0;                     // 已移除的动物数量
     private List<AnimalBase> availableAnimals = new List<AnimalBase>();
-    private Action<List<AnimalBase>> onSelectionComplete;
-    private Action onSelectionCancel;
+    private Action onSelectionComplete;               // 完成回调（移除2只后调用）
+    private Action onSelectionCancel;                 // 取消回调
     private Func<AnimalBase, bool> selectionFilter;
     
     private Dictionary<AnimalBase, Color> originalColors = new Dictionary<AnimalBase, Color>();
@@ -31,38 +31,38 @@ public class SelectionModeManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            mask.gameObject.SetActive(false);
+            if (mask != null) mask.gameObject.SetActive(false);
         }
     }
     
     /// <summary>
-    /// 开始选择模式
+    /// 开始移除模式
     /// </summary>
-    /// <param name="maxCount">最大选择数量</param>
-    /// <param name="onComplete">选择完成回调</param>
+    /// <param name="maxCount">需要移除的数量（默认2）</param>
+    /// <param name="onComplete">全部移除完成回调</param>
     /// <param name="onCancel">取消回调</param>
-    /// <param name="filter">可选：筛选条件</param>
-    public void StartSelectionMode(int maxCount, Action<List<AnimalBase>> onComplete, Action onCancel = null, Func<AnimalBase, bool> filter = null)
+    /// <param name="filter">可选：筛选条件（决定哪些动物可以被移除）</param>
+    public void StartSelectionMode(int maxCount, Action onComplete, Action onCancel = null, Func<AnimalBase, bool> filter = null)
     {
         if (IsInSelectionMode)
         {
             Debug.LogWarning("已经在选择模式中，请先退出");
             return;
         }
-        mask.gameObject.SetActive(true);
+        if (mask != null) mask.gameObject.SetActive(true);
         IsInSelectionMode = true;
         MaxSelectCount = maxCount;
+        removedCount = 0;
         onSelectionComplete = onComplete;
         onSelectionCancel = onCancel;
         selectionFilter = filter;
-        selectedAnimals.Clear();
         
         // 刷新可用动物列表
         RefreshAvailableAnimals();
         
         if (availableAnimals.Count == 0)
         {
-            MessageSystem.Instance.ShowTip("没有可选择的动物！");
+            MessageSystem.Instance.ShowTip("没有可移除的动物！");
             ExitSelectionMode();
             return;
         }
@@ -70,32 +70,23 @@ public class SelectionModeManager : MonoBehaviour
         // 注册动物点击事件
         RegisterAnimalClickEvents(true);
         
-        MessageSystem.Instance.ShowTip($"请选择 {maxCount} 只动物");
+        MessageSystem.Instance.ShowTip($"请选择第 1 只动物（共 {maxCount} 只）");
     }
     
     /// <summary>
-    /// 刷新可用动物列表
+    /// 刷新可用动物列表（根据筛选条件）
     /// </summary>
     private void RefreshAvailableAnimals()
     {
         availableAnimals.Clear();
-        
         AnimalBase[] allAnimals = FindObjectsOfType<AnimalBase>();
         
         foreach (var animal in allAnimals)
         {
-            // 应用筛选条件
             if (selectionFilter != null && !selectionFilter(animal))
-            {
                 continue;
-            }
-            
-            // 排除已经跑出屏幕的
-            if (animal.MapItem == null)
-            {
+            if (animal.MapItem == null) // 已经跑出屏幕的忽略
                 continue;
-            }
-            
             availableAnimals.Add(animal);
         }
     }
@@ -110,76 +101,105 @@ public class SelectionModeManager : MonoBehaviour
             if (animal != null)
             {
                 if (register)
-                {
                     animal.OnAnimalClicked += OnAnimalSelected;
-                }
                 else
-                {
                     animal.OnAnimalClicked -= OnAnimalSelected;
-                }
             }
         }
     }
     
     /// <summary>
-    /// 动物被选中
+    /// 动物被选中时调用（立即移除）
     /// </summary>
     private void OnAnimalSelected(AnimalBase animal)
     {
         if (!IsInSelectionMode) return;
         
+        // 如果动物不在可用列表中，说明已经被移除或不可选，静默忽略（避免重复点击提示）
         if (!availableAnimals.Contains(animal))
         {
-            MessageSystem.Instance.ShowTip("这个动物不能被选择！");
             return;
         }
         
-        if (selectedAnimals.Contains(animal))
+        StartCoroutine(RemoveSingleAnimal(animal));
+    }
+    
+    /// <summary>
+    /// 移除单个动物（带特效）
+    /// </summary>
+    private IEnumerator RemoveSingleAnimal(AnimalBase animal)
+    {
+        if (animal == null || animal.gameObject == null) yield break;
+        
+        // 二次检查：防止重复移除（例如在协程等待期间动物已被其他方式移除）
+        if (!availableAnimals.Contains(animal)) yield break;
+        
+        // 显示移除特效
+        ShowRemoveEffect(animal.transform.position);
+        // 播放音效（如有）
+        // AudioManager.Instance.PlaySoundEffect("tool_remove");
+        
+        // 从可用列表中移除，避免重复点击
+        availableAnimals.Remove(animal);
+        
+        // 移除高亮效果（如果之前有）
+        RemoveSelectedEffect(animal);
+        
+        // 取消注册该动物的点击事件（临时）
+        animal.OnAnimalClicked -= OnAnimalSelected;
+        
+        // 延迟一点，让特效可见
+        yield return new WaitForSeconds(0.2f);
+        
+        // 真正移除动物
+        if (animal.MapItem != null)
+            Map.Instance.RemoveItem(animal.MapItem);
+        else
+            Destroy(animal.gameObject);
+        
+        removedCount++;
+        
+        // 判断是否已经移除完毕
+        if (removedCount >= MaxSelectCount)
         {
-            // 取消选中
-            selectedAnimals.Remove(animal);
-            RemoveSelectedEffect(animal);
-            MessageSystem.Instance.ShowTip($"已取消选中 ({selectedAnimals.Count}/{MaxSelectCount})");
+            // 全部移除完成
+            MessageSystem.Instance.ShowTip($"成功移除了 {removedCount} 只动物！");
+            CompleteSelection();
         }
         else
         {
-            if (selectedAnimals.Count >= MaxSelectCount)
-            {
-                MessageSystem.Instance.ShowTip($"最多只能选择 {MaxSelectCount} 只动物！");
-                return;
-            }
+            // 移除后刷新可用动物列表（因为刚才移除了一只，列表变化）
+            RefreshAvailableAnimals();
+            // 重新注册点击事件（新列表中的动物）
+            RegisterAnimalClickEvents(true);
             
-            selectedAnimals.Add(animal);
-            AddSelectedEffect(animal);
-            MessageSystem.Instance.ShowTip($"已选中 ({selectedAnimals.Count}/{MaxSelectCount})");
-        }
-        
-        if (selectedAnimals.Count >= MaxSelectCount)
-        {
-            CompleteSelection();
+            int next = removedCount + 1;
+            MessageSystem.Instance.ShowTip($"已移除 {removedCount} 只，请选择第 {next} 只动物");
         }
     }
     
     /// <summary>
-    /// 完成选择
+    /// 完成所有移除
     /// </summary>
     private void CompleteSelection()
     {
         if (!IsInSelectionMode) return;
         
-        // 清除选中效果
-        foreach (var animal in selectedAnimals)
+        // 清除所有高亮效果
+        foreach (var kv in selectedHalos)
         {
-            RemoveSelectedEffect(animal);
+            if (kv.Key != null) RemoveSelectedEffect(kv.Key);
         }
+        selectedHalos.Clear();
+        originalColors.Clear();
         
         // 取消注册事件
         RegisterAnimalClickEvents(false);
         
-        // 执行回调
-        onSelectionComplete?.Invoke(new List<AnimalBase>(selectedAnimals));
+        // 执行完成回调
+        onSelectionComplete?.Invoke();
         
-        // 退出选择模式
+        // 退出模式
         ExitSelectionMode();
     }
     
@@ -190,23 +210,22 @@ public class SelectionModeManager : MonoBehaviour
     {
         if (!IsInSelectionMode) return;
         
-        mask.gameObject.SetActive(false);
+        if (mask != null) mask.gameObject.SetActive(false);
         // 取消注册事件
         RegisterAnimalClickEvents(false);
         
-        // 清除所有选中效果
-        foreach (var animal in selectedAnimals)
+        // 清除所有高亮效果
+        foreach (var animal in new List<AnimalBase>(selectedHalos.Keys))
         {
             RemoveSelectedEffect(animal);
         }
-        
-        selectedAnimals.Clear();
-        originalColors.Clear();
         selectedHalos.Clear();
+        originalColors.Clear();
         
         IsInSelectionMode = false;
+        removedCount = 0;
         
-        // 执行取消回调
+        // 执行取消回调（如果有）
         onSelectionCancel?.Invoke();
         
         onSelectionComplete = null;
@@ -214,6 +233,7 @@ public class SelectionModeManager : MonoBehaviour
         selectionFilter = null;
     }
     
+    // ========== 特效相关（保持不变） ==========
     private void AddSelectedEffect(AnimalBase animal)
     {
         // 高亮效果
@@ -221,9 +241,7 @@ public class SelectionModeManager : MonoBehaviour
         if (renderer != null)
         {
             if (!originalColors.ContainsKey(animal))
-            {
                 originalColors[animal] = renderer.material.color;
-            }
             renderer.material.color = Color.yellow;
         }
         
@@ -250,9 +268,7 @@ public class SelectionModeManager : MonoBehaviour
         {
             var renderer = animal.GetComponent<Renderer>();
             if (renderer != null)
-            {
                 renderer.material.color = originalColors[animal];
-            }
             originalColors.Remove(animal);
         }
         
@@ -263,60 +279,10 @@ public class SelectionModeManager : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// 移除动物（带特效）
-    /// </summary>
-    public void RemoveAnimals(List<AnimalBase> animalsToRemove)
-    {
-        if (animalsToRemove == null || animalsToRemove.Count == 0) return;
-        
-        StartCoroutine(RemoveAnimalsCoroutine(animalsToRemove));
-    }
-    
-    private IEnumerator RemoveAnimalsCoroutine(List<AnimalBase> animalsToRemove)
-    {
-        int removedCount = 0;
-        
-        foreach (var animal in animalsToRemove)
-        {
-            if (animal != null && animal.gameObject != null)
-            {
-                // 显示移除特效
-                ShowRemoveEffect(animal.transform.position);
-                
-                // 播放音效
-                //AudioManager.Instance.PlaySoundEffect("tool_remove");
-                
-                // 延迟一下，让特效更明显
-                yield return new WaitForSeconds(0.2f);
-                
-                // 从地图移除动物
-                if (animal.MapItem != null)
-                {
-                    Map.Instance.RemoveItem(animal.MapItem);
-                }
-                else
-                {
-                    Destroy(animal.gameObject);
-                }
-                
-                removedCount++;
-            }
-        }
-        
-        // 显示成功提示
-        if (removedCount > 0)
-        {
-            MessageSystem.Instance.ShowTip($"成功移除了 {removedCount} 个动物！");
-        }
-    }
-    
     private void ShowRemoveEffect(Vector3 position)
     {
-        // 创建特效文字
         GameObject effectObj = new GameObject("RemoveEffect");
         effectObj.transform.position = position + Vector3.up * 0.5f;
-        
         var textMesh = effectObj.AddComponent<TextMesh>();
         textMesh.text = "✨ 移除 ✨";
         textMesh.color = Color.cyan;
@@ -324,14 +290,8 @@ public class SelectionModeManager : MonoBehaviour
         textMesh.characterSize = 0.05f;
         textMesh.anchor = TextAnchor.MiddleCenter;
         textMesh.alignment = TextAlignment.Center;
-        
-        // 添加Billboard效果
         effectObj.AddComponent<Billboard>();
-        
-        // 淡出并销毁
         StartCoroutine(FadeAndDestroy(effectObj, 0.8f));
-        
-        // 创建粒子特效
         StartCoroutine(CreateRemoveParticles(position));
     }
     
@@ -342,10 +302,8 @@ public class SelectionModeManager : MonoBehaviour
             GameObject particle = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             particle.transform.localScale = Vector3.one * 0.08f;
             particle.transform.position = position + Random.insideUnitSphere * 0.8f;
-            
             var renderer = particle.GetComponent<Renderer>();
             renderer.material.color = Color.cyan;
-            
             Destroy(particle, 0.5f);
             yield return new WaitForSeconds(0.02f);
         }
@@ -355,7 +313,6 @@ public class SelectionModeManager : MonoBehaviour
     {
         float elapsed = 0;
         TextMesh textMesh = obj.GetComponent<TextMesh>();
-        
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
@@ -368,7 +325,6 @@ public class SelectionModeManager : MonoBehaviour
             obj.transform.Translate(Vector3.up * Time.deltaTime * 0.5f);
             yield return null;
         }
-        
         Destroy(obj);
     }
 }
