@@ -51,15 +51,25 @@ public abstract class AnimalBase : MonoBehaviour
             return;
         }
 
-        // 只有在选择模式下触发事件
-        if (OnAnimalClicked != null && mapItem != null)
-        {
-            OnAnimalClicked(this);
-        }
+        // 检查是否处于选择模式（由 SelectionModeManager 管理）
+        bool isInSelectionMode = SelectionModeManager.Instance != null && SelectionModeManager.Instance.IsInSelectionMode;
 
-        if (OnAnimalClicked == null)
+        if (isInSelectionMode)
         {
-            currentState?.HandleClick();
+            // 选择模式下，仅触发点击事件（用于选择），绝不触发移动
+            OnAnimalClicked?.Invoke(this);
+        }
+        else
+        {
+            // 非选择模式，正常逻辑：如果有监听则触发事件，否则移动
+            if (OnAnimalClicked != null && mapItem != null)
+            {
+                OnAnimalClicked(this);
+            }
+            else
+            {
+                currentState?.HandleClick();
+            }
         }
     }
 

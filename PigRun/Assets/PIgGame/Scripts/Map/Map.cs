@@ -509,7 +509,7 @@ public class Map : MonoBehaviour
         {
             case 0: // 原本朝右，旋转180度后朝左
                 // 右转左：新的左上角在原位置的左上方
-                return new Vector2Int(originalPos.x - rows, originalPos.y - cols);
+                return new Vector2Int(originalPos.x - rows, originalPos.y + (cols-1));
             
             case 1: // 原本朝下，旋转180度后朝上
                 // 下转上：新的左上角在原位置的左上方
@@ -517,7 +517,7 @@ public class Map : MonoBehaviour
             
             case 2: // 原本朝左，旋转180度后朝右
                 // 左转右：新的左上角在原位置的右下方
-                return new Vector2Int(originalPos.x + rows, originalPos.y + cols);
+                return new Vector2Int(originalPos.x + rows, originalPos.y - (cols-1));
             
            // 原本朝上，旋转180度后朝下
            // 上转下：新的左上角在原位置的右下方
