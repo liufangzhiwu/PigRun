@@ -12,9 +12,7 @@ public class NumberTurtleItem : AnimalBase
    
     [Header("视觉效果")]
     [SerializeField] private Color completedColor = Color.green; // 完成后的颜色
-    [SerializeField] private float progressFillSpeed = 0.5f;     // 进度填充速度
-    
-    
+   
     private bool isComplete = false;      // 是否已完成任务
     private int currentEscapesCount = 0;  // 当前跑出的动物计数
     private List<AnimalBase> trackedAnimals = new List<AnimalBase>(); // 追踪的动物

@@ -131,7 +131,7 @@ public class UseToolPanel : UIBase
         Close();
         
         
-        SelectionModeManager.Instance.StartSelectionMode(
+        SelectionModeManager.Instance.StartRemoveMode(
             maxCount: 2,
             onComplete: () => {
                 // 移除完成后的逻辑（如关闭面板、刷新UI等）
@@ -154,9 +154,7 @@ public class UseToolPanel : UIBase
     {
         // 关闭道具界面
         Close();
-      
-        // 关闭道具界面
-        Close();
+     
         // 执行洗牌（随机翻转5只动物）
         Map.Instance.ShuffleAnimals(5);
         MessageSystem.Instance.ShowTip("已随机翻转5只动物...");
@@ -170,8 +168,23 @@ public class UseToolPanel : UIBase
         // 关闭道具界面
         Close();
         
-        // TODO: 实现翻转功能
-        MessageSystem.Instance.ShowTip("翻转道具开发中...");
+        SelectionModeManager.Instance.StartFlipMode(
+            onComplete: (animal) => {
+                // 获取 PlacedItem 并执行翻转
+                var placed = Map.Instance.GetPlacedItem(animal.MapItem.id);
+                if (placed != null)
+                    Map.Instance.RotateAnimal180(placed);
+                MessageSystem.Instance.ShowTip("已翻转动物方向");
+                Close();
+            },
+            onCancel: () => {
+                MessageSystem.Instance.ShowTip("已取消翻转操作");
+                Close();
+            },
+            filter: (animal) => {
+                return !(animal is MedicineCowItem || animal is SickDonkeyItem);
+            }
+        );
     }
     
     private void ClickCloseButton()

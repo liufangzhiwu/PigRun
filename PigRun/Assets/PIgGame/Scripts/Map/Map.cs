@@ -450,44 +450,40 @@ public class Map : MonoBehaviour
     /// <summary>
     /// 将动物旋转180度（使用 DOTween 动画）
     /// </summary>
-   /// <summary>
-/// 将动物旋转180度（使用 DOTween 动画）
-/// </summary>
-private void RotateAnimal180(PlacedItem placed)
-{
-    // 计算新的旋转索引（+2 模4）
-    int newRotIndex = (placed.rotIndex + 2) % 4;
+    public void RotateAnimal180(PlacedItem placed)
+    {
+        // 计算新的旋转索引（+2 模4）
+        int newRotIndex = (placed.rotIndex + 2) % 4;
 
-    // 获取 MapItem 组件
-    MapItem mi = placed.instance.GetComponent<MapItem>();
-    if (mi == null) return;
+        // 获取 MapItem 组件
+        MapItem mi = placed.instance.GetComponent<MapItem>();
+        if (mi == null) return;
 
-    // 清除当前占用（防止动画期间其他动物进入该格子）
-    //ClearArea(placed);
+        // 清除当前占用（防止动画期间其他动物进入该格子）
+        //ClearArea(placed);
 
-    // 获取当前的网格位置
-    Vector2Int originalGridPos = mi.gridPos;
-    
-    // 计算旋转后的新网格位置
-    // 旋转180度后，左上角会变为原来的右下角
-    Vector2Int newGridPos = CalculateRotatedGridPos(originalGridPos, placed.rotIndex, newRotIndex, mi.info.rows, mi.info.cols);
-    
-    // 更新内存中的旋转索引和网格位置
-    placed.rotIndex = newRotIndex;
-    placed.gridPos = newGridPos; // 如果有这个字段的话
-    mi.rotIndex = newRotIndex;
-    mi.gridPos = newGridPos;
+        // 获取当前的网格位置
+        Vector2Int originalGridPos = mi.gridPos;
+        
+        // 计算旋转后的新网格位置
+        // 旋转180度后，左上角会变为原来的右下角
+        Vector2Int newGridPos = CalculateRotatedGridPos(originalGridPos, placed.rotIndex, newRotIndex, mi.info.rows, mi.info.cols);
+        
+        // 更新内存中的旋转索引和网格位置
+        placed.rotIndex = newRotIndex;
+        placed.gridPos = newGridPos; // 如果有这个字段的话
+        mi.rotIndex = newRotIndex;
+        mi.gridPos = newGridPos;
 
-    Debug.Log($"Rotated grid pos is {newGridPos}");
-    
-    // 计算目标旋转四元数
-    Quaternion targetRotation = Quaternion.AngleAxis(placed.rotIndex * 90f, Vector3.up) * placed.baseRotation;
-    
-    // 执行 DOTween 旋转动画，时长1秒
-    placed.instance.transform.DORotateQuaternion(targetRotation, 1f)
-        .SetEase(Ease.InOutQuad); // 缓动曲线，使动画更自然
-}
-
+        Debug.Log($"Rotated grid pos is {newGridPos}");
+        
+        // 计算目标旋转四元数
+        Quaternion targetRotation = Quaternion.AngleAxis(placed.rotIndex * 90f, Vector3.up) * placed.baseRotation;
+        
+        // 执行 DOTween 旋转动画，时长1秒
+        placed.instance.transform.DORotateQuaternion(targetRotation, 1f)
+            .SetEase(Ease.InOutQuad); // 缓动曲线，使动画更自然
+    }
 
     
     /// <summary>
@@ -530,15 +526,13 @@ private void RotateAnimal180(PlacedItem placed)
         }
     }
     
-    /// <summary>自动将地图缩放并居中到屏幕（根据当前物品分布）</summary>
-    /// <summary>自动将地图缩放并居中到屏幕（保证完整显示地图网格）</summary>
-    /// <param name="targetScreenUV">目标屏幕位置，视口坐标 (0,0) 左下角到 (1,1) 右上角。默认 null 表示屏幕中心 (0.5,0.5)。</param>
+   
     /// <summary>
     /// 自动将地图缩放并居中到屏幕
     /// </summary>
     /// <param name="targetScreenUV">目标屏幕位置，视口坐标 (0,0) 左下角到 (1,1) 右上角。默认 null 表示屏幕中心 (0.5,0.5)。</param>
     /// <param name="padding">缩放边距（0~1），数值越小地图越小，1 表示刚好填满屏幕无留白，默认 0.9。</param>
-      /// <summary>自动将地图缩放并居中到屏幕（根据当前物品分布）</summary>
+    /// <summary>自动将地图缩放并居中到屏幕（根据当前物品分布）</summary>
     public void FitMapToScreen(Vector2? targetScreenUV = null)
     {
         if (!cam.orthographic) return;
