@@ -10,11 +10,18 @@ namespace PigGame
     {
         
         [SerializeField] private Button LevelButton;
+        [SerializeField] private Text LevetTest;
         
         // Start is called before the first frame update
         void Start()
         {
             LevelButton.onClick.AddListener(ClickLevelButton);
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            LevetTest.text=$"第{GameDataManager.Instance.UserData.LevelIndex}关";
         }
 
         private void ClickLevelButton()

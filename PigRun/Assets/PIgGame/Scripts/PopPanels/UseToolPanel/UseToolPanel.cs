@@ -14,7 +14,9 @@ public enum ToolType
 public class UseToolPanel : UIBase
 {
     [SerializeField] private Text tipText;
-    [SerializeField] private Button useButton;
+    [SerializeField] private Text toolNameText;
+    [SerializeField] private Button goldButton;
+    [SerializeField] private Button adsButton;
     [SerializeField] private Button closeButton;
     
     [Header("道具类型")]
@@ -42,7 +44,8 @@ public class UseToolPanel : UIBase
     protected override void InitButtonEvents()
     {
         base.InitButtonEvents();
-        useButton.AddClickAction(ClickUseButton);
+        goldButton.AddClickAction(ClickUseButton);
+        adsButton.AddClickAction(ClickUseButton);
         closeButton.AddClickAction(ClickCloseButton);
     }
     
@@ -56,12 +59,15 @@ public class UseToolPanel : UIBase
         switch (currentToolType)
         {
             case ToolType.Remove:
-                tipText.text = "移除道具\n点击[使用]后,再点击2只动物即可移除它们";
+                toolNameText.text = "移除";
+                tipText.text = "将2只动物移除";
                 break;
             case ToolType.Shuffle:
+                toolNameText.text = "洗牌";
                 tipText.text = "洗牌道具\n点击[使用]后,4只动物随机反转";
                 break;
             case ToolType.Reverse:
+                toolNameText.text = "翻转";
                 tipText.text = "翻转道具\n可翻转地图中所有动物的方向";
                 break;
         }

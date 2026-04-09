@@ -616,7 +616,7 @@ GameObject:
   - component: {fileID: 1672104765}
   - component: {fileID: 1672104764}
   m_Layer: 5
-  m_Name: Image
+  m_Name: bg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -638,8 +638,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -15.335144, y: -35.800293}
+  m_SizeDelta: {x: 39.47028, y: 146.79932}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1672104764
 MonoBehaviour:

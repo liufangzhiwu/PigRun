@@ -2719,7 +2719,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d6bb25d603849842adcd403ce8133c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showUI: 1
+  showUI: 0
   logToConsole: 1
   updateInterval: 0.5
   frameHistorySize: 60
