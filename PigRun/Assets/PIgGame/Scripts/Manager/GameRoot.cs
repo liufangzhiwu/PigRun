@@ -21,6 +21,7 @@ public class GameRoot : MonoBehaviour
         }      
      
         Application.targetFrameRate = 90;
+        self.sceneMask.gameObject.SetActive(false);
     }
 
     public void EnterGameScene(int cost = -1)

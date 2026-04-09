@@ -29,8 +29,11 @@ namespace ThreePeakGame
 
         public void EnterGameScene(int cost = -1)
         {
-            group.gameObject.Hide();
 
+            OnEnable();
+            
+            transform.GetComponent<CanvasGroup>().alpha = 1;
+            
             //PowerCount.text = (PowerRoot.self.energySave.GamePower - cost).ToString();
             ReduceCount.text = "-" + Mathf.Abs(cost);
 

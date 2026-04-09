@@ -31,23 +31,6 @@ public class AudioManager : MonoBehaviour
         audioSourcePool = new ObjectPool(audioSPrefab.gameObject, ObjectPool.CreatePoolContainer(transform, "audio_pool"));
     }
 
-    // 预加载音效
-    public IEnumerator PreloadCommonSounds(string[] soundNames)
-    {
-        foreach (var name in soundNames)
-        {
-            if (!soundClipCache.ContainsKey(name))
-            {
-                AudioClip clip = AssetBundleLoader.SharedInstance.LoadAudioClip("musics", name);
-                if (clip != null)
-                {
-                    soundClipCache[name] = clip;
-                    Debug.Log($"预加载音效: {name}, 长度: {clip.length:F2}s");
-                }
-                yield return null; // 每帧加载一个，避免卡顿
-            }
-        }
-    }
     
     // 播放音效（支持并发）
     public void PlaySoundEffect(string soundName)
@@ -70,8 +53,7 @@ public class AudioManager : MonoBehaviour
         
         // 设置并播放
         source.clip = clip;
-        //source.volume = GameDataManager.Instance.UserData.IsSoundOn ? normalVolume : 0;
-        source.volume = normalVolume;
+        source.volume = GameDataManager.Instance.UserData.IsSoundOn ? normalVolume : 0;
         source.pitch = 1;
         source.loop = false;
         source.Play();
@@ -114,16 +96,7 @@ public class AudioManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // // 预加载背景音乐
-        // string[] musicNames =
-        // {
-        //     "music", "Button","ShowUI","Puzzle1","Puzzle2","Puzzle3" ,"Puzzle4","lianci",
-        //     "chongzhidaoju","EnterStage","PassStage","SignWater","ciright","xuanzhecuowu"
-        // }; // 替换为实际的音乐名称
-        // StartCoroutine(PreloadCommonSounds(musicNames));
-        
         StartCoroutine(PlayMusic(0.2f)); // 初始化音乐开关
-
         ApplyCriticalFixes();
     }
     
@@ -213,14 +186,14 @@ public class AudioManager : MonoBehaviour
     {             
         yield return new WaitForSeconds(transitionTime);
         
-        // if (!GameDataManager.Instance.UserData.IsMusicOn)
-        // {
-        //     musicSource.Stop(); // 如果音乐关闭，停止播放
-        // }
-        // else
-        // {
+        if (!GameDataManager.Instance.UserData.IsMusicOn)
+        {
+            musicSource.Stop(); // 如果音乐关闭，停止播放
+        }
+        else
+        {
             PlayBackgroundMusic("menu-bgm"); // 播放默认音乐
-        //}
+        }
     }
     
     public void ToggleMusic()
@@ -231,7 +204,7 @@ public class AudioManager : MonoBehaviour
         }
         else
         {
-            PlayBackgroundMusic("music"); // 播放默认音乐
+            PlayBackgroundMusic("menu-bgm"); // 播放默认音乐
         }
     }
 
@@ -314,20 +287,5 @@ public class AudioManager : MonoBehaviour
         }
         source.volume = targetVolume;
         Debug.Log("背景音乐播放"+source.volume);
-    }
-    
-    public void TriggerVibration(long milliseconds = 5,int intensity=50,int iointensity=1)
-    {
-        //if (!GameDataManager.instance.UserData.IsVibrationOn) return;
-// #if UNITY_EDITOR
-//         // 编辑器模式下的模拟逻辑
-//         Debug.Log($"模拟震动：强度 {intensity}，持续时间 {milliseconds}ms");
-// #elif UNITY_IOS
-//      // iOS 震动逻辑
-//         TriggerVibrationWithStyle(1);
-// #elif UNITY_ANDROID
-//     // Android 平台的震动逻辑
-//       AndroidVibration.Vibrate(milliseconds,intensity);
-// #endif
     }
 }

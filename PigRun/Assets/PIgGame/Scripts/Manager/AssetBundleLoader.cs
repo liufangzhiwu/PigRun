@@ -222,7 +222,7 @@ public sealed class AssetBundleLoader
     /// <summary>
     /// 从缓存图集中获取精灵
     /// </summary>
-    public Sprite GetSpriteFromAtlas(string spriteName, string atlasName = "UI_Universal")
+    public Sprite GetSpriteFromAtlas(string spriteName, string atlasName = "UI_Common")
     {
         if (_spriteAtlasCache.TryGetValue(atlasName, out var spriteAtlas))
         {

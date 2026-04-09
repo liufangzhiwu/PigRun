@@ -889,6 +889,16 @@ PrefabInstance:
       propertyPath: m_SortingOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3370672164828638600, guid: 577b6d6640740e54890359274e372022,
+        type: 3}
+      propertyPath: m_Maskable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3370672164828638600, guid: 577b6d6640740e54890359274e372022,
+        type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4600224846965263310, guid: 577b6d6640740e54890359274e372022,
         type: 3}
       propertyPath: m_Alpha
@@ -917,6 +927,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1229061521}
+    - targetCorrespondingSourceObject: {fileID: 6965737096528709532, guid: 577b6d6640740e54890359274e372022,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1229061524}
   m_SourcePrefab: {fileID: 100100000, guid: 577b6d6640740e54890359274e372022, type: 3}
 --- !u!1 &1229061520 stripped
 GameObject:
@@ -943,12 +957,30 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 1229061519}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1229061523}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4656c80210c7f144d8b485c2e6432000, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1229061523 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6965737096528709532, guid: 577b6d6640740e54890359274e372022,
+    type: 3}
+  m_PrefabInstance: {fileID: 1229061519}
+  m_PrefabAsset: {fileID: 0}
+--- !u!225 &1229061524
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1229061523}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1375746572
 GameObject:
   m_ObjectHideFlags: 0
