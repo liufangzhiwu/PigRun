@@ -39,24 +39,24 @@ namespace ThreePeakGame
 
             Sequence sequence = DOTween.Sequence();
             // 修改 EnterGameScene 中的第一句动画
-            sequence.Append(mat.DOFloat(1f, "_Float0", 1f).From(0).SetEase(Ease.InSine));
+            sequence.Append(mat.DOFloat(1f, "_Float0", 0.5f).From(0).SetEase(Ease.InSine));
             sequence.Append(group.DOFade(1, 0.5f).From(0).SetEase(Ease.Linear).OnStart(() =>
             {
                 group.gameObject.Show();
                 ReduceCount.SetAlpha(0);
             }));
             sequence.AppendInterval(0.2f);
-            sequence.Append(ReduceCount.transform.DOLocalMoveY(110, 0.75f).From(80).SetEase(Ease.OutSine).OnStart(() =>
-            {
-                //PowerCount.text = PowerRoot.self.energySave.GamePower.ToString();
-                //AudioRoot.PlayAudio(AudioName.Counter);
-            }));
-            sequence.Join(ReduceCount.DOFade(0, 0.75f).From(1).SetEase(Ease.OutSine).OnComplete(() =>
+            // sequence.Append(ReduceCount.transform.DOLocalMoveY(110, 0.75f).From(80).SetEase(Ease.OutSine).OnStart(() =>
+            // {
+            //     //PowerCount.text = PowerRoot.self.energySave.GamePower.ToString();
+            //     //AudioRoot.PlayAudio(AudioName.Counter);
+            // }));
+            sequence.Join(ReduceCount.DOFade(0, 0.5f).From(1).SetEase(Ease.OutSine).OnComplete(() =>
             {
                 SetLoader();
             }));
             sequence.Append(group.DOFade(0, 0.5f).From(1).SetEase(Ease.Linear));
-            sequence.Join(mat.DOFloat(0, "_Float0", 1f).From(1f).SetEase(Ease.OutSine));
+            sequence.Join(mat.DOFloat(0, "_Float0", 0.5f).From(1f).SetEase(Ease.OutSine));
             sequence.AppendCallback(() =>
             {
                 UIManager.Instance.ShowPanel(PanelType.MenuPanel);

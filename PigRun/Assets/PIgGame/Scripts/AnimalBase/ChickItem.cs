@@ -39,7 +39,7 @@ public class ChickItem : AnimalBase
             });
         }
         
-        Debug.Log($"小鸡已激活，当前位置网格: {mapItem.gridPos}");
+        //Debug.Log($"小鸡已激活，当前位置网格: {mapItem.gridPos}");
     }
     
 

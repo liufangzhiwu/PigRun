@@ -158,7 +158,7 @@ public class SetPanel : UIBase
     {
         Map.Instance.ClearAllItems();
         
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.1f);
         
         GameManager.instance.StartGamePanel();
         
