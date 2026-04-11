@@ -17,6 +17,12 @@ namespace PigGame
             LevelButton.AddClickAction(ClickLevelButton);
         }
 
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            AudioManager.Instance.PlaySoundEffect("win");
+        }
+
         private void ClickLevelButton()
         {
             UIManager.Instance.HidePanel(PanelType.FinishPanel);

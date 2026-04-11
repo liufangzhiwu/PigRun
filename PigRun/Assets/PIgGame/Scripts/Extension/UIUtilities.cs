@@ -18,6 +18,7 @@ public static class UIUtilities
 
     public static void AddClickAction(this Button targetButton, UnityAction onClickAction, string soundName = "Button", bool includeAnimation = true)
     {
+        
         targetButton.onClick.AddListener(() =>
         {
             if (!string.IsNullOrEmpty(soundName))
@@ -27,10 +28,28 @@ public static class UIUtilities
 
             if (includeAnimation)
             {
-                targetButton.transform.DOScale(new Vector3(0.85f, 0.85f, 0.85f), 0.11f).OnComplete(() =>
+                float delayTime = 0.15f;
+                
+                // targetButton.transform.DOScaleX(0.95f, delayTime).OnComplete(() =>
+                // {
+                //     targetButton.transform.DOScaleX(1.05f, delayTime).OnComplete(() =>
+                //     {
+                //         targetButton.transform.DOScaleX(1f, delayTime);
+                //     });
+                // });
+                // targetButton.transform.DOScaleY(1.05f, delayTime).OnComplete(() =>
+                // {
+                //     targetButton.transform.DOScaleY(0.95f, delayTime).OnComplete(() =>
+                //     {
+                //         targetButton.transform.DOScaleY(1f, delayTime);
+                //         onClickAction?.Invoke();
+                //     });
+                // });
+                
+                targetButton.transform.DOScale(new Vector3(0.85f, 0.85f, 0.85f), delayTime).OnComplete(() =>
                 {
                     onClickAction?.Invoke();
-                    targetButton.transform.DOScale(Vector3.one, 0.11f);
+                    targetButton.transform.DOScale(Vector3.one, delayTime);
                 });
             }
             else

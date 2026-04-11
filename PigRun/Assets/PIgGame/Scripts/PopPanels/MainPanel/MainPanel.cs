@@ -15,7 +15,7 @@ namespace PigGame
         // Start is called before the first frame update
         void Start()
         {
-            LevelButton.onClick.AddListener(ClickLevelButton);
+            LevelButton.AddClickAction(ClickLevelButton);
         }
 
         protected override void OnEnable()
