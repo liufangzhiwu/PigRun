@@ -301,6 +301,15 @@ public class Map : MonoBehaviour
         mi.animalType = it.animalType;
         mi.boomTime = it.boomTime;
 
+        // 如果是障碍物，添加点击处理器
+        if (it.animalType == -1)
+        {
+            if (obj.GetComponent<ObstacleClickHandler>() == null)
+                obj.AddComponent<ObstacleClickHandler>();
+            
+            mi.obstacleIdType = it.obstacleIdType;  // 确保 MapItem 有此字段
+        }
+
         int id = nextId++;
         mi.id = id;
 
@@ -314,17 +323,20 @@ public class Map : MonoBehaviour
             baseRotation = baseRot,
             occupiedCells = ComputeOccupiedCells(it.gridPos, it.info, it.rotIndex)
         };
-        items[id] = placed;
+        if (it.animalType != -1)
+        {
+            items[id] = placed;
+        }
         MarkArea(placed);
 
-        // 关联药牛和病驴（特殊逻辑）
-        if ((AnimalType)it.animalType == AnimalType.Cattle)
+        // 关联药牛和病驴（仅对动物有效）
+        if (it.animalType == (int)AnimalType.Cattle)
         {
             medicineCowItem = mi.info.prefab.GetComponent<MedicineCowItem>();
             if (medicineCowItem != null && sickDonkeyItem != null)
                 medicineCowItem.SetLinkedDonkey(sickDonkeyItem);
         }
-        if ((AnimalType)it.animalType == AnimalType.Donkey)
+        if (it.animalType == (int)AnimalType.Donkey)
         {
             sickDonkeyItem = mi.info.prefab.GetComponent<SickDonkeyItem>();
             if (sickDonkeyItem != null && medicineCowItem != null)

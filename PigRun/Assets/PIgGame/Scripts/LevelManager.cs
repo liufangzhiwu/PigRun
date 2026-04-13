@@ -107,7 +107,7 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     private PrefabInfo LoadObstaclePrefabInfo(int obstacleId)
     {
-        if (animalPrefabCache.TryGetValue(obstacleId, out var cached))
+        if (obstaclePrefabCache.TryGetValue(obstacleId, out var cached))
             return cached;
 
         string path = $"Prefabs/ObstacleIds/Type_{obstacleId}";
@@ -117,7 +117,7 @@ public class LevelManager : MonoBehaviour
             Debug.LogError($"无法加载障碍物预制体: {path}");
             return null;
         }
-        animalPrefabCache[obstacleId] = info;
+        obstaclePrefabCache[obstacleId] = info;
         return info;
     }
 
@@ -164,13 +164,13 @@ public class LevelManager : MonoBehaviour
         {
             foreach (var obs in level.obstacleGroup)
             {
-                PrefabInfo info = LoadObstaclePrefabInfo((int)obs.type);
+                PrefabInfo info = LoadObstaclePrefabInfo(obs.id);
                 if (info == null) continue;
 
                 MapData.MapItemData item = new MapData.MapItemData();
                 item.info = info;
                 item.animalType = -1;   // 标记为障碍物
-                item.obstacleIdType = (int)obs.type;   // 障碍物类型
+                item.obstacleIdType =obs.id;   // 障碍物类型
                 item.boomTime = 0;
 
                 int gridX = Mathf.RoundToInt((obs.position.x - mapData.origin.x) / cellSize);

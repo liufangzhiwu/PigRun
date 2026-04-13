@@ -24,6 +24,7 @@ public class MapItem : MonoBehaviour
     public int rotIndex;
     public int id;
     public int animalType;
+    public int obstacleIdType;
     public int boomTime;
     // 预制体的初始旋转（作为世界 Y 轴叠加的基底）
     public Quaternion baseRotation;
