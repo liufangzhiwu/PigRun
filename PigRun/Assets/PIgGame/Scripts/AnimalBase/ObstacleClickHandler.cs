@@ -19,9 +19,16 @@ public class ObstacleClickHandler : MonoBehaviour
 
         // 获取障碍物类型ID（如果存储了）
         int typeId = mapItem.obstacleIdType;
-        string obstacleName = GetObstacleName(typeId);
-
-        MessageSystem.Instance.ShowTip($"{obstacleName} 是障碍物，无法移动！");
+       
+        if (typeId == 4)
+        {
+            MessageSystem.Instance.ShowTip("农场主正在巡逻，动物触碰游戏失败！");
+        }
+        else
+        {
+            string obstacleName = GetObstacleName(typeId);
+            MessageSystem.Instance.ShowTip($"{obstacleName} 是障碍物，无法移动！");
+        }
     }
 
     private string GetObstacleName(int typeId)

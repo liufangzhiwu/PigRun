@@ -55,6 +55,7 @@ MonoBehaviour:
   animalType: 0
   obstacleIdType: 0
   boomTime: 0
+  way: []
   baseRotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!54 &-2356354976258558053
 Rigidbody:
@@ -102,8 +103,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.31321126, y: 0.31938744, z: 0.52727807}
-  m_Center: {x: 0.010048479, y: 0.26090893, z: 0.009132624}
+  m_Size: {x: 0.24260941, y: 0.31938744, z: 0.50507975}
+  m_Center: {x: -0.005225312, y: 0.26090893, z: -0.001966536}
 --- !u!114 &8015123005061291093
 MonoBehaviour:
   m_ObjectHideFlags: 0

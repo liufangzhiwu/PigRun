@@ -38,6 +38,15 @@ public class GameManager : MonoBehaviour
         OnLevelLoaded?.Invoke();
     }
     
+    public void GameOver(bool success)
+    {
+        if (!success)
+        {
+            // 显示失败界面
+            UIManager.Instance.ShowPanel(PanelType.FailPanel);
+        }
+    }
+    
     
     public void StartGamePanel()
     {

@@ -16,6 +16,7 @@ public class MovingObstacle : MonoBehaviour
     private Vector2Int targetGrid;
     private Vector3 targetWorldPos;
     private bool isMoving = false;
+    private bool hasCausedGameOver = false; // 防止重复触发游戏结束
 
     void Start()
     {
@@ -35,17 +36,6 @@ public class MovingObstacle : MonoBehaviour
             waypoints.Add(new Vector2Int((int)wp.x, (int)wp.y));
         }
 
-        // // 确保初始位置是第一个路径点
-        // Vector2Int firstGrid = mapItem.gridPos;
-        // if (mapItem.gridPos != firstGrid)
-        // {
-        //     mapItem.gridPos = firstGrid;
-        //     var dims = map.FootprintDims(mapItem.info, mapItem.rotIndex);
-        //     var anchor = map.StartFromPivot(firstGrid, mapItem.info, mapItem.rotIndex);
-        //     transform.position = map.FootprintWorldCenter(anchor, dims);
-        //     UpdateGridPosition(firstGrid);
-        // }
-
         // 延迟启动移动
         StartCoroutine(DelayedStart());
     }
@@ -54,7 +44,7 @@ public class MovingObstacle : MonoBehaviour
     {
         yield return new WaitForSeconds(startDelay);
         SetNextTarget();
-        isMoving = true; // 开始移动
+        isMoving = true;
     }
 
     void Update()
@@ -168,6 +158,22 @@ public class MovingObstacle : MonoBehaviour
             for (int r = 0; r < dims.x; r++)
                 for (int c = 0; c < dims.y; c++)
                     map.occupancy[anchor.x + r, anchor.y + c] = -1;
+        }
+    }
+
+    // ==================== 碰撞检测逻辑 ====================
+    private void OnTriggerEnter(Collider other)
+    {
+        // 如果已经触发过游戏结束，不再重复触发
+        if (hasCausedGameOver) return;
+
+        // 检测碰撞对象是否为动物
+        AnimalBase animal = other.GetComponent<AnimalBase>();
+        if (animal != null)
+        {
+            hasCausedGameOver = true;
+            // 触发游戏失败
+            GameManager.instance.GameOver(false);
         }
     }
 }
