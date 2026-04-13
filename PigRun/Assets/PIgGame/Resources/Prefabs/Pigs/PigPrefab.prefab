@@ -1,12 +1,12 @@
 %YAML 1.1
-%TAG !u! tag:yousandi.cn,2023:
+%TAG !u! tag:unity3d.com,2011:
 --- !u!1 &6647560384166464273
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 7
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4437194010975269772}
   - component: {fileID: 6728409668075640222}
@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 5838655706163292422}
   - component: {fileID: 8939642119794021110}
   m_Layer: 0
-  m_HasEditorInfo: 1
   m_Name: PigPrefab
   m_TagString: Pig
   m_Icon: {fileID: 0}
@@ -556,6 +555,26 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 8b60ae89f660b744d8789ab5caade630, type: 2}
+    - target: {fileID: -744284019329448609, guid: ee8f501006f6f3242966312b017194cb,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -744284019329448609, guid: ee8f501006f6f3242966312b017194cb,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -744284019329448609, guid: ee8f501006f6f3242966312b017194cb,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -744284019329448609, guid: ee8f501006f6f3242966312b017194cb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: ee8f501006f6f3242966312b017194cb,
         type: 3}
       propertyPath: m_Name
@@ -592,7 +611,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
 --- !u!95 &3421955766904073414
 Animator:
-  serializedVersion: 6
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -603,8 +622,6 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 4de708b70175c014787a4d50c43a7f4e, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_UpdateFrequencyMode: 0
-  m_UpdateFrequency: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
