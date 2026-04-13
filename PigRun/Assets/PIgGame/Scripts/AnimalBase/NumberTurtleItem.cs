@@ -95,9 +95,6 @@ public class NumberTurtleItem : AnimalBase
         // 播放跑出音效
         //AudioManager.Instance.PlaySoundEffect(escapeSound);
         
-        // 显示进度特效
-        ShowProgressEffect();
-        
         Debug.Log($"乌龟见证第 {currentEscapes}/{requiredEscapes} 只动物跑出");
         
         // 检查是否达到所需数量
@@ -117,8 +114,8 @@ public class NumberTurtleItem : AnimalBase
         {
             if (isComplete)
             {
-                numberText.text = "✓";
-                numberText.color = completedColor;
+                numberText.gameObject.SetActive(false);
+                animator.SetBool("IsUnlock", true);
             }
             else
             {
@@ -168,7 +165,7 @@ public class NumberTurtleItem : AnimalBase
         UpdateNumberDisplay();
         
         // 播放完成特效
-        ShowCompleteEffect();
+        //ShowCompleteEffect();
         
         // 播放完成音效
         //AudioManager.Instance.PlaySoundEffect(completeSound);

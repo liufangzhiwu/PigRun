@@ -13,7 +13,7 @@ public class IdleState : AnimalBase.IAnimalState
     {
         idleTimer = 0f;
         animal.animator.SetBool("IsRun", false);
-        animal.idleFidgetDelay = Random.Range(10, 200);
+        animal.idleFidgetDelay = Random.Range(10, 100);
     }
 
     public void Update()
