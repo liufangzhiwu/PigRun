@@ -11,7 +11,7 @@ public class LevelData
     public CameraPosition cameraPos;         // 相机位置
     public CameraAngle cameraAngle;          // 相机角度
     public List<PigData> pigGroup;           // 猪的列表
-    public List<object> obstacleGroup;       // 障碍物（空数组）
+    public List<ObstacleData> obstacleGroup;       // 障碍物（空数组）
     public float roadSpeed;                     // 道路速度
     public bool is2Dir;                        // 是否双方向
     public bool isEatAnim;                     // 是否有吃动画
@@ -42,6 +42,15 @@ public class PigData
     public Position position;
     public float angle;      // 旋转角度（0/90/180/270）
     public float type;        // 猪的类型，对应不同预制体
+    public float boomTime;    // 爆炸时间（可能未使用）
+}
+
+[System.Serializable]
+public class ObstacleData
+{
+    public Position position;
+    public float angle;      // 旋转角度（0/90/180/270）
+    public float type;        // 障碍物的类型，对应不同预制体
     public float boomTime;    // 爆炸时间（可能未使用）
 }
 

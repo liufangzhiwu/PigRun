@@ -15,8 +15,9 @@ public class LevelManager : MonoBehaviour
     public string LevelName = "level";
     public float cellSize = 1f;
 
-    // 缓存已加载的 PrefabInfo，避免重复从 Resources 加载
-    private Dictionary<int, PrefabInfo> prefabInfoCache = new Dictionary<int, PrefabInfo>();
+    // 缓存
+    private Dictionary<int, PrefabInfo> animalPrefabCache = new Dictionary<int, PrefabInfo>();
+    private Dictionary<int, PrefabInfo> obstaclePrefabCache = new Dictionary<int, PrefabInfo>();
 
     private void Awake()
     {
@@ -26,14 +27,12 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+
     private void OnEnable()
     {
         LoadLevel(GameDataManager.Instance.UserData.LevelIndex);
     }
 
-    /// <summary>
-    /// 加载关卡（异步协程，分批实例化）
-    /// </summary>
     public void LoadLevel(int levelid)
     {
         StartCoroutine(LoadLevelCoroutine(levelid));
@@ -41,12 +40,11 @@ public class LevelManager : MonoBehaviour
 
     private IEnumerator LoadLevelCoroutine(int levelid)
     {
-        // 1. 加载并解析 JSON
         string fileName = LevelName + levelid;
         TextAsset levelTextAsset = AssetBundleLoader.SharedInstance.LoadTextFile("levels", fileName);
         MapData mapData = ParseToMapData(levelTextAsset.ToString(), cellSize);
 
-        // 2. 准备地图（清空、重置占用表等）
+        // 清空并重置地图
         Map.Instance.ClearAllItems();
         int targetWidth = mapData.rows;
         int gridSize = Map.Instance.GetClosestGridSize(targetWidth);
@@ -61,7 +59,7 @@ public class LevelManager : MonoBehaviour
         Map.Instance.origin = mapData.origin;
         Map.Instance.LevelFinish = false;
 
-        // 3. 分批实例化物品
+        // 分批实例化所有物品（动物 + 障碍物）
         List<MapData.MapItemData> itemsToLoad = mapData.items;
         int totalCount = itemsToLoad.Count;
         int batchSize = 3;
@@ -78,41 +76,51 @@ public class LevelManager : MonoBehaviour
             yield return null;
         }
 
-        // 4. 所有物品加载完成，适配屏幕并触发事件
         Map.Instance.FitMapToScreen(new Vector2(0.53f, 0.48f));
         Map.Instance.OnLoadNewMapEvent();
 
-        Debug.Log($"关卡 {levelid} 加载完成，共 {totalCount} 个动物");
+        Debug.Log($"关卡 {levelid} 加载完成，共 {totalCount} 个物体（动物+障碍物）");
         GameManager.instance.OverLevelLoadedEvent();
     }
 
     /// <summary>
-    /// 根据类型 ID 动态加载 PrefabInfo（自动从 Resources 中按规则加载）
+    /// 动态加载动物 PrefabInfo（按路径 Resources/Prefabs/Pigs/Type_{typeId}）
     /// </summary>
-    private PrefabInfo LoadPrefabInfoByType(int typeId)
+    private PrefabInfo LoadAnimalPrefabInfo(int typeId)
     {
-        // 先从缓存查找
-        if (prefabInfoCache.TryGetValue(typeId, out var cached))
+        if (animalPrefabCache.TryGetValue(typeId, out var cached))
             return cached;
 
-        // 构建资源路径，格式：Prefabs/Pigs/Type_{typeId}
-        // 注意：根据你的目录结构，Type_0, Type_1, ... 等预制体直接放在 Prefabs/Pigs 下
         string path = $"Prefabs/Pigs/Type_{typeId}";
-        PrefabInfo loadedInfo = Resources.Load<PrefabInfo>(path);
-        if (loadedInfo == null)
+        PrefabInfo info = Resources.Load<PrefabInfo>(path);
+        if (info == null)
         {
-            Debug.LogError($"无法加载PrefabInfo预制体，路径: {path}");
+            Debug.LogError($"无法加载动物预制体: {path}");
             return null;
         }
-
-        // 缓存并返回
-        prefabInfoCache[typeId] = loadedInfo;
-        return loadedInfo;
+        animalPrefabCache[typeId] = info;
+        return info;
     }
 
     /// <summary>
-    /// 将 JSON 字符串转换为 MapData（自动加载 PrefabInfo）
+    /// 加载障碍物 PrefabInfo（从 Inspector 映射表）
     /// </summary>
+    private PrefabInfo LoadObstaclePrefabInfo(int obstacleId)
+    {
+        if (animalPrefabCache.TryGetValue(obstacleId, out var cached))
+            return cached;
+
+        string path = $"Prefabs/ObstacleIds/Type_{obstacleId}";
+        PrefabInfo info = Resources.Load<PrefabInfo>(path);
+        if (info == null)
+        {
+            Debug.LogError($"无法加载障碍物预制体: {path}");
+            return null;
+        }
+        animalPrefabCache[obstacleId] = info;
+        return info;
+    }
+
     private MapData ParseToMapData(string jsonContent, float cellSize)
     {
         LevelData level = JsonConvert.DeserializeObject<LevelData>(jsonContent);
@@ -125,27 +133,58 @@ public class LevelManager : MonoBehaviour
         mapData.version = "1.0";
         mapData.items = new List<MapData.MapItemData>();
 
+        // ---- 处理动物 ----
         foreach (var pig in level.pigGroup)
         {
             int typeId = (int)pig.type;
-            PrefabInfo info = LoadPrefabInfoByType(typeId);
+            PrefabInfo info = LoadAnimalPrefabInfo(typeId);
             if (info == null) continue;
 
             MapData.MapItemData item = new MapData.MapItemData();
             item.info = info;
+            item.animalType = typeId;   // 正数表示动物
+            item.boomTime = (int)pig.boomTime;
 
             int gridX = Mathf.RoundToInt((pig.position.x - mapData.origin.x) / cellSize);
             int gridY = Mathf.RoundToInt((pig.position.y - mapData.origin.y) / cellSize);
-            item.rotIndex = ((int)pig.angle / 90 - 1) % 4;
-            item.animalType = typeId;
-            item.boomTime = (int)pig.boomTime;
+            // 注意：动物角度映射特殊处理 (angle/90 - 1) % 4
+            int rotIndex = ((int)pig.angle / 90 - 1) % 4;
+            item.rotIndex = rotIndex;
 
-            if (item.rotIndex == -1) // 0度
+            if (item.rotIndex == -1)
                 item.gridPos = new Vector2Int(gridX - 1, gridY - 1);
             else
                 item.gridPos = new Vector2Int(gridX, gridY);
 
             mapData.items.Add(item);
+        }
+
+        // ---- 处理障碍物 ----
+        if (level.obstacleGroup != null)
+        {
+            foreach (var obs in level.obstacleGroup)
+            {
+                PrefabInfo info = LoadObstaclePrefabInfo((int)obs.type);
+                if (info == null) continue;
+
+                MapData.MapItemData item = new MapData.MapItemData();
+                item.info = info;
+                item.animalType = -1;   // 标记为障碍物
+                item.obstacleIdType = (int)obs.type;   // 障碍物类型
+                item.boomTime = 0;
+
+                int gridX = Mathf.RoundToInt((obs.position.x - mapData.origin.x) / cellSize);
+                int gridY = Mathf.RoundToInt((obs.position.y - mapData.origin.y) / cellSize);
+                // 障碍物旋转：直接 angle/90，无偏移
+                int rotIndex = ((int)obs.angle / 90) % 4;
+                item.rotIndex = rotIndex;
+
+                // 障碍物锚点：假定锚点在中心（或按 PrefabInfo 的 pivot 计算）
+                // 为了简化，直接使用计算出的网格作为锚点，具体占用由 ComputeOccupiedCells 根据 PrefabInfo.rows/cols 决定
+                item.gridPos = new Vector2Int(gridX, gridY);
+
+                mapData.items.Add(item);
+            }
         }
 
         return mapData;

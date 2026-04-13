@@ -365,7 +365,7 @@
         "y": 17.0
       },
       "angle": 0,
-      "type": 13,
+      "type": 12,
       "boomTime": 0
     },
     {
@@ -374,7 +374,7 @@
         "y": 20.0
       },
       "angle": 0,
-      "type": 13,
+      "type": 12,
       "boomTime": 0
     },
     {
@@ -383,7 +383,7 @@
         "y": 32.0
       },
       "angle": 0,
-      "type": 13,
+      "type": 12,
       "boomTime": 0
     },
     {
@@ -392,7 +392,7 @@
         "y": 35.0
       },
       "angle": 0,
-      "type": 13,
+      "type": 12,
       "boomTime": 0
     },
     {
@@ -401,7 +401,7 @@
         "y": 35.0
       },
       "angle": 0,
-      "type": 13,
+      "type": 12,
       "boomTime": 0
     }
   ],
