@@ -333,7 +333,7 @@ public class Map : MonoBehaviour
             baseRotation = baseRot,
             occupiedCells = ComputeOccupiedCells(it.gridPos, it.info, it.rotIndex)
         };
-        if (it.animalType != -1)
+        if (it.animalType != -1&&it.animalType != 13)
         {
             items[id] = placed;
         }
