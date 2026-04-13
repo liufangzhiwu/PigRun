@@ -19,7 +19,7 @@ public class Map : MonoBehaviour
     [Header("地图网格")]
     public int rows = 10;
     public int cols = 10;
-    private float cellSize = 0.18f;          // 每个网格的单位尺寸（世界单位）
+    public float cellSize = 0.18f;          // 每个网格的单位尺寸（世界单位）
     public Vector3 origin;                   // 地图原点（本地坐标）
 
     /// <summary>所有地图项被销毁时触发的事件（关卡完成）</summary>
@@ -137,7 +137,7 @@ public class Map : MonoBehaviour
     }
 
     /// <summary>给定锚点网格坐标，计算占用矩形的左下角起点（anchor）</summary>
-    private Vector2Int StartFromPivot(Vector2Int pivotGrid, PrefabInfo info, int rotIndex)
+    public Vector2Int StartFromPivot(Vector2Int pivotGrid, PrefabInfo info, int rotIndex)
     {
         var dims0 = info != null ? new Vector2Int(info.rows, info.cols) : Vector2Int.one;
         var pivR = RotatedPivot(rotIndex, dims0);
@@ -146,7 +146,7 @@ public class Map : MonoBehaviour
 
     // ==================== 预计算占用格子 ====================
     /// <summary>计算物品占用的所有网格坐标（用于快速更新占用表）</summary>
-    private List<Vector2Int> ComputeOccupiedCells(Vector2Int pivotGrid, PrefabInfo info, int rotIndex)
+    public List<Vector2Int> ComputeOccupiedCells(Vector2Int pivotGrid, PrefabInfo info, int rotIndex)
     {
         var dims = FootprintDims(info, rotIndex);
         var anchor = StartFromPivot(pivotGrid, info, rotIndex);
@@ -159,14 +159,14 @@ public class Map : MonoBehaviour
 
     // ==================== 高效占用表更新 ====================
     /// <summary>标记物品占用的所有格子</summary>
-    private void MarkArea(PlacedItem item)
+    public void MarkArea(PlacedItem item)
     {
         foreach (var cell in item.occupiedCells)
             occupancy[cell.x, cell.y] = item.id;
     }
 
     /// <summary>清除物品占用的所有格子（设为 -1）</summary>
-    private void ClearArea(PlacedItem item)
+    public void ClearArea(PlacedItem item)
     {
         foreach (var cell in item.occupiedCells)
             occupancy[cell.x, cell.y] = -1;
@@ -190,6 +190,15 @@ public class Map : MonoBehaviour
         float lz = (grid.x + 0.5f) * cellSize + origin.z;
         var local = new Vector3(lx, origin.y, lz);
         return transform.TransformPoint(local);
+    }
+    
+    /// <summary>将世界坐标转换为网格坐标</summary>
+    public Vector2Int WorldToGrid(Vector3 worldPos)
+    {
+        Vector3 localPos = transform.InverseTransformPoint(worldPos);
+        int gridX = Mathf.RoundToInt((localPos.z - origin.z) / cellSize);
+        int gridY = Mathf.RoundToInt((localPos.x - origin.x) / cellSize);
+        return new Vector2Int(gridX, gridY);
     }
 
     /// <summary>计算占用矩形的几何中心世界坐标</summary>
@@ -308,6 +317,7 @@ public class Map : MonoBehaviour
                 obj.AddComponent<ObstacleClickHandler>();
             
             mi.obstacleIdType = it.obstacleIdType;  // 确保 MapItem 有此字段
+            mi.way = it.way;  // 确保 MapItem 有此字段
         }
 
         int id = nextId++;

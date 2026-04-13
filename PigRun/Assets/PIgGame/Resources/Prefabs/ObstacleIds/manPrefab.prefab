@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: -2356354976258558053}
   - component: {fileID: 5838655706163292422}
   - component: {fileID: 8015123005061291093}
+  - component: {fileID: 5533272945541854167}
   m_Layer: 0
   m_Name: manPrefab
   m_TagString: Pig
@@ -55,6 +56,7 @@ MonoBehaviour:
   animalType: 0
   obstacleIdType: 0
   boomTime: 0
+  way: []
   baseRotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!54 &-2356354976258558053
 Rigidbody:
@@ -116,6 +118,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f56ab5be7466b154f9352242cf053d0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5533272945541854167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6647560384166464273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1702aaaff2118f448820084e322cbd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 1
+  loop: 1
+  startDelay: 1
 --- !u!1001 &6651757663166533150
 PrefabInstance:
   m_ObjectHideFlags: 0

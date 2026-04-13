@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum AnimalType
@@ -26,6 +27,7 @@ public class MapItem : MonoBehaviour
     public int animalType;
     public int obstacleIdType;
     public int boomTime;
+    public List<Position> way;
     // 预制体的初始旋转（作为世界 Y 轴叠加的基底）
     public Quaternion baseRotation;
     #endregion

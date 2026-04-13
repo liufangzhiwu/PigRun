@@ -171,6 +171,7 @@ public class LevelManager : MonoBehaviour
                 item.info = info;
                 item.animalType = -1;   // 标记为障碍物
                 item.obstacleIdType =obs.id;   // 障碍物类型
+                item.way =obs.way;   // 障碍物类型
                 item.boomTime = 0;
 
                 int gridX = Mathf.RoundToInt((obs.position.x - mapData.origin.x) / cellSize);

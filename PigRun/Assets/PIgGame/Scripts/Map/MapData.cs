@@ -37,6 +37,7 @@ public class MapData : ScriptableObject
         public int rotIndex;
         public int animalType;
         public int obstacleIdType;
+        public List<Position> way; // 路径点（某些障碍物可能有移动路径）
         public int boomTime;
     }
     #endregion
