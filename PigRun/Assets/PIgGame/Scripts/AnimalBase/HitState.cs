@@ -16,15 +16,34 @@ public class HitState : AnimalBase.IAnimalState
     {
         animal.animator.SetBool(IsHitHash, true);
         AudioManager.Instance.PlaySoundEffect("jump");
-        
-        // 延迟 0.5s 关闭受击动画
-        DOVirtual.DelayedCall(0.5f, () => {
-            animal.animator.SetBool(IsHitHash, false);
-            // 再延迟 0.5s 切换回闲置状态
+
+        if (animal.MapItem.animalType == (int)AnimalType.Kangaroo)
+        {
+            if (!animal.GetComponent<KangarooItem>().isMoveTarget)
+            {
+                // 延迟 0.5s 关闭受击动画
+                DOVirtual.DelayedCall(0.5f, () => {
+                    animal.animator.SetBool(IsHitHash, false);
+                    // 再延迟 0.5s 切换回闲置状态
+                    DOVirtual.DelayedCall(0.5f, () => {
+                        animal.ChangeState(new IdleState(animal));
+                    });
+                });
+            }
+        }
+        else
+        {
+            // 延迟 0.5s 关闭受击动画
             DOVirtual.DelayedCall(0.5f, () => {
-                animal.ChangeState(new IdleState(animal));
+                animal.animator.SetBool(IsHitHash, false);
+                // 再延迟 0.5s 切换回闲置状态
+                DOVirtual.DelayedCall(0.5f, () => {
+                    animal.ChangeState(new IdleState(animal));
+                });
             });
-        });
+        }
+        
+      
     }
 
     public void Update() { }

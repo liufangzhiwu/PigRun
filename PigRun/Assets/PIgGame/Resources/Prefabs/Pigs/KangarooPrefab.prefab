@@ -120,12 +120,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 8539879991609704185}
   runParticleSystem: {fileID: 2651393495807241011}
-  speed: 4
+  speed: 3
   idleFidgetDelay: 30
   currentRunway: {fileID: 0}
   currentSegmentIndex: 0
   bounceHeight: 1
   bounceDuration: 0.3
+  isMoveTarget: 0
 --- !u!1001 &2579590395576219095
 PrefabInstance:
   m_ObjectHideFlags: 0

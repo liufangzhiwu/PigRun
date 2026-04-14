@@ -582,6 +582,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bb920aca96b6624b9fd8bb94544b729, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  toolImage: {fileID: 979032961901873078}
   tipText: {fileID: 2281023997325239887}
   toolNameText: {fileID: 7450388669929300761}
   goldButton: {fileID: 5877720491972443609}

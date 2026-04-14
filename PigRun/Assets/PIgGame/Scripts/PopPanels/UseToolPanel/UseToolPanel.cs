@@ -13,6 +13,7 @@ public enum ToolType
 
 public class UseToolPanel : UIBase
 {
+    [SerializeField] private Image toolImage;
     [SerializeField] private Text tipText;
     [SerializeField] private Text toolNameText;
     [SerializeField] private Button goldButton;
@@ -61,14 +62,17 @@ public class UseToolPanel : UIBase
             case ToolType.Remove:
                 toolNameText.text = "移除";
                 tipText.text = "将2只动物移除";
+                toolImage.sprite = AssetBundleLoader.SharedInstance.GetSpriteFromAtlas("removeicon");
                 break;
             case ToolType.Shuffle:
                 toolNameText.text = "洗牌";
-                tipText.text = "洗牌道具\n点击[使用]后,4只动物随机反转";
+                tipText.text = "重新摆放棋盘动物";
+                toolImage.sprite = AssetBundleLoader.SharedInstance.GetSpriteFromAtlas("shuffleicon");
                 break;
             case ToolType.Reverse:
                 toolNameText.text = "翻转";
-                tipText.text = "翻转道具\n可翻转地图中所有动物的方向";
+                tipText.text = "任意翻转1个动物方向";
+                toolImage.sprite = AssetBundleLoader.SharedInstance.GetSpriteFromAtlas("reverseicon");
                 break;
         }
     }

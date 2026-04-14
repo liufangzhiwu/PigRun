@@ -88,6 +88,14 @@ public abstract class AnimalBase : MonoBehaviour
     {
         ChangeState(new HitState(this));
     }
+    
+    /// <summary>
+    /// 有目标对象的自身撞击障碍时调用（内部触发）
+    /// </summary>
+    public virtual void TargetHitSelf()
+    {
+        ChangeState(new HitState(this));
+    }
 
     /// <summary>
     /// 切换状态

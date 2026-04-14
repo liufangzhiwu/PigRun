@@ -45,13 +45,28 @@ public class MovingState : AnimalBase.IAnimalState
             {
                 float step = animal.Speed * Time.deltaTime;
                 animal.transform.position = Vector3.MoveTowards(animal.transform.position, targetPosition, step);
-
-                if (Vector3.Distance(animal.transform.position, targetPosition) < 0.05f)
+                if (animal.MapItem.animalType == (int)AnimalType.Kangaroo)
                 {
-                    animal.HitSelf();
-                    animal.BehitItem?.BeHit();
-                    animal.runParticleSystem.Stop();
+                    bool isMoveTarget = animal.GetComponent<KangarooItem>().isMoveTarget;
+
+                    if (Vector3.Distance(animal.transform.position, targetPosition) < 0.01f&&!isMoveTarget)
+                    {
+                        animal.TargetHitSelf();
+                        animal.BehitItem?.BeHit();
+                        animal.runParticleSystem.Stop();
+                    }
                 }
+                else
+                {
+                    if (Vector3.Distance(animal.transform.position, targetPosition) < 0.05f)
+                    {
+                        animal.TargetHitSelf();
+                        animal.BehitItem?.BeHit();
+                        animal.runParticleSystem.Stop();
+                    }
+                }
+                
+              
             }
             else
             {
