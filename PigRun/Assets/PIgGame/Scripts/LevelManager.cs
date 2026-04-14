@@ -164,13 +164,13 @@ public class LevelManager : MonoBehaviour
         {
             foreach (var obs in level.obstacleGroup)
             {
-                PrefabInfo info = LoadObstaclePrefabInfo(obs.id);
+                PrefabInfo info = LoadObstaclePrefabInfo((int)obs.id);
                 if (info == null) continue;
 
                 MapData.MapItemData item = new MapData.MapItemData();
                 item.info = info;
                 item.animalType = -1;   // 标记为障碍物
-                item.obstacleIdType =obs.id;   // 障碍物类型
+                item.obstacleIdType =(int)obs.id;   // 障碍物类型
                 item.way =obs.way;   // 障碍物类型
                 item.boomTime = 0;
 

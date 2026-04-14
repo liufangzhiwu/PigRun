@@ -50,8 +50,8 @@ public class ObstacleData
 {
     public Position position;
     public float angle;      // 旋转角度（0/90/180/270）
-    public int id;           // 障碍物类型 ID（映射到预制体）
-    public int num;          // 数量（可能未使用）
+    public float id;           // 障碍物类型 ID（映射到预制体）
+    public float num;          // 数量（可能未使用）
     public List<Position> way; // 路径点（某些障碍物可能有移动路径）
 }
 
