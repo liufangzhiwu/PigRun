@@ -172,10 +172,10 @@ public abstract class AnimalBase : MonoBehaviour
                     // 根据旋转调整目标格子（原有逻辑）
                     switch (mapItem.rotIndex)
                     {
-                        case 0: break;
-                        case 1: checkGrid = new Vector2Int(checkGrid.x + 1, checkGrid.y); break;
-                        case 2: checkGrid = new Vector2Int(checkGrid.x + 2, checkGrid.y + 1); break;
-                        default: checkGrid = new Vector2Int(checkGrid.x, checkGrid.y + 1); break;
+                        case 0: checkGrid = new Vector2Int(checkGrid.x, checkGrid.y-1); break;
+                        case 1: checkGrid = new Vector2Int(checkGrid.x + 2, checkGrid.y); break;
+                        case 2: checkGrid = new Vector2Int(checkGrid.x + 2, checkGrid.y + 2); break;
+                        default: checkGrid = new Vector2Int(checkGrid.x - 1, checkGrid.y + 1); break;
                     }
 
                     Vector2Int obstacleGrid = new Vector2Int(checkGrid.x, checkGrid.y);
@@ -192,16 +192,19 @@ public abstract class AnimalBase : MonoBehaviour
         currentGrid = mapItem.gridPos;
         switch (mapItem.rotIndex)
         {
-            case 0: forwardOffset = new Vector2Int(1, 0); break; // 右
+            case 0: forwardOffset = new Vector2Int(1, 0); // 右
+                currentGrid = new Vector2Int(mapItem.gridPos.x, mapItem.gridPos.y+1);
+                break;
             case 1:
-                currentGrid = new Vector2Int(mapItem.gridPos.x - 1, mapItem.gridPos.y);
+                currentGrid = new Vector2Int(mapItem.gridPos.x - 2, mapItem.gridPos.y);
                 forwardOffset = new Vector2Int(0, 1); // 下
                 break;
             case 2:
-                currentGrid = new Vector2Int(mapItem.gridPos.x, mapItem.gridPos.y - 1);
+                currentGrid = new Vector2Int(mapItem.gridPos.x, mapItem.gridPos.y - 2);
                 forwardOffset = new Vector2Int(-1, 0); // 左
                 break;
             default:
+                currentGrid = new Vector2Int(mapItem.gridPos.x+1, mapItem.gridPos.y); 
                 forwardOffset = new Vector2Int(0, -1); // 上
                 break;
         }

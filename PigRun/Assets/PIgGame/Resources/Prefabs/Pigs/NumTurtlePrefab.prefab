@@ -152,7 +152,9 @@ MonoBehaviour:
   rotIndex: 0
   id: 0
   animalType: 0
+  obstacleIdType: 0
   boomTime: 0
+  way: []
   baseRotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!54 &-2356354976258558053
 Rigidbody:
@@ -216,7 +218,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 8702812560301980482}
   runParticleSystem: {fileID: 3936911030254415788}
-  speed: 4
+  speed: 2
   idleFidgetDelay: 30
   currentRunway: {fileID: 0}
   currentSegmentIndex: 0
