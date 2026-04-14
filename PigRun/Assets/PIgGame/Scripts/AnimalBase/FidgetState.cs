@@ -21,6 +21,29 @@ public class FidgetState : AnimalBase.IAnimalState
         animal.animator.SetBool("IsFidget", false);
         animal.ChangeState(new IdleState(animal));
     }
+    
+    public void HandleClick()
+    {
+        if (!(animal.CurrentState is FidgetState)) return;
+        
+        bool hasObstacle = animal.CalculateTargetPosition(out Vector3 targetPos);
+        if (hasObstacle)
+        {
+            if (targetPos != Vector3.zero)
+            {
+                animal.ChangeState(new MovingState(animal, targetPos, false));
+            }
+            else
+            {
+                animal.HitSelf();
+                animal.BehitItem?.BeHit();
+            }
+        }
+        else
+        {
+            animal.ChangeState(new MovingState(animal, Vector3.zero, true));
+        }
+    }
 
     public void Update() { }
     public void Exit() { }

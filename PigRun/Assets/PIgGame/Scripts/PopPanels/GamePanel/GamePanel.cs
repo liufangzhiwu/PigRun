@@ -26,7 +26,7 @@ public class GamePanel : UIBase
 
     private void InitUI()
     {
-        LevelText.text = "关卡" + GameDataManager.Instance.UserData.LevelIndex;
+        LevelText.text = $"第{GameDataManager.Instance.UserData.LevelIndex}关";
     }
     
     void Start()
