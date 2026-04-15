@@ -46,14 +46,14 @@ public class LevelManager : MonoBehaviour
 
         // 清空并重置地图
         Map.Instance.ClearAllItems();
-        int targetWidth = mapData.rows;
+        int targetWidth = mapData.cols;
         int gridSize = Map.Instance.GetClosestGridSize(targetWidth);
 
         Map.Instance.transform.position = Vector3.zero;
         Map.Instance.transform.localScale = Vector3.one;
 
-        Map.Instance.rows = gridSize;
-        Map.Instance.cols = gridSize;
+        Map.Instance.rows = gridSize; // 8*12 或 12*18
+        Map.Instance.cols =(gridSize == 24) ? 36 : 54;   // 8*12 或 12*18
         Map.Instance.ResetOccupancy();
         Map.Instance.dataAsset = mapData;
         Map.Instance.origin = mapData.origin;
