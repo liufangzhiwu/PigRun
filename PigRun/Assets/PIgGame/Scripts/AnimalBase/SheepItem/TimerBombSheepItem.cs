@@ -210,12 +210,12 @@ public class TimerBombSheepItem : AnimalBase
         if (enableTimerMode)
         {
             // 倒计时模式下，根据时间决定颜色
-            if (currentTime <= 3)
-                countText.color = Color.red;
-            else if (currentTime <= 5)
-                countText.color = new Color(1f, 0.5f, 0f); // 橙色
-            else
-                countText.color = Color.yellow;
+            // if (currentTime <= 3)
+            //     countText.color = Color.red;
+            // else if (currentTime <= 5)
+            //     countText.color = new Color(1f, 0.5f, 0f); // 橙色
+            // else
+            //     countText.color = Color.yellow;
         }
     }
     

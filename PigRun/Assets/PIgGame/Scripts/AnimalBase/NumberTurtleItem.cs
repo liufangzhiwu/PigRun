@@ -123,10 +123,10 @@ public class NumberTurtleItem : AnimalBase
                 numberText.text = remaining.ToString();
                 
                 // 根据剩余数量改变颜色
-                if (remaining <= 1)
-                    numberText.color = Color.green;
-                else if (remaining <= 2)
-                    numberText.color = Color.yellow;
+                // if (remaining <= 1)
+                //     numberText.color = Color.green;
+                // else if (remaining <= 2)
+                //     numberText.color = Color.yellow;
             }
         }
     }
@@ -216,7 +216,7 @@ public class NumberTurtleItem : AnimalBase
         // effectObj.AddComponent<Billboard>();
         
         // 创建围绕乌龟的粒子效果
-        StartCoroutine(CreateSurroundingParticles());
+        //StartCoroutine(CreateSurroundingParticles());
     }
     
     /// <summary>

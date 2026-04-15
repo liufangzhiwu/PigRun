@@ -54,7 +54,9 @@ MonoBehaviour:
   rotIndex: 0
   id: 0
   animalType: 0
+  obstacleIdType: 0
   boomTime: 0
+  way: []
   baseRotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!54 &-2356354976258558053
 Rigidbody:
@@ -479,17 +481,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 1ded200f521842d4c9ce01c5f6290613,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.97
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1ded200f521842d4c9ce01c5f6290613,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.97
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1ded200f521842d4c9ce01c5f6290613,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.97
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1ded200f521842d4c9ce01c5f6290613,
         type: 3}

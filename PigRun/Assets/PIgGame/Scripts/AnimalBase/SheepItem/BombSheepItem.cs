@@ -10,7 +10,7 @@ public class BombSheepItem : AnimalBase
 
     private void OnEnable()
     {
-        //CreateCountDisplay();
+        UpdateCountDisplay();
     }
 
     public override void BeHit()
