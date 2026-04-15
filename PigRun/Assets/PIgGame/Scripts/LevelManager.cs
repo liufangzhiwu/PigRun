@@ -95,7 +95,7 @@ public class LevelManager : MonoBehaviour
         PrefabInfo info = Resources.Load<PrefabInfo>(path);
         if (info == null)
         {
-            Debug.LogError($"无法加载动物预制体: {path}");
+            Debug.LogWarning($"无法加载动物预制体: {path}");
             return null;
         }
         animalPrefabCache[typeId] = info;

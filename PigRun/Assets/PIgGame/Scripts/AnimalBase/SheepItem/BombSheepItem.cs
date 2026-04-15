@@ -45,15 +45,15 @@ public class BombSheepItem : AnimalBase
             countText.text = $"{hitCount}";
             
             // 根据碰撞次数改变颜色
-            if (hitCount == 3)
-                countText.color = Color.green;
-            else if (hitCount == 2)
+            //if (hitCount == 3)
+                //countText.color = Color.green;
+            if (hitCount == 2)
             {
-                countText.color = Color.yellow;
+                //countText.color = Color.yellow;
                 UIManager.Instance.ShowPanel(PanelType.TipAnimalPanel);
             }
-            else
-                countText.color = Color.red;
+            //else
+                //countText.color = Color.red;
         }
     }
 

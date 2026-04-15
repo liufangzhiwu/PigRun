@@ -35,7 +35,6 @@ Transform:
   m_Children:
   - {fileID: 4826747926943850720}
   - {fileID: 3839612012993649798}
-  - {fileID: 4184496301843921077}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6728409668075640222
@@ -55,7 +54,9 @@ MonoBehaviour:
   rotIndex: 0
   id: 0
   animalType: 0
+  obstacleIdType: 0
   boomTime: 0
+  way: []
   baseRotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!54 &-2356354976258558053
 Rigidbody:
@@ -154,13 +155,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8069324571547198265}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.4151625, y: 0.57239854, z: -0.4151625, w: 0.57239854}
-  m_LocalPosition: {x: -0.09, y: 0.6217861, z: -0.234}
-  m_LocalScale: {x: 0.08, y: 0.08, z: 0.08}
+  m_LocalRotation: {x: -0.70644087, y: 0.030646635, z: -0.030647477, w: 0.70644385}
+  m_LocalPosition: {x: -0.09898674, y: -0.2924017, z: 0.021998635}
+  m_LocalScale: {x: 0.050000004, y: 0.049999993, z: 0.05}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 4437194010975269772}
-  m_LocalEulerAnglesHint: {x: 71.907, y: 90, z: 0}
+  m_Father: {fileID: 5326751466289741720}
+  m_LocalEulerAnglesHint: {x: -85.63, y: 90, z: -90}
 --- !u!23 &7197809217673333047
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -169,7 +170,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8069324571547198265}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -181,7 +182,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7494a1187570a3e48826a0d72e27e5ba, type: 3}
+  - {fileID: 10100, guid: 0000000000000000e000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -213,15 +214,15 @@ TextMesh:
   m_GameObject: {fileID: 8069324571547198265}
   m_Text: 120s
   m_OffsetZ: 0
-  m_CharacterSize: 1
+  m_CharacterSize: 1.2
   m_LineSpacing: 1
   m_Anchor: 4
   m_Alignment: 0
   m_TabSize: 3
-  m_FontSize: 80
+  m_FontSize: 50
   m_FontStyle: 1
   m_RichText: 1
-  m_Font: {fileID: 12800000, guid: 7494a1187570a3e48826a0d72e27e5ba, type: 3}
+  m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
   m_Color:
     serializedVersion: 2
     rgba: 4278190335
@@ -315,7 +316,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 908276781140129939, guid: 882758be0e18a55458e7f796fc4b4c89,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4184496301843921077}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 882758be0e18a55458e7f796fc4b4c89,
         type: 3}
@@ -355,6 +360,12 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!4 &5326751466289741720 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 908276781140129939, guid: 882758be0e18a55458e7f796fc4b4c89,
+    type: 3}
+  m_PrefabInstance: {fileID: 5005386875329447691}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &9138511124155660537
 PrefabInstance:
   m_ObjectHideFlags: 0
