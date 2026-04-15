@@ -22,6 +22,8 @@ public abstract class AnimalBase : MonoBehaviour
     protected bool isOnRunway;
     
     public readonly int IsRunHash = Animator.StringToHash("IsRun");
+    public readonly int IsHitHash = Animator.StringToHash("IsHit");
+    public readonly int IsBeHitHash = Animator.StringToHash("IsBeHit");
     
     public event Action<AnimalBase> OnAnimalClicked;
 

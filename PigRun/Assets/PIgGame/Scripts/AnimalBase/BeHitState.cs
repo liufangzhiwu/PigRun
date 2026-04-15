@@ -5,44 +5,56 @@ using UnityEngine;
 public class BeHitState : AnimalBase.IAnimalState
 {
     private readonly AnimalBase animal;
-    private static readonly int IsBeHitHash = Animator.StringToHash("IsBeHit");
-    private Tween firstDelay;   // 第一个延迟（关闭动画）
-    private Tween secondDelay;  // 第二个延迟（切换闲置）
+    private Tween firstDelay;   // 延迟回调
 
     public BeHitState(AnimalBase animal)
     {
         this.animal = animal;
     }
 
+    // public void Enter()
+    // {
+    //     // 取消之前的延迟
+    //     if (firstDelay != null && firstDelay.IsActive())
+    //         firstDelay.Kill();
+    //
+    //     // 强制重置动画，确保每次进入都重新播放
+    //     animal.animator.SetBool(animal.IsBeHitHash, false);
+    //     animal.animator.SetBool(animal.IsBeHitHash, true);
+    //
+    //     // 短暂延迟后关闭动画并切换到闲置状态
+    //     firstDelay = DOVirtual.DelayedCall(0.05f, () => {
+    //         animal.animator.SetBool(animal.IsBeHitHash, false);
+    //         if (animal.CurrentState is BeHitState)
+    //             animal.ChangeState(new IdleState(animal));
+    //     });
+    // }
+    
     public void Enter()
     {
-        // 取消之前未完成的延迟
-        if (firstDelay != null && firstDelay.IsActive())
-            firstDelay.Kill();
-        
-        animal.animator.SetBool(IsBeHitHash, true);
+        firstDelay?.Kill();
 
-        // 延迟 0.5 秒关闭受击动画
-        firstDelay = DOVirtual.DelayedCall(0.03f, () => {
-            animal.animator.SetBool(IsBeHitHash, false);
-                // 仅当当前状态仍然是 BeHitState 时才切换，避免覆盖其他状态
-                if (animal.CurrentState is BeHitState)
-                    animal.ChangeState(new IdleState(animal));
+        // 直接播放指定状态，0 为层级，0 为过渡归一化时间（立即播放）
+        animal.animator.Play("BeHit", 0, 0f);
+        //AudioManager.Instance.PlaySoundEffect("jump");
+
+        firstDelay = DOVirtual.DelayedCall(1f, () =>
+        {
+            if (animal.CurrentState is BeHitState)
+                animal.ChangeState(new IdleState(animal));
         });
     }
 
     public void HandleClick()
     {
-        animal.animator.SetBool(IsBeHitHash, false);
-        // 取消所有延迟回调，防止后续强制切换回闲置
+        // 点击时取消延迟并立即响应移动
         if (firstDelay != null && firstDelay.IsActive())
             firstDelay.Kill();
-        if (secondDelay != null && secondDelay.IsActive())
-            secondDelay.Kill();
         firstDelay = null;
-        secondDelay = null;
 
-        // 执行移动逻辑（与原来相同）
+        // 先关闭动画参数，避免残留
+        //animal.animator.SetBool(animal.IsBeHitHash, false);
+
         bool hasObstacle = animal.CalculateTargetPosition(out Vector3 targetPos);
         if (hasObstacle)
         {
@@ -66,12 +78,8 @@ public class BeHitState : AnimalBase.IAnimalState
 
     public void Exit()
     {
-        // 退出状态时也取消延迟，避免残留
         if (firstDelay != null && firstDelay.IsActive())
             firstDelay.Kill();
-        if (secondDelay != null && secondDelay.IsActive())
-            secondDelay.Kill();
         firstDelay = null;
-        secondDelay = null;
     }
 }

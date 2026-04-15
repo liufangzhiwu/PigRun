@@ -5,29 +5,42 @@ using UnityEngine;
 public class HitState : AnimalBase.IAnimalState
 {
     private readonly AnimalBase animal;
-    private static readonly int IsHitHash = Animator.StringToHash("IsHit");
-    private Tween firstDelay;   // 关闭动画的延迟
+    private Tween firstDelay;   // 延迟回调
 
     public HitState(AnimalBase animal) 
     { 
         this.animal = animal; 
     }
 
+    // public void Enter()
+    // {
+    //     // 取消之前的延迟
+    //     if (firstDelay != null && firstDelay.IsActive())
+    //         firstDelay.Kill();
+    //
+    //     // 强制重置动画，确保每次进入都重新播放
+    //     animal.animator.SetBool(animal.IsHitHash, false);
+    //     animal.animator.SetBool(animal.IsHitHash, true);
+    //     AudioManager.Instance.PlaySoundEffect("jump");
+    //
+    //     // 短暂延迟后关闭动画并切换到闲置状态
+    //     firstDelay = DOVirtual.DelayedCall(0.05f, () => {
+    //         animal.animator.SetBool(animal.IsHitHash, false);
+    //         if (animal.CurrentState is HitState)
+    //             animal.ChangeState(new IdleState(animal));
+    //     });
+    // }
+    
     public void Enter()
     {
-        // 取消之前未完成的延迟
-        if (firstDelay != null && firstDelay.IsActive())
-            firstDelay.Kill();
+        firstDelay?.Kill();
 
-        // 强制重置动画参数，确保每次撞击都重新播放动画
-        animal.animator.SetBool(IsHitHash, false);
-        animal.animator.SetBool(IsHitHash, true);
+        // 直接播放指定状态，0 为层级，0 为过渡归一化时间（立即播放）
+        animal.animator.Play("Hit", 0, 0f);
         AudioManager.Instance.PlaySoundEffect("jump");
 
-        // 0.05秒后关闭受击动画
-        firstDelay = DOVirtual.DelayedCall(0.03f, () => {
-            animal.animator.SetBool(IsHitHash, false);
-            // 再0.5秒后切换到闲置状态（仅当当前状态仍是HitState）
+        firstDelay = DOVirtual.DelayedCall(1f, () =>
+        {
             if (animal.CurrentState is HitState)
                 animal.ChangeState(new IdleState(animal));
         });
@@ -35,12 +48,13 @@ public class HitState : AnimalBase.IAnimalState
     
     public void HandleClick()
     {
-        // 点击时先强制关闭动画参数，避免残留
-        animal.animator.SetBool(IsHitHash, false);
-        // 取消延迟，防止后续切换回闲置
+        // 点击时取消延迟，立即响应移动
         if (firstDelay != null && firstDelay.IsActive())
             firstDelay.Kill();
         firstDelay = null;
+
+        // 先关闭动画参数，避免残留
+        //animal.animator.SetBool(animal.IsHitHash, false);
 
         bool hasObstacle = animal.CalculateTargetPosition(out Vector3 targetPos);
         if (hasObstacle)
@@ -68,6 +82,5 @@ public class HitState : AnimalBase.IAnimalState
         if (firstDelay != null && firstDelay.IsActive())
             firstDelay.Kill();
         firstDelay = null;
-        animal.animator.SetBool(IsHitHash, false);
     }
 }
