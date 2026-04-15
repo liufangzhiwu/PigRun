@@ -19,7 +19,7 @@ public class Map : MonoBehaviour
     [Header("地图网格")]
     public int rows = 10;
     public int cols = 10;
-    public float cellSize = 0.18f;          // 每个网格的单位尺寸（世界单位）
+    public float cellSize = 0.15f;          // 每个网格的单位尺寸（世界单位）
     public Vector3 origin;                   // 地图原点（本地坐标）
 
     /// <summary>所有地图项被销毁时触发的事件（关卡完成）</summary>
@@ -266,7 +266,7 @@ public class Map : MonoBehaviour
 
     // ==================== 地图尺寸适配 ====================
     private static readonly int[] AvailableGridSizes = { 20, 23, 25, 30,54};
-    private static readonly float[] MapScales = { 1.1f, 0.9f, 0.9f, 0.9f,0.9f };
+    private static readonly float[] MapScales = { 1.1f, 0.9f, 0.9f, 0.9f,0.75f };
 
     /// <summary>获取与目标尺寸最接近的可用网格尺寸</summary>
     public int GetClosestGridSize(int target)

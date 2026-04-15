@@ -1718,13 +1718,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 673649474}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0.43, y: 0, z: 2.15}
-  m_LocalScale: {x: 1.4, y: 1, z: 2.03}
+  m_LocalRotation: {x: 0, y: 0.99633783, z: -0, w: -0.08550383}
+  m_LocalPosition: {x: 0, y: 0, z: 0.39}
+  m_LocalScale: {x: 0.88, y: 1, z: 1.4}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1991746639}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 189.81, z: 0}
 --- !u!64 &673649476
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1822,13 +1822,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 714065451}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.665479, y: 0.061575186, z: -0.055238556, w: 0.7418187}
-  m_LocalPosition: {x: 1.26, y: 1, z: 7}
-  m_LocalScale: {x: 0.48, y: 0.48, z: 0.48}
+  m_LocalRotation: {x: 0.6787564, y: 0.068403915, z: -0.06374304, w: 0.7283869}
+  m_LocalPosition: {x: 1.13, y: 1, z: 5}
+  m_LocalScale: {x: 0.49, y: 0.49, z: 0.49}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1991746639}
-  m_LocalEulerAnglesHint: {x: 83.79, y: 9.49, z: 0}
+  m_LocalEulerAnglesHint: {x: 85.96, y: 10.73, z: 0}
 --- !u!212 &714065453
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2518,13 +2518,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 961739749}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 60, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!43 &1078647017
 Mesh:
   m_ObjectHideFlags: 0
@@ -3911,7 +3911,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rows: 20
   cols: 20
-  cellSize: 0.18
+  cellSize: 0.15
   origin: {x: 0, y: 0, z: 0}
   gridColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   selectedColor: {r: 1, g: 0, b: 0, a: 1}
