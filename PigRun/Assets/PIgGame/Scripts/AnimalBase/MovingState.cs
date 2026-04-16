@@ -34,8 +34,18 @@ public class MovingState : AnimalBase.IAnimalState
 
         if (movingForward)
         {
-            // 直线前进
-            animal.transform.Translate(Vector3.forward * animal.Speed * Time.deltaTime);
+            if (animal.IsOutOfScreen())
+            {
+                if (animal.animator != null)
+                    animal.animator.SetBool(animal.IsRunHash, false);
+                Map.Instance.RunOutRemoveItem(animal);
+                animal.ChangeState(new IdleState(animal));
+            }
+            else
+            {
+                // 直线前进
+                animal.transform.Translate(Vector3.forward * animal.Speed * Time.deltaTime);
+            }
         }
         else
         {

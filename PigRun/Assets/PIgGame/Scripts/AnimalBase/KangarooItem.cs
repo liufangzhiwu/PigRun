@@ -45,12 +45,12 @@ public class KangarooItem : AnimalBase
         // 触发跳跃动画
         animator.SetBool("IsJump", true);
 
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.2f);
 
         
         // 计算跳跃距离（从当前位置到起始位置）
         float distance = Vector3.Distance(transform.position, startPosition);
-        float jumpSpeed = 4f;
+        float jumpSpeed = 5f;
         float jumpDuration = distance / jumpSpeed;
         jumpDuration = Mathf.Max(jumpDuration, 0.2f);
 

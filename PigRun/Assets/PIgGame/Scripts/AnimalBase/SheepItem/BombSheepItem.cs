@@ -10,6 +10,16 @@ public class BombSheepItem : AnimalBase
 
     private void OnEnable()
     {
+        StartCoroutine(GetDateTime());
+    }
+
+    IEnumerator GetDateTime()
+    {
+        yield return new WaitForSeconds(0.2f);
+        
+        // 设置数量
+        hitCount = MapItem.boomTime==0 ? 3 : MapItem.boomTime;
+        
         UpdateCountDisplay();
     }
 
@@ -50,7 +60,7 @@ public class BombSheepItem : AnimalBase
             if (hitCount == 2)
             {
                 //countText.color = Color.yellow;
-                UIManager.Instance.ShowPanel(PanelType.TipAnimalPanel);
+                //UIManager.Instance.ShowPanel(PanelType.TipAnimalPanel);
             }
             //else
                 //countText.color = Color.red;

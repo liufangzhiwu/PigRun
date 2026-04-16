@@ -31,7 +31,8 @@ public class TimerBombSheepItem : AnimalBase
         
         if (enableTimerMode)
         {
-            currentTime = MapItem.boomTime;
+            // 设置数量
+            currentTime = MapItem.boomTime==0 ? 60 : MapItem.boomTime;
             StartCountdown();
         }
         UpdateCountDisplay();

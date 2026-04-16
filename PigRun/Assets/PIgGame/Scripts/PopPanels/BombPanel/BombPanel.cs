@@ -16,6 +16,8 @@ namespace PigGame
         protected override void OnEnable()
         {
             EventDispatcher.instance.TriggerUpdateLayerCoin(true,false);
+            
+            AudioManager.Instance.PlaySoundEffect("bomb");
         }
         
         protected override void InitButtonEvents()

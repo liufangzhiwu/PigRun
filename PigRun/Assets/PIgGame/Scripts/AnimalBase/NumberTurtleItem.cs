@@ -32,7 +32,7 @@ public class NumberTurtleItem : AnimalBase
         yield return new WaitForSeconds(0.2f);
         
         // 设置数量
-        requiredEscapes = MapItem.boomTime;
+        requiredEscapes = MapItem.boomTime==0 ? 5 : MapItem.boomTime;
         
         // 更新数字显示
         UpdateNumberDisplay();
@@ -168,10 +168,10 @@ public class NumberTurtleItem : AnimalBase
         //ShowCompleteEffect();
         
         // 播放完成音效
-        //AudioManager.Instance.PlaySoundEffect(completeSound);
+        //AudioManager.Instance.PlaySoundEffect("unlock");
         
         // 播放庆祝动画
-        StartCoroutine(CelebrateAnimation());
+        //StartCoroutine(CelebrateAnimation());
         
         Debug.Log($"乌龟完成任务！{requiredEscapes} 只动物已跑出，乌龟现在可以移动了！");
     }
