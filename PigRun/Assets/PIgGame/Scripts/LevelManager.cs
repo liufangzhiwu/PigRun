@@ -173,10 +173,21 @@ public class LevelManager : MonoBehaviour
             int rotIndex = ((int)pig.angle / 90 - 1) % 4;
             item.rotIndex = rotIndex;
 
-            if (item.rotIndex == -1)
-                item.gridPos = new Vector2Int(gridX - 1, gridY - 1);
-            else
-                item.gridPos = new Vector2Int(gridX, gridY);
+            switch (item.rotIndex)
+            {
+                case -1: //上
+                    item.gridPos = new Vector2Int(gridX, gridY);
+                    break;
+                case 0: //右
+                    item.gridPos = new Vector2Int(gridX+1, gridY+1);
+                    break;
+                case 1: //下
+                    item.gridPos = new Vector2Int(gridX+1, gridY+1);
+                    break; 
+                case 2: //左
+                    item.gridPos = new Vector2Int(gridX+1, gridY+1);
+                    break;
+            }
 
             mapData.items.Add(item);
         }
