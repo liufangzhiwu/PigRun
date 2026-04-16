@@ -1,5 +1,6 @@
 using DG.Tweening;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -43,7 +44,6 @@ public class UIManager : MonoBehaviour
 
     public static UIManager Instance;
   
-
     #endregion
 
     #region 成员变量
@@ -54,6 +54,24 @@ public class UIManager : MonoBehaviour
     private Transform _uiRoot; // UI根节点
 
     public event PanelSystemEventHandler PanelEvent; // UI面板事件
+
+    #endregion
+
+    #region 相机自适应配置
+
+    [Header("Camera Adaptation (by Screen Height)")]
+    [SerializeField] private bool enableCameraAdaptation = true;
+    [Tooltip("参考分辨率1 (高)")]
+    [SerializeField] private float refHeight1 = 2688f;
+    [SerializeField] private float orthoSize1 = 6.5f;
+    [SerializeField] private float cameraZ1 = -1.34f;
+    [Tooltip("参考分辨率2 (低)")]
+    [SerializeField] private float refHeight2 = 2208f;
+    [SerializeField] private float orthoSize2 = 5.2f;
+    [SerializeField] private float cameraZ2 = -1.85f;
+
+    private Camera _mainCamera;
+    private float _lastScreenHeight;
 
     #endregion
 
@@ -87,9 +105,13 @@ public class UIManager : MonoBehaviour
             if (item.name == "Canvas")
             {
                 _uiRoot = item.transform;
-                return;
+                break;
             }
-        }        
+        }
+
+        // 场景加载后重新获取主相机并应用自适应
+        _mainCamera = null;
+        ApplyCameraAdaptation();
     }
 
     public void ClearUIBase()
@@ -106,6 +128,22 @@ public class UIManager : MonoBehaviour
     {
         InitializePanelEvents();
         LoadPanelConfiguration();
+        ApplyCameraAdaptation();              // 首次应用相机自适应
+        StartCoroutine(MonitorResolutionChange()); // 监听分辨率变化
+    }
+
+    private void OnEnable()
+    {
+        // 确保启用了自适应时开始监听
+        if (enableCameraAdaptation)
+        {
+            StartCoroutine(MonitorResolutionChange());
+        }
+    }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
     }
 
     #endregion
@@ -209,7 +247,6 @@ public class UIManager : MonoBehaviour
 
     #region 私有方法
 
-
     private void LoadPanelConfiguration()
     {
         if (_panelConfig == null)
@@ -302,5 +339,70 @@ public class UIManager : MonoBehaviour
         });
     }
   
+    #endregion
+
+    #region 相机自适应逻辑
+
+    /// <summary>
+    /// 根据当前屏幕高度调整主相机的正交尺寸和Z轴位置
+    /// </summary>
+    private void ApplyCameraAdaptation()
+    {
+        if (!enableCameraAdaptation) return;
+        
+        // 获取主相机（若不存在则尝试查找）
+        if (_mainCamera == null)
+        {
+            _mainCamera = Camera.main;
+            if (_mainCamera == null)
+            {
+                Debug.LogWarning("UIManager: 未找到主相机，无法应用自适应逻辑");
+                return;
+            }
+        }
+        
+        // 确保相机为正交模式
+        if (!_mainCamera.orthographic)
+        {
+            Debug.LogWarning("UIManager: 主相机不是正交相机，无法设置 orthographicSize");
+            return;
+        }
+        
+        float currentHeight = Screen.height;
+        if (Mathf.Approximately(currentHeight, _lastScreenHeight)) return;
+        _lastScreenHeight = currentHeight;
+        
+        // 边界保护：避免超出参考范围时插值溢出，直接钳位使用端点值
+        float t = (currentHeight - refHeight2) / (refHeight1 - refHeight2);
+        t = Mathf.Clamp01(t);
+        
+        float targetSize = Mathf.Lerp(orthoSize2, orthoSize1, t);
+        float targetZ = Mathf.Lerp(cameraZ2, cameraZ1, t);
+        
+        // 应用参数
+        _mainCamera.orthographicSize = targetSize;
+        Vector3 pos = _mainCamera.transform.localPosition;
+        pos.z = targetZ;
+        _mainCamera.transform.localPosition = pos;
+        
+        Debug.Log($"相机自适应: 高度={currentHeight}, Size={targetSize:F2}, Z={targetZ:F2}");
+    }
+
+    /// <summary>
+    /// 监听分辨率变化（适用于窗口大小改变或屏幕旋转）
+    /// </summary>
+    private IEnumerator MonitorResolutionChange()
+    {
+        while (enableCameraAdaptation)
+        {
+            float currentHeight = Screen.height;
+            if (!Mathf.Approximately(currentHeight, _lastScreenHeight))
+            {
+                ApplyCameraAdaptation();
+            }
+            yield return new WaitForSeconds(0.2f); // 降低检测频率
+        }
+    }
+
     #endregion
 }
