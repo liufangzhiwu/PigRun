@@ -70,10 +70,6 @@ public class Map : MonoBehaviour
     private int nextId = 1;
     private PlacedItem selected;                                 // 当前选中的物品
 
-    // ==================== 拾取相关 ====================
-    private Plane plane;
-    private Camera cam;
-
     // ==================== 初始化方法 ====================
     private void Awake()
     {
@@ -85,9 +81,6 @@ public class Map : MonoBehaviour
         for (int r = 0; r < rows; r++)
             for (int c = 0; c < cols; c++)
                 occupancy[r, c] = -1;
-
-        plane = new Plane(transform.up, transform.TransformPoint(origin));
-        cam = Camera.main;
     }
 
     private void OnDestroy()
