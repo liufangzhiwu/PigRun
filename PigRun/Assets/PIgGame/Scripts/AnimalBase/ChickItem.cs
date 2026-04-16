@@ -118,12 +118,12 @@ public class ChickItem : AnimalBase
     }
     
     /// <summary>
-    /// 寻找到达地图边界的路径（BFS算法）
+    /// 依次检查四个方向，寻找一条无障碍的直线路径到达边界
     /// </summary>
     private bool FindPathToExit()
     {
         Vector2Int startPos = mapItem.gridPos;
-        
+    
         // 如果已经在边界上，直接跑出
         if (IsOnBoundary(startPos))
         {
@@ -131,16 +131,8 @@ public class ChickItem : AnimalBase
             StartCoroutine(EscapeImmediately());
             return false;
         }
-        
-        // 使用BFS寻路
-        Queue<Vector2Int> queue = new Queue<Vector2Int>();
-        Dictionary<Vector2Int, Vector2Int> cameFrom = new Dictionary<Vector2Int, Vector2Int>();
-        HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
-        
-        queue.Enqueue(startPos);
-        visited.Add(startPos);
-        cameFrom[startPos] = startPos;
-        
+    
+        // 四个方向：上、右、下、左（对应网格坐标 y+1, x+1, y-1, x-1）
         Vector2Int[] directions = new Vector2Int[]
         {
             new Vector2Int(0, 1),   // 上
@@ -148,78 +140,60 @@ public class ChickItem : AnimalBase
             new Vector2Int(0, -1),  // 下
             new Vector2Int(-1, 0)   // 左
         };
-        
-        Vector2Int exitPosition = Vector2Int.zero;
-        Vector2Int exitDir = Vector2Int.zero;
-        bool foundExit = false;
-        int shortestDistance = int.MaxValue;
-        
-        while (queue.Count > 0)
+    
+        foreach (Vector2Int dir in directions)
         {
-            Vector2Int current = queue.Dequeue();
-            int currentDist = GetDistance(current, startPos);
-            
-            if (IsOnBoundary(current))
-            {
-                if (currentDist < shortestDistance)
-                {
-                    shortestDistance = currentDist;
-                    exitPosition = current;
-                    
-                    if (current.x == 0) exitDir = new Vector2Int(-1, 0);
-                    else if (current.x == Map.Instance.rows - 1) exitDir = new Vector2Int(1, 0);
-                    else if (current.y == 0) exitDir = new Vector2Int(0, -1);
-                    else if (current.y == Map.Instance.cols - 1) exitDir = new Vector2Int(0, 1);
-                    
-                    foundExit = true;
-                    
-                    if (currentDist == 0)
-                        break;
-                }
-            }
-            
-            foreach (Vector2Int dir in directions)
+            // 检查沿此方向是否能无障碍到达边界
+            List<Vector2Int> path = new List<Vector2Int>();
+            Vector2Int current = startPos;
+            bool blocked = false;
+        
+            while (true)
             {
                 Vector2Int next = current + dir;
-                
+            
+                // 超出边界？实际上我们会在到达边界前停止，但为了安全
                 if (next.x < 0 || next.x >= Map.Instance.rows ||
                     next.y < 0 || next.y >= Map.Instance.cols)
                 {
-                    continue;
+                    // 如果 current 已经在边界上，则路径有效
+                    if (IsOnBoundary(current))
+                        break;
+                    else
+                    {
+                        blocked = true;
+                        break;
+                    }
                 }
-                
-                if (visited.Contains(next))
-                    continue;
-                
+            
+                // 检查下一个格子是否被阻挡（且不是自己）
                 if (IsCellBlocked(next))
-                    continue;
-                
-                visited.Add(next);
-                cameFrom[next] = current;
-                queue.Enqueue(next);
-            }
-        }
-        
-        if (foundExit)
-        {
-            currentPath.Clear();
-            Vector2Int pathNode = exitPosition;
+                {
+                    blocked = true;
+                    break;
+                }
             
-            while (pathNode != startPos)
+                // 记录路径点（不包括起点）
+                path.Add(next);
+                current = next;
+            
+                // 到达边界则成功
+                if (IsOnBoundary(current))
+                    break;
+            }
+        
+            if (!blocked && path.Count > 0)
             {
-                currentPath.Insert(0, pathNode);
-                pathNode = cameFrom[pathNode];
+                // 找到可行方向
+                currentPath = path;
+                escapeDirection = dir;
+                ShowPath();
+                Debug.Log($"小鸡找到直线路径，方向 {dir}，步数 {path.Count}");
+                return true;
             }
-            
-            escapeDirection = exitDir;
-            ShowPath();
-            
-            Debug.Log($"小鸡找到跑出边界的路径，需要移动 {currentPath.Count} 步，跑出方向: {exitDir}");
-            
-            return true;
         }
-        
-        Debug.Log("小鸡未找到跑出边界的路径");
+    
+        Debug.Log("小鸡未找到任何无障碍的直线路径");
         return false;
     }
     

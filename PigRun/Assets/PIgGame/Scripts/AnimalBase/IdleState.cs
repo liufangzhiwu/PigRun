@@ -41,6 +41,7 @@ public class IdleState : AnimalBase.IAnimalState
             {
                 animal.HitSelf();
                 animal.BehitItem?.BeHit();
+                animal.runParticleSystem.Stop();
             }
         }
         else

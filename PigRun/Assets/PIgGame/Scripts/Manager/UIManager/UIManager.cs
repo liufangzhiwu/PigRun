@@ -128,7 +128,7 @@ public class UIManager : MonoBehaviour
         InitializePanelEvents();
         LoadPanelConfiguration();
         ApplyCameraAdaptation();              // 首次应用相机自适应
-        StartCoroutine(MonitorResolutionChange()); // 监听分辨率变化
+        //StartCoroutine(MonitorResolutionChange()); // 监听分辨率变化
     }
 
     private void OnEnable()
@@ -136,7 +136,7 @@ public class UIManager : MonoBehaviour
         // 确保启用了自适应时开始监听
         if (enableCameraAdaptation)
         {
-            StartCoroutine(MonitorResolutionChange());
+            //StartCoroutine(MonitorResolutionChange());
         }
     }
 
@@ -394,14 +394,14 @@ public class UIManager : MonoBehaviour
     /// <summary>
     /// 监听分辨率变化（适用于窗口大小改变或屏幕旋转）
     /// </summary>
-    private IEnumerator MonitorResolutionChange()
-    {
-        while (enableCameraAdaptation)
-        {
-            ApplyCameraAdaptation();
-            yield return new WaitForSeconds(0.2f);
-        }
-    }
+    // private IEnumerator MonitorResolutionChange()
+    // {
+    //     while (enableCameraAdaptation)
+    //     {
+    //         ApplyCameraAdaptation();
+    //         yield return new WaitForSeconds(0.2f);
+    //     }
+    // }
 
     #endregion
 
