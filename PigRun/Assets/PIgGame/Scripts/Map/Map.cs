@@ -17,10 +17,13 @@ public class Map : MonoBehaviour
 
     // ==================== 地图网格配置 ====================
     [Header("地图网格")]
-    public int rows = 10;
-    public int cols = 10;
+    public int rows = 12;
+    public int cols = 8;
     public float cellSize = 0.15f;          // 每个网格的单位尺寸（世界单位）
     public Vector3 origin;                   // 地图原点（本地坐标）
+
+    [Header("地面适配")]
+    public GameObject mapGround;             // 固定尺寸的地面对象（用于自动缩放对齐）
 
     /// <summary>所有地图项被销毁时触发的事件（关卡完成）</summary>
     public event System.Action OnAllItemsDestroyed;
@@ -33,8 +36,6 @@ public class Map : MonoBehaviour
     public Color selectedColor = Color.red;
     public bool selectedUseComplementary = false;
     public float gridLineWidth = 1f;
-    public Sprite grid01 = null;
-    public Sprite grid02 = null;
 
     [Tooltip("运行时在地图网格上显示每格占用 id，便于检查占用表是否正确")]
     public bool showOccupancyTable = true;
@@ -87,10 +88,6 @@ public class Map : MonoBehaviour
 
         plane = new Plane(transform.up, transform.TransformPoint(origin));
         cam = Camera.main;
-
-        // 加载网格纹理（用于 UI 显示）
-        grid01 = Resources.Load<Sprite>("UI/grid01");
-        grid02 = Resources.Load<Sprite>("UI/grid02");
     }
 
     private void OnDestroy()
@@ -264,11 +261,11 @@ public class Map : MonoBehaviour
 #endif
     }
 
-    // ==================== 地图尺寸适配 ====================
-    private static readonly int[] AvailableGridSizes = { 24,36};
-    private static readonly float[] MapScales = { 1f,0.75f };
+    // ==================== 地图尺寸适配（限定两种规格） ====================
+    // 可用高度值：24 对应 24x36，36 对应 36x54
+    private static readonly int[] AvailableGridSizes = { 24, 36 };
 
-    /// <summary>获取与目标尺寸最接近的可用网格尺寸</summary>
+    /// <summary>获取与目标尺寸最接近的可用网格高度（rows）</summary>
     public int GetClosestGridSize(int target)
     {
         int closest = AvailableGridSizes[0];
@@ -316,8 +313,8 @@ public class Map : MonoBehaviour
             if (obj.GetComponent<ObstacleClickHandler>() == null)
                 obj.AddComponent<ObstacleClickHandler>();
             
-            mi.obstacleIdType = it.obstacleIdType;  // 确保 MapItem 有此字段
-            mi.way = it.way;  // 确保 MapItem 有此字段
+            mi.obstacleIdType = it.obstacleIdType;
+            mi.way = it.way;
         }
 
         int id = nextId++;
@@ -333,7 +330,7 @@ public class Map : MonoBehaviour
             baseRotation = baseRot,
             occupiedCells = ComputeOccupiedCells(it.gridPos, it.info, it.rotIndex)
         };
-        if (it.animalType != -1&&it.animalType != 13)
+        if (it.animalType != -1 && it.animalType != 13)
         {
             items[id] = placed;
         }
@@ -437,7 +434,6 @@ public class Map : MonoBehaviour
         foreach (var kv in items)
         {
             var placed = kv.Value;
-            // 根据animalType判断是否为特殊动物？这里简单通过组件判断
             var animal = placed.instance.GetComponent<AnimalBase>();
             if (animal == null) continue;
             if (animal is MedicineCowItem || animal is SickDonkeyItem) continue;
@@ -452,7 +448,6 @@ public class Map : MonoBehaviour
 
         // 随机选择 count 个（不超过总数）
         int shuffleCount = Mathf.Min(count, animalItems.Count);
-        // 随机打乱列表
         for (int i = 0; i < shuffleCount; i++)
         {
             int randomIndex = Random.Range(i, animalItems.Count);
@@ -461,155 +456,51 @@ public class Map : MonoBehaviour
             animalItems[randomIndex] = temp;
         }
 
-        // 对前 shuffleCount 个动物进行旋转180度
         for (int i = 0; i < shuffleCount; i++)
         {
             RotateAnimal180(animalItems[i]);
         }
     }
 
-
     /// <summary>
     /// 将动物旋转180度（使用 DOTween 动画）
     /// </summary>
     public void RotateAnimal180(PlacedItem placed)
     {
-        // 计算新的旋转索引（+2 模4）
         int newRotIndex = (placed.rotIndex + 2) % 4;
 
-        // 获取 MapItem 组件
         MapItem mi = placed.instance.GetComponent<MapItem>();
         if (mi == null) return;
 
-        // 清除当前占用（防止动画期间其他动物进入该格子）
-        //ClearArea(placed);
-
-        // 获取当前的网格位置
         Vector2Int originalGridPos = mi.gridPos;
-        
-        // 计算旋转后的新网格位置
-        // 旋转180度后，左上角会变为原来的右下角
         Vector2Int newGridPos = CalculateRotatedGridPos(originalGridPos, placed.rotIndex, newRotIndex, mi.info.rows, mi.info.cols);
         
-        // 更新内存中的旋转索引和网格位置
         placed.rotIndex = newRotIndex;
-        placed.gridPos = newGridPos; // 如果有这个字段的话
+        placed.gridPos = newGridPos;
         mi.rotIndex = newRotIndex;
         mi.gridPos = newGridPos;
 
         Debug.Log($"Rotated grid pos is {newGridPos}");
         
-        // 计算目标旋转四元数
         Quaternion targetRotation = Quaternion.AngleAxis(placed.rotIndex * 90f, Vector3.up) * placed.baseRotation;
-        
-        // 执行 DOTween 旋转动画，时长1秒
         placed.instance.transform.DORotateQuaternion(targetRotation, 1f)
-            .SetEase(Ease.InOutQuad); // 缓动曲线，使动画更自然
+            .SetEase(Ease.InOutQuad);
     }
 
-    
     /// <summary>
-    /// 计算旋转后的网格位置
+    /// 计算旋转后的网格位置（仅支持180度旋转）
     /// </summary>
-    /// <param name="originalPos">原始网格位置（左上角）</param>
-    /// <param name="oldRot">原始旋转索引</param>
-    /// <param name="newRot">新旋转索引</param>
-    /// <param name="rows">行数（高度）</param>
-    /// <param name="cols">列数（宽度）</param>
-    /// <returns>旋转后的网格位置（新的左上角）</returns>
     private Vector2Int CalculateRotatedGridPos(Vector2Int originalPos, int oldRot, int newRot, int rows, int cols)
     {
-        // 计算旋转的角度差（90度的倍数）
         int rotDiff = (newRot - oldRot + 4) % 4;
-    
-        // 如果旋转不是180度，返回原位置（或者需要单独处理90度旋转）
         if (rotDiff != 2) return originalPos;
-    
-        // 旋转180度：需要考虑原始朝向
-        // 旋转索引：0=右，1=下，2=左，3=上
+
         switch (oldRot)
         {
-            case 0: // 原本朝右，旋转180度后朝左
-                // 右转左：新的左上角在原位置的左上方
-                return new Vector2Int(originalPos.x - rows, originalPos.y + (cols-1));
-            
-            case 1: // 原本朝下，旋转180度后朝上
-                // 下转上：新的左上角在原位置的左上方
-                return new Vector2Int(originalPos.x - cols, originalPos.y - rows);
-            
-            case 2: // 原本朝左，旋转180度后朝右
-                // 左转右：新的左上角在原位置的右下方
-                return new Vector2Int(originalPos.x + rows, originalPos.y - (cols-1));
-            
-           // 原本朝上，旋转180度后朝下
-           // 上转下：新的左上角在原位置的右下方
-            default:
-                return new Vector2Int(originalPos.x + cols, originalPos.y + rows);
+            case 0: return new Vector2Int(originalPos.x - rows, originalPos.y + (cols - 1));
+            case 1: return new Vector2Int(originalPos.x - cols, originalPos.y - rows);
+            case 2: return new Vector2Int(originalPos.x + rows, originalPos.y - (cols - 1));
+            default: return new Vector2Int(originalPos.x + cols, originalPos.y + rows);
         }
     }
-    
-   
-    /// <summary>
-    /// 自动将地图缩放并居中到屏幕
-    /// </summary>
-    /// <param name="targetScreenUV">目标屏幕位置，视口坐标 (0,0) 左下角到 (1,1) 右上角。默认 null 表示屏幕中心 (0.5,0.5)。</param>
-    /// <param name="padding">缩放边距（0~1），数值越小地图越小，1 表示刚好填满屏幕无留白，默认 0.9。</param>
-    /// <summary>自动将地图缩放并居中到屏幕（根据当前物品分布）</summary>
-    public void FitMapToScreen(Vector2? targetScreenUV = null)
-    {
-        if (!cam.orthographic) return;
-
-        if (items.Count == 0)
-        {
-            Debug.Log("没有物品，不进行缩放适配。");
-            return;
-        }
-
-        // 计算所有物品占用的最小/最大行列
-        int minRow = int.MaxValue, maxRow = int.MinValue, minCol = int.MaxValue, maxCol = int.MinValue;
-        foreach (var kv in items)
-        {
-            var placed = kv.Value;
-            var dims = FootprintDims(placed.info, placed.rotIndex);
-            var anchor = StartFromPivot(placed.gridPos, placed.info, placed.rotIndex);
-            for (int r = 0; r < dims.x; r++)
-                for (int c = 0; c < dims.y; c++)
-                {
-                    int row = anchor.x + r, col = anchor.y + c;
-                    if (row < minRow) minRow = row;
-                    if (row > maxRow) maxRow = row;
-                    if (col < minCol) minCol = col;
-                    if (col > maxCol) maxCol = col;
-                }
-        }
-
-        float occupiedWidth = (maxCol - minCol + 1) * cellSize;
-        float occupiedHeight = (maxRow - minRow + 1) * cellSize;
-        float screenWorldHeight = 2f * cam.orthographicSize;
-        float screenWorldWidth = screenWorldHeight * cam.aspect;
-        float scaleHeight = screenWorldHeight / occupiedHeight;
-        float scaleWidth = screenWorldWidth / occupiedWidth;
-        float scale = Mathf.Min(scaleHeight, scaleWidth);
-
-        // 根据网格尺寸选择预设缩放系数
-        int mscaleid = Array.FindIndex(AvailableGridSizes, size => size == rows);
-        float mapScale = mscaleid >= 0 ? MapScales[mscaleid] : MapScales[MapScales.Length - 1];
-        scale = Mathf.Min(mapScale, 1.3f);
-        transform.localScale = Vector3.one * scale;
-
-        // 计算中心点
-        Vector2Int occupiedAnchor = new Vector2Int(minRow, minCol);
-        Vector2Int occupiedDims = new Vector2Int(maxRow - minRow + 1, maxCol - minCol + 1);
-        Vector3 occupiedCenter = FootprintWorldCenter(occupiedAnchor, occupiedDims);
-
-        Vector2 screenUV = targetScreenUV ?? new Vector2(0.5f, 0.5f);
-        Ray camRay = cam.ViewportPointToRay(screenUV);
-        Plane groundPlane = new Plane(Vector3.up, occupiedCenter);
-        if (groundPlane.Raycast(camRay, out float enter))
-        {
-            Vector3 targetWorldPoint = camRay.GetPoint(enter);
-            transform.position += targetWorldPoint - occupiedCenter;
-        }
-    }
-
 }

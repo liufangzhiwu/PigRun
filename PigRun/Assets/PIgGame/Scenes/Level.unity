@@ -3891,8 +3891,8 @@ Transform:
   m_GameObject: {fileID: 1768097193}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.76604444, z: 0, w: 0.64278764}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
+  m_LocalPosition: {x: -1.373, y: 0, z: 3.103}
+  m_LocalScale: {x: 1.056, y: 1.056, z: 1.056}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1991746639}
@@ -3909,16 +3909,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fffc6d63d4d2d0e45a796e2629bea6e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rows: 20
-  cols: 20
+  rows: 24
+  cols: 36
   cellSize: 0.15
   origin: {x: 0, y: 0, z: 0}
+  mapGround: {fileID: 9011750481984072014}
   gridColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   selectedColor: {r: 1, g: 0, b: 0, a: 1}
   selectedUseComplementary: 0
   gridLineWidth: 1
-  grid01: {fileID: 0}
-  grid02: {fileID: 0}
   showOccupancyTable: 1
   LevelFinish: 0
   medicineCowItem: {fileID: 0}

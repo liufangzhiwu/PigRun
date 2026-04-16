@@ -39,49 +39,71 @@ public class LevelManager : MonoBehaviour
     }
 
     private IEnumerator LoadLevelCoroutine(int levelid)
+{
+    string fileName = LevelName + levelid;
+    TextAsset levelTextAsset = AssetBundleLoader.SharedInstance.LoadTextFile("levels", fileName);
+    MapData mapData = ParseToMapData(levelTextAsset.ToString(), cellSize);
+
+    // 清空并重置地图
+    Map.Instance.ClearAllItems();
+
+    // 根据关卡数据中的行数选择合适的地图规格（仅支持 24 或 36 行）
+    int targetRows = mapData.cols; // 注意：mapData.rows 是从 level.size.y/cellSize 算出的
+    int gridRows = Map.Instance.GetClosestGridSize(targetRows); // 返回 24 或 36
+    int gridCols = (gridRows == 24) ? 36 : 54;   // 对应宽 24 或 36
+
+    Map.Instance.rows = gridRows;
+    Map.Instance.cols = gridCols;
+
+    // Map.Instance.transform.position = Vector3.zero;
+    // Map.Instance.transform.localScale = Vector3.one;
+    Map.Instance.ResetOccupancy();
+    Map.Instance.dataAsset = mapData;
+    
+    string spriteName = (gridRows == 24) ? "map1" : "map2";
+    Sprite sprite = AssetBundleLoader.SharedInstance.GetSpriteFromBundle("ui_map",spriteName);
+
+    if (sprite != null)
     {
-        string fileName = LevelName + levelid;
-        TextAsset levelTextAsset = AssetBundleLoader.SharedInstance.LoadTextFile("levels", fileName);
-        MapData mapData = ParseToMapData(levelTextAsset.ToString(), cellSize);
+        MeshRenderer renderer = Map.Instance.mapGround.GetComponent<MeshRenderer>();
+        Material mat = renderer.material;  // 自动创建材质实例，避免影响其他物体
 
-        // 清空并重置地图
-        Map.Instance.ClearAllItems();
-        int targetWidth = mapData.cols;
-        int gridSize = Map.Instance.GetClosestGridSize(targetWidth);
-
-        Map.Instance.transform.position = Vector3.zero;
-        Map.Instance.transform.localScale = Vector3.one;
-
-        Map.Instance.rows = gridSize; // 8*12 或 12*18
-        Map.Instance.cols =(gridSize == 24) ? 36 : 54;   // 8*12 或 12*18
-        Map.Instance.ResetOccupancy();
-        Map.Instance.dataAsset = mapData;
-        Map.Instance.origin = mapData.origin;
-        Map.Instance.LevelFinish = false;
-
-        // 分批实例化所有物品（动物 + 障碍物）
-        List<MapData.MapItemData> itemsToLoad = mapData.items;
-        int totalCount = itemsToLoad.Count;
-        int batchSize = 3;
-        int loaded = 0;
-
-        while (loaded < totalCount)
-        {
-            int end = Mathf.Min(loaded + batchSize, totalCount);
-            for (int i = loaded; i < end; i++)
-            {
-                Map.Instance.InstantiateItem(itemsToLoad[i]);
-            }
-            loaded = end;
-            yield return null;
-        }
-
-        Map.Instance.FitMapToScreen(new Vector2(0.53f, 0.48f));
-        Map.Instance.OnLoadNewMapEvent();
-
-        Debug.Log($"关卡 {levelid} 加载完成，共 {totalCount} 个物体（动物+障碍物）");
-        GameManager.instance.OverLevelLoadedEvent();
+        Texture atlasTexture = sprite.texture;
+        mat.mainTexture = atlasTexture;
     }
+    else
+    {
+        Debug.LogError($"Failed to load sprite '{spriteName}' from atlas 'UI_Map'");
+    }
+    
+    Map.Instance.origin = mapData.origin;
+    Map.Instance.transform.localScale =(gridRows == 24) ? new Vector3(1.056f,1.056f,1.056f) : new Vector3(0.7f,0.7f,0.7f);// 每个网格的单位尺寸（世界单位）
+    Map.Instance.LevelFinish = false;
+
+    // 分批实例化所有物品
+    List<MapData.MapItemData> itemsToLoad = mapData.items;
+    int totalCount = itemsToLoad.Count;
+    int batchSize = 3;
+    int loaded = 0;
+
+    while (loaded < totalCount)
+    {
+        int end = Mathf.Min(loaded + batchSize, totalCount);
+        for (int i = loaded; i < end; i++)
+        {
+            Map.Instance.InstantiateItem(itemsToLoad[i]);
+        }
+        loaded = end;
+        yield return null;
+    }
+
+    // 注意：不要调用 FitMapToScreen，否则会覆盖缩放设置
+    //Map.Instance.FitMapToScreen(new Vector2(0.53f, 0.48f));
+
+    Map.Instance.OnLoadNewMapEvent();
+    Debug.Log($"关卡 {levelid} 加载完成，网格 {gridCols}x{gridRows}");
+    GameManager.instance.OverLevelLoadedEvent();
+}
 
     /// <summary>
     /// 动态加载动物 PrefabInfo（按路径 Resources/Prefabs/Pigs/Type_{typeId}）
