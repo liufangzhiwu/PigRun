@@ -341,10 +341,12 @@ public class UIManager : MonoBehaviour
   
     #endregion
 
+  
+
     #region 相机自适应逻辑
 
     /// <summary>
-    /// 根据当前屏幕高度调整主相机的正交尺寸和Z轴位置
+    /// 根据当前屏幕高度调整主相机的正交尺寸和Z轴位置（iPad 使用固定参数）
     /// </summary>
     private void ApplyCameraAdaptation()
     {
@@ -372,20 +374,35 @@ public class UIManager : MonoBehaviour
         if (Mathf.Approximately(currentHeight, _lastScreenHeight)) return;
         _lastScreenHeight = currentHeight;
         
-        // 边界保护：避免超出参考范围时插值溢出，直接钳位使用端点值
-        float t = (currentHeight - refHeight2) / (refHeight1 - refHeight2);
-        t = Mathf.Clamp01(t);
+        float targetSize;
+        float targetZ;
         
-        float targetSize = Mathf.Lerp(orthoSize2, orthoSize1, t);
-        float targetZ = Mathf.Lerp(cameraZ2, cameraZ1, t);
+        // 判断是否为 iPad 尺寸（宽高比 < 1.6 视为 iPad）
+        float aspectRatio = (float)Screen.width / Screen.height;
+        bool isiPad = aspectRatio < 1.6f;
+        
+        if (isiPad)
+        {
+            // iPad 固定使用低分辨率参数（2208 对应的值）
+            targetSize = orthoSize2;
+            targetZ = cameraZ2;
+            Debug.Log($"相机自适应: iPad模式, 宽高比={aspectRatio:F2}, Size={targetSize:F2}, Z={targetZ:F2}");
+        }
+        else
+        {
+            // 非 iPad 设备：基于屏幕高度线性插值
+            float t = (currentHeight - refHeight2) / (refHeight1 - refHeight2);
+            t = Mathf.Clamp01(t);
+            targetSize = Mathf.Lerp(orthoSize2, orthoSize1, t);
+            targetZ = Mathf.Lerp(cameraZ2, cameraZ1, t);
+            Debug.Log($"相机自适应: 高度={currentHeight}, Size={targetSize:F2}, Z={targetZ:F2}");
+        }
         
         // 应用参数
         _mainCamera.orthographicSize = targetSize;
         Vector3 pos = _mainCamera.transform.localPosition;
         pos.z = targetZ;
         _mainCamera.transform.localPosition = pos;
-        
-        Debug.Log($"相机自适应: 高度={currentHeight}, Size={targetSize:F2}, Z={targetZ:F2}");
     }
 
     /// <summary>
@@ -404,5 +421,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    #endregion
+#endregion
+
+    
 }
