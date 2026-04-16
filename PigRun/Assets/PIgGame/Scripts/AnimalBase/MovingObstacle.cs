@@ -109,7 +109,7 @@ public class MovingObstacle : MonoBehaviour
 
     private void OnReachWaypoint()
     {
-        UpdateGridPosition(targetGrid);
+        //UpdateGridPosition(targetGrid);
 
         if (movingForward)
             currentTargetIndex++;

@@ -59,19 +59,18 @@ public class UIManager : MonoBehaviour
 
     #region 相机自适应配置
 
-    [Header("Camera Adaptation (by Screen Height)")]
+    [Header("Camera Adaptation (by Aspect Ratio)")]
     [SerializeField] private bool enableCameraAdaptation = true;
-    [Tooltip("参考分辨率1 (高)")]
-    [SerializeField] private float refHeight1 = 2688f;
-    [SerializeField] private float orthoSize1 = 6.5f;
-    [SerializeField] private float cameraZ1 = -1.34f;
-    [Tooltip("参考分辨率2 (低)")]
-    [SerializeField] private float refHeight2 = 2208f;
-    [SerializeField] private float orthoSize2 = 5.2f;
-    [SerializeField] private float cameraZ2 = -1.85f;
+    [Tooltip("宽高比阈值：大于等于此值视为宽屏，使用低参数；否则视为窄屏，使用高参数")]
+    [SerializeField] private float aspectRatioThreshold = 0.5f;
+    [Tooltip("窄屏（竖屏/iPad）使用的参数（原2688对应）")]
+    [SerializeField] private float orthoSizeNarrow = 6.5f;
+    [SerializeField] private float cameraZNarrow = -1.34f;
+    [Tooltip("宽屏（横屏/全面屏）使用的参数（原2208对应）")]
+    [SerializeField] private float orthoSizeWide = 5.2f;
+    [SerializeField] private float cameraZWide = -1.85f;
 
     private Camera _mainCamera;
-    private float _lastScreenHeight;
 
     #endregion
 
@@ -346,13 +345,12 @@ public class UIManager : MonoBehaviour
     #region 相机自适应逻辑
 
     /// <summary>
-    /// 根据当前屏幕高度调整主相机的正交尺寸和Z轴位置（iPad 使用固定参数）
+    /// 根据屏幕宽高比调整主相机参数：宽屏用2208参数，窄屏用2688参数
     /// </summary>
     private void ApplyCameraAdaptation()
     {
         if (!enableCameraAdaptation) return;
-        
-        // 获取主相机（若不存在则尝试查找）
+    
         if (_mainCamera == null)
         {
             _mainCamera = Camera.main;
@@ -362,43 +360,31 @@ public class UIManager : MonoBehaviour
                 return;
             }
         }
-        
-        // 确保相机为正交模式
+    
         if (!_mainCamera.orthographic)
         {
             Debug.LogWarning("UIManager: 主相机不是正交相机，无法设置 orthographicSize");
             return;
         }
-        
-        float currentHeight = Screen.height;
-        if (Mathf.Approximately(currentHeight, _lastScreenHeight)) return;
-        _lastScreenHeight = currentHeight;
-        
+    
+        float currentAspect = (float)Screen.width / Screen.height;
         float targetSize;
         float targetZ;
-        
-        // 判断是否为 iPad 尺寸（宽高比 < 1.6 视为 iPad）
-        float aspectRatio = (float)Screen.width / Screen.height;
-        bool isiPad = aspectRatio < 1.6f;
-        
-        if (isiPad)
+        bool isWide = currentAspect >= aspectRatioThreshold;
+    
+        if (isWide)
         {
-            // iPad 固定使用低分辨率参数（2208 对应的值）
-            targetSize = orthoSize2;
-            targetZ = cameraZ2;
-            Debug.Log($"相机自适应: iPad模式, 宽高比={aspectRatio:F2}, Size={targetSize:F2}, Z={targetZ:F2}");
+            targetSize = orthoSizeWide;
+            targetZ = cameraZWide;
+            Debug.Log($"相机自适应: 宽屏模式, 宽高比={currentAspect:F2} >= {aspectRatioThreshold}, Size={targetSize:F2}, Z={targetZ:F2}");
         }
         else
         {
-            // 非 iPad 设备：基于屏幕高度线性插值
-            float t = (currentHeight - refHeight2) / (refHeight1 - refHeight2);
-            t = Mathf.Clamp01(t);
-            targetSize = Mathf.Lerp(orthoSize2, orthoSize1, t);
-            targetZ = Mathf.Lerp(cameraZ2, cameraZ1, t);
-            Debug.Log($"相机自适应: 高度={currentHeight}, Size={targetSize:F2}, Z={targetZ:F2}");
+            targetSize = orthoSizeNarrow;
+            targetZ = cameraZNarrow;
+            Debug.Log($"相机自适应: 窄屏模式, 宽高比={currentAspect:F2} < {aspectRatioThreshold}, Size={targetSize:F2}, Z={targetZ:F2}");
         }
-        
-        // 应用参数
+    
         _mainCamera.orthographicSize = targetSize;
         Vector3 pos = _mainCamera.transform.localPosition;
         pos.z = targetZ;
@@ -412,16 +398,12 @@ public class UIManager : MonoBehaviour
     {
         while (enableCameraAdaptation)
         {
-            float currentHeight = Screen.height;
-            if (!Mathf.Approximately(currentHeight, _lastScreenHeight))
-            {
-                ApplyCameraAdaptation();
-            }
-            yield return new WaitForSeconds(0.2f); // 降低检测频率
+            ApplyCameraAdaptation();
+            yield return new WaitForSeconds(0.2f);
         }
     }
 
-#endregion
+    #endregion
 
     
 }

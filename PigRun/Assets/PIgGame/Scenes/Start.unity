@@ -360,12 +360,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableCameraAdaptation: 1
-  refHeight1: 2688
-  orthoSize1: 6.5
-  cameraZ1: -1.34
-  refHeight2: 2208
-  orthoSize2: 5.2
-  cameraZ2: -1.85
+  aspectRatioThreshold: 0.5
+  orthoSizeNarrow: 6.5
+  cameraZNarrow: -1.34
+  orthoSizeWide: 5.2
+  cameraZWide: -1.85
 --- !u!1 &546846754
 GameObject:
   m_ObjectHideFlags: 0
