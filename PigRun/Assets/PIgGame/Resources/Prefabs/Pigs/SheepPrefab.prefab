@@ -54,7 +54,9 @@ MonoBehaviour:
   rotIndex: 0
   id: 0
   animalType: 0
+  obstacleIdType: 0
   boomTime: 0
+  way: []
   baseRotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!54 &-2356354976258558053
 Rigidbody:
@@ -102,8 +104,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.87874013, y: 0.53973144, z: 1.0594224}
-  m_Center: {x: -0.02690205, y: 0.26986572, z: 0.029260457}
+  m_Size: {x: 0.4552714, y: 0.53973144, z: 0.87141013}
+  m_Center: {x: -0.006002918, y: 0.26986572, z: -0.064745665}
 --- !u!114 &8939642119794021110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -163,7 +165,7 @@ PrefabInstance:
     - target: {fileID: 5448099611804689535, guid: edc0a065124ca4fdcabc3029287c77d4,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.35
       objectReference: {fileID: 0}
     - target: {fileID: 5448099611804689535, guid: edc0a065124ca4fdcabc3029287c77d4,
         type: 3}
@@ -233,17 +235,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 882758be0e18a55458e7f796fc4b4c89,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.89000005
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 882758be0e18a55458e7f796fc4b4c89,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.89000005
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 882758be0e18a55458e7f796fc4b4c89,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.89000005
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 882758be0e18a55458e7f796fc4b4c89,
         type: 3}

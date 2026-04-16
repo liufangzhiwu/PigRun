@@ -18,7 +18,6 @@ public class MovingState : AnimalBase.IAnimalState
     public void Enter()
     {
         animal.animator.SetBool(animal.IsRunHash, true);
-        animal.runParticleSystem.Play();
 
         if (movingForward)
         {

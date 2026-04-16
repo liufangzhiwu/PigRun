@@ -201,8 +201,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.68515176, y: 0.494602, z: 1.0515254}
-  m_Center: {x: 0.01974824, y: 0.247301, z: 0.032780766}
+  m_Size: {x: 0.54633284, y: 0.494602, z: 0.81198883}
+  m_Center: {x: -0.0074709654, y: 0.247301, z: 0.023315564}
 --- !u!114 &602720111308569755
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -232,6 +232,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4437194010975269772}
     m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 920e996064856454c91eaa002b4b690b,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 920e996064856454c91eaa002b4b690b,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 920e996064856454c91eaa002b4b690b,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.9
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 920e996064856454c91eaa002b4b690b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -281,6 +296,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 920e996064856454c91eaa002b4b690b,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -1991272963349136948, guid: 920e996064856454c91eaa002b4b690b,
         type: 3}
@@ -385,7 +405,7 @@ PrefabInstance:
     - target: {fileID: 5448099611804689535, guid: edc0a065124ca4fdcabc3029287c77d4,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 5448099611804689535, guid: edc0a065124ca4fdcabc3029287c77d4,
         type: 3}

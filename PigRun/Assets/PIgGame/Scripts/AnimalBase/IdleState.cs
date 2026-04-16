@@ -30,6 +30,7 @@ public class IdleState : AnimalBase.IAnimalState
     public void HandleClick()
     {
         bool hasObstacle = animal.CalculateTargetPosition(out Vector3 targetPos);
+        animal.runParticleSystem.Play();
         if (hasObstacle)
         {
             if (targetPos != Vector3.zero)
