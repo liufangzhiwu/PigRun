@@ -77,7 +77,8 @@ public class LevelManager : MonoBehaviour
     }
     
     Map.Instance.origin = mapData.origin;
-    Map.Instance.transform.localScale =(gridRows == 24) ? new Vector3(1.056f,1.056f,1.056f) : new Vector3(0.7f,0.7f,0.7f);// 每个网格的单位尺寸（世界单位）
+    Map.Instance.transform.localScale =(gridRows == 24) ? new Vector3(1.14f,1.14f,1.05f) : new Vector3(0.742f,0.742f,0.72f);// 每个网格的单位尺寸（世界单位）
+    Map.Instance.transform.localPosition =(gridRows == 24) ? new Vector3(-1.344f,0f,4f) : new Vector3(-1.344f,0f,4.453f);// 每个网格的单位尺寸（世界单位）
     Map.Instance.LevelFinish = false;
 
     // 分批实例化所有物品

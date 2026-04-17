@@ -13,6 +13,7 @@ public abstract class AnimalBase : MonoBehaviour
 
     protected MapItem mapItem;
     protected AnimalBase behitItem;          // 将要撞击的物体
+    protected AnimalBase behitItem02;          // 将要撞击的物体2
     protected IAnimalState currentState;
     protected Vector2Int startGrid;
 
@@ -31,6 +32,7 @@ public abstract class AnimalBase : MonoBehaviour
     public MapItem MapItem => mapItem;
     public float Speed => speed;
     public AnimalBase BehitItem => behitItem;
+    public AnimalBase BehitItem02 => behitItem02;
     public IAnimalState CurrentState => currentState;
 
     protected virtual void Start()

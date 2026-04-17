@@ -39,41 +39,20 @@ namespace ThreePeakGame
 
             Sequence sequence = DOTween.Sequence();
             // 修改 EnterGameScene 中的第一句动画
-            sequence.Append(mat.DOFloat(1f, "_Float0", 0.5f).From(0).SetEase(Ease.InSine));
+            sequence.Append(mat.DOFloat(8f, "_Float0", 0.75f).From(0).SetEase(Ease.InSine));
             sequence.Append(group.DOFade(1, 0.5f).From(0).SetEase(Ease.Linear).OnStart(() =>
             {
                 group.gameObject.Show();
-                ReduceCount.SetAlpha(0);
+                SceneManager.LoadScene("Level");
             }));
-            sequence.AppendInterval(0.2f);
-            // sequence.Append(ReduceCount.transform.DOLocalMoveY(110, 0.75f).From(80).SetEase(Ease.OutSine).OnStart(() =>
-            // {
-            //     //PowerCount.text = PowerRoot.self.energySave.GamePower.ToString();
-            //     //AudioRoot.PlayAudio(AudioName.Counter);
-            // }));
-            sequence.Join(ReduceCount.DOFade(0, 0.5f).From(1).SetEase(Ease.OutSine).OnComplete(() =>
-            {
-                SetLoader();
-            }));
-            sequence.Append(group.DOFade(0, 0.5f).From(1).SetEase(Ease.Linear));
-            sequence.Join(mat.DOFloat(0, "_Float0", 0.5f).From(1f).SetEase(Ease.OutSine));
+            // sequence.AppendInterval(0.1f);
+            sequence.Append(mat.DOFloat(0, "_Float0", 0.75f).From(8f).SetEase(Ease.OutSine));
             sequence.AppendCallback(() =>
             {
                 UIManager.Instance.ShowPanel(PanelType.MenuPanel);
                 gameObject.Hide();
             });
         }
-
-        public void SetLoader()
-        {
-            //Hot2LoadAB2File.LoadLocalAB2File(Hot2.Hot2AESTool.GetHXFileName("HomeUIBase"));
-            //Hot2LoadAB2File.LoadLocalAB2File(Hot2.Hot2AESTool.GetHXFileName("SpritesCommon"));
-            //Hot2LoadAB2File.LoadLocalAB2File(Hot2.Hot2AESTool.GetHXFileName("Sprites"));
-            // 加载目标的热更的启动包
-            UIManager.Instance.ClearUIBase();
-            SceneManager.LoadScene("Level");
-        }
-      
 
         public void BackHomeScene()
         {
@@ -82,7 +61,7 @@ namespace ThreePeakGame
             {
                 //TrackEventSenderTemplate.SendStageEndEvent(SaveManager.levelData.CurrentLevel);
                 SceneManager.LoadScene("Home");
-                LoaderHome();
+                //LoaderHome();
             }));
             sequence.AppendInterval(0.1f);
             sequence.Append(mat.DOFloat(0, "_Float0", 0.75f).From(8f).SetEase(Ease.OutSine));
