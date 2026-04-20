@@ -28,6 +28,7 @@ public class ElephantItem : AnimalBase
             // 边界检查
             if (checkGrid.x < 0 || checkGrid.x >= rows || checkGrid.y < 0 || checkGrid.y >= cols)
                 continue;
+           
 
             int occupantId = Map.Instance.GetOccupantIdAtCell(checkGrid);
             if (occupantId != -1 && occupantId != mapItem.id)
@@ -52,7 +53,9 @@ public class ElephantItem : AnimalBase
                             case 0: vector = new Vector2Int(checkGrid.x, checkGrid.y-1); break;
                             case 1: vector = new Vector2Int(checkGrid.x + 2, checkGrid.y); break;
                             case 2: vector = new Vector2Int(checkGrid.x + 2, checkGrid.y + 2); break;
-                            default: vector = new Vector2Int(checkGrid.x - 1, checkGrid.y + 1); break;
+                            default: 
+                                int xoffest = checkGrid.x - animal.MapItem.gridPos.x;
+                                vector = new Vector2Int(checkGrid.x - xoffest, checkGrid.y + 1); break;
                         }
 
                         Vector2Int obstacleGrid = new Vector2Int(vector.x, vector.y);
@@ -61,6 +64,10 @@ public class ElephantItem : AnimalBase
                         index++;
                     }
                 }
+            }
+            else
+            {
+                index++;
             }
         }
 
