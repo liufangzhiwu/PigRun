@@ -1,5 +1,6 @@
 // ========== 闲置状态 ==========
 
+using System.Collections.Generic;
 using UnityEngine;
 
 public class IdleState : AnimalBase.IAnimalState
@@ -29,24 +30,60 @@ public class IdleState : AnimalBase.IAnimalState
 
     public void HandleClick()
     {
-        bool hasObstacle = animal.CalculateTargetPosition(out Vector3 targetPos);
-        animal.runParticleSystem.Play();
-        if (hasObstacle)
+        if (animal.MapItem.animalType == (int)AnimalType.Elephant)
         {
-            if (targetPos != Vector3.zero)
+            HandleElephantClick();
+        }
+        else
+        {
+            bool hasObstacle = animal.CalculateTargetPosition(out Vector3 targetPos);
+            animal.runParticleSystem.Play();
+            if (hasObstacle)
             {
-                animal.ChangeState(new MovingState(animal, targetPos, false));
+                if (targetPos != Vector3.zero)
+                {
+                    animal.ChangeState(new MovingState(animal, targetPos, false));
+                }
+                else
+                {
+                    animal.HitSelf();
+                    animal.BehitItem?.BeHit();
+                    animal.runParticleSystem.Stop();
+                }
             }
             else
             {
+                animal.ChangeState(new MovingState(animal, Vector3.zero, true));
+            }
+        }
+    }
+    
+    public void HandleElephantClick()
+    {
+        animal.runParticleSystem.Play();
+        bool hasObstacle = animal.GetHitTargets(out List<AnimalBase> hitAnimals, out List<Vector3> targetPositions);
+        
+        // 使用多目标检测接口（支持大象）
+        if (hasObstacle)
+        {
+            if (targetPositions[0] != Vector3.zero)
+            {
+                animal.ChangeState(new MovingState(animal, targetPositions[0], false));
+            }
+            else
+            {
+                // 紧邻障碍，直接撞击
                 animal.HitSelf();
-                animal.BehitItem?.BeHit();
-                animal.BehitItem02?.BeHit();
+                foreach (var hitAnimal in hitAnimals)
+                {
+                    hitAnimal.BeHit();
+                }
                 animal.runParticleSystem.Stop();
             }
         }
         else
         {
+            // 无撞击目标，直线移动到边界
             animal.ChangeState(new MovingState(animal, Vector3.zero, true));
         }
     }

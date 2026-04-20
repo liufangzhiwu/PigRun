@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
@@ -12,8 +13,7 @@ public abstract class AnimalBase : MonoBehaviour
     [SerializeField] public float idleFidgetDelay = 30;   // 闲置多少秒后触发小动作
 
     protected MapItem mapItem;
-    protected AnimalBase behitItem;          // 将要撞击的物体
-    protected AnimalBase behitItem02;          // 将要撞击的物体2
+    protected AnimalBase behitItem;          // 将要撞击的物体（单目标）
     protected IAnimalState currentState;
     protected Vector2Int startGrid;
 
@@ -32,7 +32,6 @@ public abstract class AnimalBase : MonoBehaviour
     public MapItem MapItem => mapItem;
     public float Speed => speed;
     public AnimalBase BehitItem => behitItem;
-    public AnimalBase BehitItem02 => behitItem02;
     public IAnimalState CurrentState => currentState;
 
     protected virtual void Start()
@@ -141,14 +140,13 @@ public abstract class AnimalBase : MonoBehaviour
     }
 
     /// <summary>
-    /// 计算移动目标位置（用于点击）
+    /// 计算移动目标位置（单目标，用于点击移动）
     /// </summary>
     public virtual bool CalculateTargetPosition(out Vector3 target)
     {
         target = Vector3.zero;
         Vector2Int checkGrid = GetForwardOffset(out Vector2Int currentGrid, out Vector2Int forwardOffset);
 
-        // 缓存 Map 实例和尺寸，减少属性访问
         var map = Map.Instance;
         int rows = map.rows;
         int cols = map.cols;
@@ -189,6 +187,29 @@ public abstract class AnimalBase : MonoBehaviour
             }
             checkGrid += forwardOffset;
         }
+    }
+
+    /// <summary>
+    /// 获取撞击目标列表（支持多目标，如大象）。默认实现为单目标。
+    /// </summary>
+    /// <param name="hitAnimals">被撞击的动物列表</param>
+    /// <param name="targetPositions">每个动物对应的目标世界坐标列表</param>
+    /// <returns>是否至少有一个有效目标</returns>
+    public virtual bool GetHitTargets(out List<AnimalBase> hitAnimals, out List<Vector3> targetPositions)
+    {
+        hitAnimals = new List<AnimalBase>();
+        targetPositions = new List<Vector3>();
+
+        if (CalculateTargetPosition(out Vector3 target))
+        {
+            if (behitItem != null)
+            {
+                hitAnimals.Add(behitItem);
+                targetPositions.Add(target);
+                return true;
+            }
+        }
+        return false;
     }
 
     protected Vector2Int GetForwardOffset(out Vector2Int currentGrid, out Vector2Int forwardOffset)

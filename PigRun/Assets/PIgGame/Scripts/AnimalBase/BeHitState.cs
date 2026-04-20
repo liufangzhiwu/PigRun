@@ -66,7 +66,6 @@ public class BeHitState : AnimalBase.IAnimalState
             {
                 animal.HitSelf();
                 animal.BehitItem?.BeHit();
-                animal.BehitItem02?.BeHit();
             }
         }
         else

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6728409668075640222}
   - component: {fileID: -2356354976258558053}
   - component: {fileID: 5838655706163292422}
-  - component: {fileID: 8939642119794021110}
+  - component: {fileID: 1852855115261483876}
   m_Layer: 0
   m_Name: ElephantPrefab
   m_TagString: Untagged
@@ -106,7 +106,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.6431321, y: 0.7121367, z: 1.273316}
   m_Center: {x: 0.02166146, y: 0.35606834, z: 0.13901867}
---- !u!114 &8939642119794021110
+--- !u!114 &1852855115261483876
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -115,7 +115,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6647560384166464273}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 389a36c0d6f54574db7a454bef0ca14c, type: 3}
+  m_Script: {fileID: 11500000, guid: 107d447d2305cf84ca233737c89afd1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 6143991899558175025}
@@ -124,6 +124,7 @@ MonoBehaviour:
   idleFidgetDelay: 30
   currentRunway: {fileID: 0}
   currentSegmentIndex: 0
+  frontOffsets: []
 --- !u!1001 &2352096440230507600
 PrefabInstance:
   m_ObjectHideFlags: 0
