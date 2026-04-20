@@ -26,6 +26,7 @@ public class BombSheepItem : AnimalBase
     public override void BeHit()
     {
         hitCount--;
+        CheckShowBombTip();
         UpdateCountDisplay();
         if (hitCount <= 0)
         {
@@ -38,6 +39,8 @@ public class BombSheepItem : AnimalBase
     public override void HitSelf()
     {
         hitCount--;
+
+        CheckShowBombTip();
         UpdateCountDisplay();
         if (hitCount <= 0)
         {
@@ -45,6 +48,16 @@ public class BombSheepItem : AnimalBase
             return;
         }
         base.HitSelf();
+    }
+
+    private void CheckShowBombTip()
+    {
+        if (Map.Instance.firshHitBomb)
+        {
+            //countText.color = Color.yellow;
+            UIManager.Instance.ShowPanel(PanelType.TipAnimalPanel);
+            Map.Instance.firshHitBomb = false;
+        }
     }
     
     
@@ -60,7 +73,6 @@ public class BombSheepItem : AnimalBase
             if (hitCount == 2)
             {
                 //countText.color = Color.yellow;
-                //UIManager.Instance.ShowPanel(PanelType.TipAnimalPanel);
             }
             //else
                 //countText.color = Color.red;

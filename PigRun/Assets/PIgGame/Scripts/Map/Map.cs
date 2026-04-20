@@ -41,6 +41,7 @@ public class Map : MonoBehaviour
     public bool showOccupancyTable = true;
 
     public bool LevelFinish = false;          // 是否已完成关卡
+    public bool firshHitBomb = true;          // 是否是首次撞击炸弹
     public MedicineCowItem medicineCowItem;   // 药牛引用（用于关联）
     public SickDonkeyItem sickDonkeyItem;     // 病驴引用（用于关联）
 
