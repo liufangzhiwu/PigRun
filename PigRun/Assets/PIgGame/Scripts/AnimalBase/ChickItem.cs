@@ -187,7 +187,7 @@ public class ChickItem : AnimalBase
                 // 找到可行方向
                 currentPath = path;
                 escapeDirection = dir;
-                ShowPath();
+                //ShowPath();
                 Debug.Log($"小鸡找到直线路径，方向 {dir}，步数 {path.Count}");
                 return true;
             }
