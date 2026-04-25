@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f29ae30e1ddab2849ba570d2e7c5a671
+guid: 6a7be168a906a854b938beba170f83c3
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -108,9 +108,9 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Android
-    maxTextureSize: 2048
+    maxTextureSize: 1024
     resizeAlgorithm: 0
-    textureFormat: 50
+    textureFormat: 49
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
@@ -136,5 +136,5 @@ TextureImporter:
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
-  assetBundleName: 
+  assetBundleName: ui_map
   assetBundleVariant: 
