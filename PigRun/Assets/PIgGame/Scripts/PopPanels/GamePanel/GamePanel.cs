@@ -6,6 +6,9 @@ using UnityEngine.UI;
 public class GamePanel : UIBase
 {
     [SerializeField] private Text LevelText;
+    [SerializeField] private Text removeText;
+    [SerializeField] private Text shuffleText;
+    [SerializeField] private Text reverseText;
     [SerializeField] private Button removeButton;
     [SerializeField] private Button shuffleButton;
     [SerializeField] private Button reverseButton;
@@ -27,6 +30,9 @@ public class GamePanel : UIBase
     private void InitUI()
     {
         LevelText.text = $"第{GameDataManager.Instance.UserData.LevelIndex}关";
+        removeText.text = GameDataManager.Instance.UserData.GetToolCount(ToolType.Remove).ToString();
+        shuffleText.text =  GameDataManager.Instance.UserData.GetToolCount(ToolType.Shuffle).ToString();
+        reverseText.text =  GameDataManager.Instance.UserData.GetToolCount(ToolType.Reverse).ToString();
     }
     
     void Start()
